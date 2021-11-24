@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('manager.navbar')
 
 @section('content') 
     <?php $prospect = getProspectById($id); ?>
@@ -30,7 +30,7 @@
                 </ul>
             </div>
         @endif
-        <form method="post" action="{{ route('tracking.store') }}">
+        <form method="post" action="{{ route('manager.tracking.store') }}">
             @csrf    
             <input type="hidden" name="id" value="{{ $id }}">
             <div class="row">
@@ -71,7 +71,7 @@
                 <button type="submit" class="btn btn-warning float-end">Archive</button>
             </div>
         </form>
-        <a href="{{ route('prospect.show', $prospect->id) }}" class="btn btn-danger">Return</a>
+        <a href="{{ route('manager.prospect.show', $prospect->id) }}" class="btn btn-danger">Return</a>
     </div>
 
     <script>

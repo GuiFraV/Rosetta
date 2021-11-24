@@ -8,5 +8,5 @@ use Illuminate\Database\Eloquent\Model;
 class Prospect extends Model
 {
     use HasFactory;
-    protected $dates = ['deadline'];
+    protected $dates = ['deadline', 'unavailable_until'];
 }

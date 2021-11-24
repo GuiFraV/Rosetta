@@ -42,6 +42,8 @@ class ProspectController extends Controller
                 ->addIndexColumn()
                 ->editColumn('name', function($row)
                 {
+                    if(isset($row->unavailable_until) && $row->unavailable_until > date("Y-m-d H:i:s"))
+                        return "<div class='fw-bold text-warning'> ". $row->name ." </div>";
                     switch ($row->state) {
                         case "2":
                         case "3":
@@ -59,6 +61,8 @@ class ProspectController extends Controller
                 })
                 ->editColumn('state', function($row)
                 {
+                    if(isset($row->unavailable_until) && $row->unavailable_until > date("Y-m-d H:i:s"))
+                        return "On Stand-By";
                     return getStateToHuman($row->state);
                 })
                 ->editColumn('created_at', function($row)
@@ -612,6 +616,7 @@ class ProspectController extends Controller
             'name' => 'required|max:255',
             'country' => 'required|max:255',
             'email' => 'email:rfc|required|max:255',
+            'callingCodeForm' => 'required|max:8',
             'phone' => 'required|max:255',
             'type' => 'required|max:255',
         ]);
@@ -619,7 +624,7 @@ class ProspectController extends Controller
         $prospect->name = $request->name;
         $prospect->country = $request->country;
         $prospect->email = $request->email;
-        $prospect->phone = $request->phone;
+        $prospect->phone = $request->callingCodeForm.$request->phone;
         $prospect->type = $request->type;
         if ($request->actor == "No") {
             $prospect->actor = null;
@@ -672,13 +677,14 @@ class ProspectController extends Controller
             'name' => 'required|max:255',
             'country' => 'required|max:255',
             'email' => 'email:rfc|required|max:255',
-            'phone' => 'required|max:255',
+            'callingCodeForm' => 'required|max:8',
+            'phone' => 'required|max:255',            
             'type' => 'required|max:255',
         ]);
         $prospect->name = $request->name;
         $prospect->country = $request->country;
         $prospect->email = $request->email;
-        $prospect->phone = $request->phone;
+        $prospect->phone = $request->callingCodeForm.$request->phone;
         $prospect->type = $request->type;
         $prospect->save();
         return back()->with('message', "The prospect has been updated!");        
@@ -721,7 +727,7 @@ class ProspectController extends Controller
             return app()->call('App\Http\Controllers\ProspectController@show', ['prospect' => $prospect]);
         $prospect->actor = Manager::with('user')->where("user_id","=",Auth::user()->id)->get()[0]["id"];
         $prospect->state = 2;
-        $prospect->deadline = date("Y-m-d H:i:s", mktime(0, 0, 0, date("m"), date("d")+14, date("Y")));
+        $prospect->deadline = date("Y-m-d H:i:s", mktime(0, 0, 0, date("m")+3, date("d"), date("Y")));
         $prospect->save();
         
         // Call to the function show of the prospect controller to return to the prospect details

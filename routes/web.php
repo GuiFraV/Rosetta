@@ -93,7 +93,7 @@ Route::group(['as'=>'manager.','prefix' => 'manager','middleware'=>['auth','mana
 
     // Redo this route because the solution is weak
     Route::get('result/{id}', function ($id) {
-        return view('prospects/trackings/create', ['id' => $id]);
+        return view('manager/prospects/trackings/create', ['id' => $id]);
     })->name('result');
 
     // Tracking routes
