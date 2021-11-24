@@ -16,9 +16,9 @@ class Trajet extends Migration
         Schema::create('trajets', function (Blueprint $table) {
             $table->id();
             $table->date("date_depart");
-            $table->integer('zone_id')->unsigned();
+            $table->bigInteger('zone_id')->unsigned();
             $table->foreign('zone_id')->references('id')->on('zones');
-            $table->integer('manager_id')->unsigned();
+            $table->bigInteger('manager_id')->unsigned();
             $table->foreign('manager_id')->references('id')->on('managers');
             $table->string("from_others");
             $table->string("to_others");

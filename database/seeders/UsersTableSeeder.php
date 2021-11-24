@@ -15,6 +15,7 @@ class UsersTableSeeder extends Seeder
      */
     public function run()
     {
+        
         DB::table('users')->insert([
             'role_id' => '1',
             'active' => '0',
@@ -57,5 +58,6 @@ class UsersTableSeeder extends Seeder
             'type' => 'TM',
             'signature' => 'aaaaa2',
         ]);
+        
     }
 }

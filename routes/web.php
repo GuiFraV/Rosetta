@@ -80,7 +80,7 @@ Route::group(['as'=>'manager.','prefix' => 'manager','middleware'=>['auth','mana
     Route::get('groups/showPartner/{group_id}', [RelationshipController::class, 'showPartner'])->name('groups.showPartner');
     Route::post('groups/savePartnerToGroup', [RelationshipController::class, 'savePartnerToGroup'])->name('groups.savePartnerToGroup');
     Route::get('groups/deletePartnerFromGroup/{group_id}/{partner_id}', [RelationshipController::class, 'deletePartnerFromGroup'])->name('groups.deletePartnerFromGroup');
-    //prospet
+    // Prospects
     Route::put('prospect/book/{id}', 'App\Http\Controllers\ProspectController@book')->name('prospect.book');
     Route::resource('prospect', ProspectController::class);
     Route::get('prospects', [ProspectController::class, 'index']);

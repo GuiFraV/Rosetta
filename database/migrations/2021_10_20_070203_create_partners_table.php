@@ -15,7 +15,7 @@ class CreatePartnersTable extends Migration
     {
         Schema::create('partners', function (Blueprint $table) {
             $table->id();
-            $table->integer('manager_id')->unsigned();
+            $table->bigInteger('manager_id')->unsigned();
             $table->string('name');
             $table->string('company');
             $table->string('origin');

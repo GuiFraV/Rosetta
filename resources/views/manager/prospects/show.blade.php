@@ -1,6 +1,11 @@
 @extends('manager.navbar')
 
 @section('content')
+    <style>
+        .lbl-color {
+            color: #1f3d7a;
+        }
+    </style>
     <div class="container col-6">
         <div class="float-end">
             <div style="display: flex; font-size: 2rem;">
@@ -36,31 +41,31 @@
         <hr style="border-top-width: 2px;border-top-style: solid; color: black; opacity: 75%">
         <div class="row">
             <div class="col">
-                <h5>Name</h5>
+                <h5 class="lbl-color">Name</h5>
                 <p>{{ $prospect->name }}</p>
             </div>
             <div class="col">
-                <h5>Origin</h5>
+                <h5 class="lbl-color">Origin</h5>
                 <p>{{ countryCodeToEmojiName($prospect->country) }}</p>
             </div>
         </div>
         <div class="row">
             <div class="col">
-                <h5>Email</h5>
+                <h5 class="lbl-color">Email</h5>
                 <p>{{ $prospect->email }}</p>
             </div>
             <div class="col">
-                <h5>Phone</h5>
+                <h5 class="lbl-color">Phone</h5>
                 <p>{{ $prospect->phone }}</p>
             </div>
         </div>
         <div class="row">
             <div class="col">
-                <h5>Type</h5>
+                <h5 class="lbl-color">Type</h5>
                 <p>{{ $prospect->type }}</p>
             </div>
             <div class="col">    
-                <h5>Current State</h5>
+                <h5 class="lbl-color">Current State</h5>
                 <p>{{ (isset($prospect->unavailable_until) && $prospect->unavailable_until > date("Y-m-d H:i:s")) ? "On stand-by" : getStateToHuman($prospect->state) }}</p>
             </div>
         </div>
@@ -87,12 +92,12 @@
         @endif
         <div class="row">
             <div class="col">
-                <h5>Created</h5>
+                <h5 class="lbl-color">Created</h5>
                 <p>{{ $prospect->created_at->format('Y-m-d h:m') }}</p>
             </div>
             @if ($prospect->updated_at != $prospect->created_at)
                 <div class="col">    
-                    <h5>Last update</h5>
+                    <h5 class="lbl-color">Last update</h5>
                     <p>{{ $prospect->updated_at->format('Y-m-d h:m') }}</p>        
                 </div>
             @endif

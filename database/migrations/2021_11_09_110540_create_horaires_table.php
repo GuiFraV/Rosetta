@@ -17,7 +17,7 @@ class CreateHorairesTable extends Migration
             $table->id();
             $table->string('horaire_text');
             $table->string('manager_type');
-            $table->integer('agency_id')->unsigned();
+            $table->bigInteger('agency_id')->unsigned();
             $table->foreign('agency_id')->references('id')->on('agencies');
             $table->timestamps();
         });
