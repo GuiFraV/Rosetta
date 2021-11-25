@@ -626,15 +626,10 @@ class ProspectController extends Controller
         $prospect->email = $request->email;
         $prospect->phone = $request->callingCodeForm.$request->phone;
         $prospect->type = $request->type;
-        if ($request->actor == "No") {
-            $prospect->actor = null;
-            $prospect->state = 1;
-            $prospect->deadline = null;
-        } else {
-            $prospect->actor = $request->actor;
-            $prospect->state = 2;
-            $prospect->deadline = date("Y-m-d H:i:s", mktime(0, 0, 0, date("m"), date("d")+14, date("Y")));
-        }
+        $prospect->actor = Manager::with('user')->where("user_id","=",Auth::user()->id)->get()[0]["id"];
+        $prospect->state = 2;
+        // Automatically booked for 3 months
+        $prospect->deadline = date("Y-m-d H:i:s", mktime(0, 0, 0, date("m")+3, date("d"), date("Y")));
         $prospect->creator = Manager::with('user')->where("user_id","=",Auth::user()->id)->get()[0]["id"];
         $prospect->save();
         return back()->with('message', "The prospect has been created!");

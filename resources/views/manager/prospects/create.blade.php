@@ -35,60 +35,8 @@
                 </div>
                 <div class="col">
                     <label for="country" class="form-label">Country</label>
-                    <select class="form-select" aria-label="Select" name="country">
-                        <option disabled selected style="display:none">Select a country</option>
-                        <option value="AX">🇦🇽 Åland Islands</option>
-                        <option value="AL">🇦🇱 Albania</option>
-                        <option value="AD">🇦🇩 Andorra</option>
-                        <option value="AT">🇦🇹 Austria</option>
-                        <option value="BY">🇧🇾 Belarus</option>
-                        <option value="BE">🇧🇪 Belgium</option>
-                        <option value="BA">🇧🇦 Bosnia and Herzegovina</option>
-                        <option value="BG">🇧🇬 Bulgaria</option>
-                        <option value="HR">🇭🇷 Croatia</option>
-                        <option value="CY">🇨🇾 Cyprus</option>
-                        <option value="CZ">🇨🇿 Czech Republic</option>
-                        <option value="DK">🇩🇰 Denmark</option>
-                        <option value="EE">🇪🇪 Estonia</option>
-                        <option value="FO">🇫🇴 Faroe Islands</option>
-                        <option value="FI">🇫🇮 Finland</option>
-                        <option value="FR">🇫🇷 France</option>
-                        <option value="DE">🇩🇪 Germany</option>
-                        <option value="GI">🇬🇮 Gibraltar</option>
-                        <option value="GR">🇬🇷 Greece</option>
-                        <option value="GG">🇬🇬 Guernsey</option>
-                        <option value="VA">🇻🇦 Holy See (Vatican City State)</option>
-                        <option value="HU">🇭🇺 Hungary</option>
-                        <option value="IS">🇮🇸 Iceland</option>
-                        <option value="IE">🇮🇪 Ireland</option>
-                        <option value="IM">🇮🇲 Isle of Man</option>
-                        <option value="IT">🇮🇹 Italy</option>
-                        <option value="JE">🇯🇪 Jersey</option>
-                        <option value="LV">🇱🇻 Latvia</option>
-                        <option value="LI">🇱🇮 Liechtenstein</option>
-                        <option value="LT">🇱🇹 Lithuania</option>
-                        <option value="LU">🇱🇺 Luxembourg</option>
-                        <option value="MK">🇲🇰 Macedonia, the former Yugoslav Republic of</option>
-                        <option value="MT">🇲🇹 Malta</option>
-                        <option value="MD">🇲🇩 Moldova, Republic of</option>
-                        <option value="MC">🇲🇨 Monaco</option>
-                        <option value="ME">🇲🇪 Montenegro</option>
-                        <option value="NL">🇳🇱 Netherlands</option>
-                        <option value="NO">🇳🇴 Norway</option>
-                        <option value="PL">🇵🇱 Poland</option>
-                        <option value="PT">🇵🇹 Portugal</option>
-                        <option value="RO">🇷🇴 Romania</option>
-                        <option value="RU">🇷🇺 Russian Federation</option>
-                        <option value="RS">🇷🇸 Serbia</option>
-                        <option value="SK">🇸🇰 Slovakia</option>
-                        <option value="SI">🇸🇮 Slovenia</option>
-                        <option value="ES">🇪🇸 Spain</option>
-                        <option value="SJ">🇸🇯 Svalbard and Jan Mayen</option>
-                        <option value="SE">🇸🇪 Sweden</option>
-                        <option value="CH">🇨🇭 Switzerland</option>
-                        <option value="UA">🇺🇦 Ukraine</option>
-                        <option value="GB">🇬🇧 United Kingdom</option>
-                    </select>
+                    <input type="text" class="form-control" id="countryAuto">
+                    <input type="hidden" name="country">
                 </div>
             </div><br>
         
@@ -125,20 +73,6 @@
                 </div>
             </div><br>
 
-            <div class="row">
-                <div class="col">
-                    <label for="actor" class="form-label">Is a manager already prospecting this company?</label>            
-                    <div class="w-50">
-                        <select name="actor" class="form-select" aria-label="Select">
-                            <option value="No" selected>No</option>
-                            @foreach(App\Models\Manager::all() as $manager)
-                                <option value="{{ $manager->id }}">{{ $manager->first_name . " " . $manager->last_name . " (" . $manager->type . ")" }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                </div>
-            </div><br>
-
             <div class="float-end">
                 <a href="{{ route('manager.prospect.index') }}" class="btn btn-danger">Return</a>
                 <button type="submit" class="btn btn-primary">Add prospect</button>
@@ -148,18 +82,98 @@
 
     <script>
         
-        $(document).ready(function() {
-            if($('[name="country"]').val() != null) {
+        // Test if onload the country value is already set, and if so set the calling code
+        $( function() {
+            if($('[name="country"]').val() != "") {
                 let code = '+'+countryCodeToCallingCode($('[name="country"]').val());
                 $('#callingCode').html(code);    
                 $('[name="callingCodeForm"]').val(code);
             }
         });
 
-        $('[name="country"]').on('change', function() {
-            let code = '+'+countryCodeToCallingCode(this.value);
-            $('#callingCode').html(code);
-            $('[name="callingCodeForm"]').val(code);
+        $(document).ready(function() {
+            // Static definition of the autocomplete values, to change for a dynamic one, linked to the database
+            var autoCountriesArr = [
+                {label:"🇦🇽 Åland Islands", value:"AX"},
+                {label:"🇦🇱 Albania", value:"AL"},
+                {label:"🇦🇩 Andorra", value:"AD"},
+                {label:"🇦🇹 Austria", value:"AT"},
+                {label:"🇧🇾 Belarus", value:"BY"},
+                {label:"🇧🇪 Belgium", value:"BE"},
+                {label:"🇧🇦 Bosnia and Herzegovina", value:"BA"},
+                {label:"🇧🇬 Bulgaria", value:"BG"},
+                {label:"🇭🇷 Croatia", value:"HR"},
+                {label:"🇨🇾 Cyprus", value:"CY"},
+                {label:"🇨🇿 Czech Republic", value:"CZ"},
+                {label:"🇩🇰 Denmark", value:"DK"},
+                {label:"🇪🇪 Estonia", value:"EE"},
+                {label:"🇫🇴 Faroe Islands", value:"FO"},
+                {label:"🇫🇮 Finland", value:"FI"},
+                {label:"🇫🇷 France", value:"FR"},
+                {label:"🇩🇪 Germany", value:"DE"},
+                {label:"🇬🇮 Gibraltar", value:"GI"},
+                {label:"🇬🇷 Greece", value:"GR"},
+                {label:"🇬🇬 Guernsey", value:"GG"},
+                {label:"🇻🇦 Holy See (Vatican City State)", value:"VA"},
+                {label:"🇭🇺 Hungary", value:"HU"},
+                {label:"🇮🇸 Iceland", value:"IS"},
+                {label:"🇮🇪 Ireland", value:"IE"},
+                {label:"🇮🇲 Isle of Man", value:"IM"},
+                {label:"🇮🇹 Italy", value:"IT"},
+                {label:"🇯🇪 Jersey", value:"JE"},
+                {label:"🇱🇻 Latvia", value:"LV"},
+                {label:"🇱🇮 Liechtenstein", value:"LI"},
+                {label:"🇱🇹 Lithuania", value:"LT"},
+                {label:"🇱🇺 Luxembourg", value:"LU"},
+                {label:"🇲🇰 Macedonia, the former Yugoslav Republic of", value:"MK"},
+                {label:"🇲🇹 Malta", value:"MT"},
+                {label:"🇲🇩 Moldova, Republic of", value:"MD"},
+                {label:"🇲🇨 Monaco", value:"MC"},
+                {label:"🇲🇪 Montenegro", value:"ME"},
+                {label:"🇳🇱 Netherlands", value:"NL"},
+                {label:"🇳🇴 Norway", value:"NO"},
+                {label:"🇵🇱 Poland", value:"PL"},
+                {label:"🇵🇹 Portugal", value:"PT"},
+                {label:"🇷🇴 Romania", value:"RO"},
+                {label:"🇷🇺 Russian Federation", value:"RU"},
+                {label:"🇷🇸 Serbia", value:"RS"},
+                {label:"🇸🇰 Slovakia", value:"SK"},
+                {label:"🇸🇮 Slovenia", value:"SI"},
+                {label:"🇪🇸 Spain", value:"ES"},
+                {label:"🇸🇯 Svalbard and Jan Mayen", value:"SJ"},
+                {label:"🇸🇪 Sweden", value:"SE"},
+                {label:"🇨🇭 Switzerland", value:"CH"},
+                {label:"🇺🇦 Ukraine", value:"UA"},
+                {label:"🇬🇧 United Kingdom", value:"GB"}
+            ];
+
+            // Autocomplete of the country input
+            $('#countryAuto').autocomplete({        
+                source: autoCountriesArr,
+                select: function( event, ui ) {
+                    // Set the value of the label input and the hidden input value
+                    $("#countryAuto").val(ui.item.label);
+                    $('[name="country"]').val(ui.item.value);
+                    // Use the newly acquired value to search for the calling code
+                    let code = '+'+countryCodeToCallingCode(ui.item.value);
+                    $('#callingCode').html(code);
+                    $('[name="callingCodeForm"]').val(code);
+                    return false;
+                }
+            });
+
+            /*
+            $("#countryAuto").on('change', function() {
+                //let code = '+'+countryCodeToCallingCode(this.value);
+                if($("#countryAuto").val() == "") {
+                    $('#callingCode').html('');
+                    $('[name="country"]').val('');
+                    $("#countryAuto").val('')
+                    //$('[name="callingCodeForm"]').val('');
+                }
+            });
+            */
+
         });
 
         function countryCodeToCallingCode(countryCode) {
