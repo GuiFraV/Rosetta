@@ -6,16 +6,7 @@
     @endif
     <div class="container col-6">
         <h2>Edit an existing offer</h2><br>
-        @if (session()->has('message'))
-            <div class="alert alert-success d-flex align-items-center" role="alert">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-check2" viewBox="0 0 16 16">
-                    <path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z"/>
-                </svg>
-                <div>
-                    {{ session('message') }} 
-                </div>
-            </div>
-        @endif
+        
         @if ($errors->any())
             <div class="alert alert-danger d-flex align-items-center" role="alert">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-exclamation-triangle-fill" viewBox="0 0 16 16">
@@ -30,7 +21,7 @@
             </div>
         @endif
 
-        <form method="post" action="{{ route('offer.update', $offer->id) }}">
+        <form method="post" action="{{ route('manager.offer.update', $offer->id) }}">
             @csrf
             @method('put')
             <div class="row">
@@ -54,7 +45,7 @@
                 <textarea class="form-control" placeholder="Feedback on the offer" name="comment" style="height: 200px;">{{$offer->comment}}</textarea>
                 <label for="comment">What can you say about the offer?</label>
             </div><br>
-            <a href="{{ route('prospect.show', $offer->id_prospect) }}" class="btn btn-danger">Return</a>
+            <a href="{{ route('manager.prospect.show', $offer->id_prospect) }}" class="btn btn-danger">Return</a>
             <button type="submit" class="btn btn-primary float-end">Update</button>
         </form>
     </div>

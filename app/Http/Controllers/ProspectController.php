@@ -19,7 +19,6 @@ class ProspectController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function index() {
-        
         return view('manager.prospects.index');
     }
     
@@ -643,7 +642,10 @@ class ProspectController extends Controller
         $prospect->deadline = date("Y-m-d H:i:s", mktime(0, 0, 0, date("m")+3, date("d"), date("Y")));
         $prospect->creator = Manager::with('user')->where("user_id","=",Auth::user()->id)->get()[0]["id"];
         $prospect->save();
-        return back()->with('message', "The prospect has been created!");
+        
+        $trackings = collect();
+        $offers = collect();
+        return view('manager.prospects.show', compact(['prospect', 'trackings', 'offers']))->with('created', "The prospect has been created!");
     }
 
     /**
@@ -693,7 +695,12 @@ class ProspectController extends Controller
         $prospect->phone = $request->callingCodeForm.$request->phone;
         $prospect->type = $request->type;
         $prospect->save();
-        return back()->with('message', "The prospect has been updated!");        
+        
+        $trackings = Tracking::all()->where('id_prospect', $prospect->id)->sortByDesc('created_at');
+        $offers = Offer::all()->where('id_prospect', $prospect->id)->sortByDesc('created_at');
+        return view('manager.prospects.show', compact(['prospect', 'trackings', 'offers']))->with('created', "The prospect has been updated!");
+
+        //return back()->with('message', "The prospect has been updated!");  
     }
 
     /**
@@ -705,7 +712,7 @@ class ProspectController extends Controller
     public function destroy(Prospect $prospect)
     {
         $prospect->delete();
-        return redirect('manager.prospect');
+        return view('manager.prospects.index')->with('deleted', 'This prospect has been deleted.');            
     }
 
     /**
@@ -737,9 +744,15 @@ class ProspectController extends Controller
         $prospect->save();
         
         // Call to the function show of the prospect controller to return to the prospect details
+        /*
         return app()->call('App\Http\Controllers\ProspectController@show',  [
             "prospect" => $prospect
         ]);
+        */
+        $trackings = Tracking::all()->where('id_prospect', $prospect->id)->sortByDesc('created_at');
+        $offers = Offer::all()->where('id_prospect', $prospect->id)->sortByDesc('created_at');
+        return view('manager.prospects.show', compact(['prospect', 'trackings', 'offers']))->with('booked', "The prospect has been booked!");
+
     }
     
 }

@@ -97,15 +97,19 @@ Route::group(['as'=>'manager.','prefix' => 'manager','middleware'=>['auth','mana
     })->name('result');
 
     // Tracking routes
-    Route::resource('prospect/tracking', TrackingController::class);
+    Route::resource('prospect/tracking', TrackingController::class, [
+        'only' => ['create', 'store', 'edit', 'update'],
+        'except' => ['index', 'show', 'destroy']
+    ]);
 
     // Offer routes
-    Route::resource('prospect/offer', OfferController::class);
+    Route::resource('prospect/offer', OfferController::class, [
+        'only' => ['create', 'store', 'edit', 'update'],
+        'except' => ['index', 'show', 'destroy']
+    ]);
     
-    //Route::view('prospects/faq', 'manager/prospects/faq');
-
+    // Prospect FAQ
     Route::get('prospects/faq',function() {
-        // dd(1);
         return view('manager.prospects.faq');
     });
 

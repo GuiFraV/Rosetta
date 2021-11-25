@@ -37,6 +37,21 @@
                 @endif
             </div>
         </div>
+
+        @if(!empty($created))
+            <script>toastr.success('{{ $created }}');</script>
+        @elseif(!empty($edited))
+            <script>toastr.success('{{ $edited }}');</script>
+        @elseif(!empty($booked))
+            <script>toastr.success('{{ $booked }}');</script>
+        @elseif(!empty($offer_created))
+            <script>toastr.success('{{ $offer_created }}');</script>
+        @elseif(!empty($offer_edited))
+            <script>toastr.success('{{ $offer_edited }}');</script>
+        @elseif(!empty($offer_deleted))
+            <script>toastr.warning('{{ $offer_deleted }}');</script>
+        @endif
+
         <h2>Prospect details @if ($prospect->state === 4 && !isset($prospect->deadline)) <div class="text-success">(Validated)</div> @endif</h2>
         <hr style="border-top-width: 2px;border-top-style: solid; color: black; opacity: 75%">
         <div class="row">
@@ -123,7 +138,7 @@
                                 <td>{{ $tracking->created_at->format('Y-m-d') }}</td>
                                 <td>{{ $tracking->comment }}</td>
                                 @if (Auth::user()->id_manager === $tracking->actor)
-                                    <td><a href="{{ route('tracking.edit', $tracking->id) }}" role="button" class="bi bi-pencil" style="font-size: 1.3rem;"></a></td>
+                                    <td><a href="{{ route('manager.tracking.edit', $tracking->id) }}" role="button" class="bi bi-pencil" style="font-size: 1.3rem;"></a></td>
                                 @else
                                     <td></td> 
                                 @endif
@@ -165,7 +180,7 @@
                                 <td>{{ $offer->comment }}</td>
                                 <td>{{ $offer->created_at->format('Y-m-d') }}</td>
                                 @if (Auth::user()->id_manager === $offer->actor)
-                                    <td><a href="{{ route('offer.edit', $offer->id) }}" role="button" class="bi bi-pencil" style="font-size: 1.3rem;"></a></td>
+                                    <td><a href="{{ route('manager.offer.edit', $offer->id) }}" role="button" class="bi bi-pencil" style="font-size: 1.3rem;"></a></td>
                                 @else
                                     <td></td> 
                                 @endif

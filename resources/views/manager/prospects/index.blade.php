@@ -13,9 +13,16 @@
 
 <div class="container">
     <h2>Prospect list</h2>
-    
     <a href="{{ route('manager.prospect.create') }}" role="button" class="float-end btn btn-primary">Add a prospect</a><br><br>
-    
+
+    @if(!empty($archived))
+        <script>toastr.warning('{{ $archived }}');</script>
+    @elseif(!empty($validated))
+        <script>toastr.success('{{ $validated }}');</script>
+    @elseif(!empty($deleted))
+        <script>toastr.warning('{{ $deleted }}');</script>
+    @endif
+
     <table class="table table-hover yajra-datatable disable-select">
         <thead>
             <tr>

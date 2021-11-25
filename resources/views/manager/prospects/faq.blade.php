@@ -20,7 +20,7 @@
     <p>Vivamus vel euismod lectus. Mauris venenatis ut risus vehicula maximus. Integer eget magna vitae mi fermentum interdum. Donec imperdiet elit a diam sollicitudin eleifend. Interdum et malesuada fames ac ante ipsum primis in faucibus. Fusce at blandit felis. Ut ac gravida nisi. Curabitur consectetur, sem eu faucibus vulputate, tellus tellus dignissim felis, a fringilla nulla sem in dolor.</p>
     <p>Duis purus orci, placerat sed nunc eu, condimentum rhoncus odio. Phasellus at aliquet libero. Fusce dapibus, lectus vel suscipit molestie, orci tellus tempor nunc, a dignissim nibh urna vel sapien. Aenean consectetur libero vitae elit consectetur, at vestibulum magna bibendum. Maecenas venenatis dictum massa. Nunc interdum, nulla quis finibus rhoncus, tellus urna sollicitudin felis, sit amet hendrerit risus justo vel purus. Nunc quis risus convallis, vulputate quam vel, vulputate lacus. Cras vel diam arcu.</p><br>
 
-    <a href="{{ route('manager.prospect.index') }}" class="btn btn-primary">Return to prospect list</a>
+    <a href="{{ route('manager.prospect.index') }}" class="btn btn-primary float-end">Return to prospect list</a>
 </div>
 
 @endsection

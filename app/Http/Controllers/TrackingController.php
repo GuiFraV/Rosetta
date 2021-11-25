@@ -46,7 +46,7 @@ class TrackingController extends Controller
             // Actually set on 6 months, but modify to change the time necessary to wait before new booking
             $prospect->unavailable_until = date("Y-m-d H:i:s", mktime(0, 0, 0, date('n')+6, 1, date('y')));
             $prospect->save();            
-            return back()->with('message', "The archive of this prospect has been done.");            
+            return view('manager.prospects.index')->with('archived', 'The archive of this prospect has been done.');            
         } else if ($request->result === '1') {            
             $data = $request->validate([
                 'id' => 'required',
@@ -61,7 +61,7 @@ class TrackingController extends Controller
             $prospect->state = 4;
             $prospect->loadNumber = $request->loadNumber;
             $prospect->save();
-            return back()->with('message', "The prospect has been validated, good work!");                                      
+            return view('manager.prospects.index')->with('validated', "The prospect has been validated, good work!"); 
         } 
     }
 

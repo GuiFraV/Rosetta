@@ -7,19 +7,10 @@ use Illuminate\Http\Request;
 use App\Models\Offer;
 use App\Models\Manager;
 use App\Models\Prospect;
-use Illuminate\Validation\Rule;
+use App\Models\Tracking;
 
 class OfferController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
-    {
-        //
-    }
 
     /**
      * Show the form for creating a new resource.
@@ -40,7 +31,6 @@ class OfferController extends Controller
      */
     public function store(Request $request)
     {
-        //dd($request);
         $data = $request->validate([
             'id_prospect' => 'required',                  
             'cityFrom' => 'string|required|max:255',
@@ -56,7 +46,11 @@ class OfferController extends Controller
         $offer->offer = $request->offer;
         $offer->comment = $request->comment;
         $offer->save();
-        return back()->with('message', "The offer has been created!");
+
+        $prospect = Prospect::findOrFail($request->id_prospect);
+        $trackings = Tracking::all()->where('id_prospect', $prospect->id)->sortByDesc('created_at');
+        $offers = Offer::all()->where('id_prospect', $prospect->id)->sortByDesc('created_at');
+        return view('manager.prospects.show', compact(['prospect', 'trackings', 'offers']))->with('offer_created', "The prospect's offer has been created!");
     }
 
     /**
@@ -101,7 +95,11 @@ class OfferController extends Controller
         $offer->offer = $request->offer;
         $offer->comment = $request->comment;
         $offer->save();
-        return back()->with('message', "The edit of this prospect offer has been done!");
+
+        $prospect = Prospect::findOrFail($offer->id_prospect);
+        $trackings = Tracking::all()->where('id_prospect', $prospect->id)->sortByDesc('created_at');
+        $offers = Offer::all()->where('id_prospect', $prospect->id)->sortByDesc('created_at');
+        return view('manager.prospects.show', compact(['prospect', 'trackings', 'offers']))->with('offer_edited', "The prospect's offer has been edited!");
     }
 
     /**
