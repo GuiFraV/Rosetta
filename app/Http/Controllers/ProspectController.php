@@ -8,6 +8,7 @@ use App\Models\Prospect;
 use App\Models\Manager;
 use App\Models\Tracking;
 use App\Models\Offer;
+use DB;
 
 class ProspectController extends Controller
 {
@@ -59,6 +60,11 @@ class ProspectController extends Controller
                 {
                     return self::countryCodeToEmojiName($row->country);
                 })
+                ->editColumn('email', function($row)
+                {
+                    $actionBtn = '<a role="button" class="bi bi-clipboard" style="font-size: 1.3rem; white-space: nowrap;" onclick="let ref = getElementById(\'mailCopy\'); ref.value = \''.$row->email.'\'; ref.style.display=\'block\'; ref.select(); document.execCommand(\'copy\'); ref.style.display=\'none\'; ref.value =\'\';"></a>';
+                    return $actionBtn . ' ' . $row->email;
+                })
                 ->editColumn('state', function($row)
                 {
                     if(isset($row->unavailable_until) && $row->unavailable_until > date("Y-m-d H:i:s"))
@@ -77,12 +83,17 @@ class ProspectController extends Controller
                         return $deadline;
                     }
                 })
+                ->addColumn('actor', function($row) {
+                    $managerName = DB::table('managers')->select('first_name', 'last_name')->where('id', $row->actor)->get();
+                    foreach($managerName as $name)
+                        return $name->first_name.' '.$name->last_name;
+                })
                 ->addColumn('action', function($row)
                 {
                     $actionBtn = '<a href="prospect/'.$row->id.'" role="button" class="bi bi-eye" style="font-size: 1.8rem;"></a>';
                     return $actionBtn;
                 })
-                ->rawColumns(['name', 'action'])
+                ->rawColumns(['name', 'email', 'action'])
                 ->make(true);
         }
                 

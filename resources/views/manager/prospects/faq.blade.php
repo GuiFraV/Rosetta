@@ -1,0 +1,26 @@
+@extends('manager.navbar')
+
+@section('content')
+
+<div class="container">
+    <h2>Prospect's frequently asked questions :</h2>
+    
+    <h4>Question 1 : Why?</h4>
+    <p>Vestibulum id iaculis ipsum, nec malesuada lacus. Ut molestie ut turpis a bibendum. Duis hendrerit accumsan lectus, at ornare metus efficitur nec. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Phasellus tempor ligula non risus molestie tristique. Maecenas porta dolor ut magna pharetra tincidunt ac non nibh. Quisque facilisis metus at urna efficitur tincidunt. Pellentesque non aliquet felis. Sed sit amet quam tristique, facilisis erat sed, sagittis arcu. Ut et arcu ante. Donec consectetur quam egestas turpis porttitor, eget accumsan tortor malesuada. Nulla eget faucibus eros. Proin tempor mollis leo, et luctus quam cursus sed. Proin eget mollis mauris, sit amet dictum urna. Aenean augue est, porttitor ac ultricies eget, faucibus a augue.</p>
+    <p>Maecenas sagittis scelerisque lorem, id sodales ex imperdiet ac. Fusce accumsan risus vel diam laoreet pellentesque. Integer egestas, augue tempus lobortis iaculis, nisi lacus laoreet ante, sed feugiat arcu leo vel neque. Donec vestibulum libero at enim rutrum, id porttitor est porta. Donec sollicitudin ipsum velit. In accumsan tincidunt auctor. Fusce massa ex, efficitur sed metus nec, auctor faucibus ante. Fusce tortor libero, auctor in ultricies ac, dignissim non odio. Nulla ornare mi a viverra commodo. Donec at risus magna. Etiam aliquet fermentum elit, quis congue magna vehicula ac. Vivamus lacinia malesuada nisl, id tristique libero mollis eu. In hac habitasse platea dictumst. Nullam lacinia leo et tincidunt volutpat. Etiam imperdiet vulputate scelerisque. Integer commodo tempus risus in dictum.</p>
+    <p>Nullam commodo mattis interdum. Morbi sodales sit amet mauris id gravida. Ut vel gravida urna, non interdum velit. Donec porttitor metus a ex egestas hendrerit. Donec convallis tincidunt libero, vitae viverra lacus ullamcorper facilisis. Aenean laoreet fermentum cursus. Curabitur molestie, erat vel tempus lacinia, leo leo sodales justo, sit amet viverra tortor est vitae ligula. Nullam vehicula ipsum eu egestas fermentum. Sed vehicula metus nunc. Ut at lectus ex.</p><br>
+    
+    <h4>Question 2 : Who?</h4>
+    <p>Nulla lacinia dui tellus, at placerat nulla ultricies eu. Vestibulum vulputate arcu et vulputate laoreet. Pellentesque a velit non est venenatis aliquam nec porttitor lectus. Pellentesque a eros ut est euismod iaculis. Nunc interdum, leo vitae lacinia viverra, neque augue porttitor sem, et mattis ipsum elit sit amet ligula. Donec ultrices malesuada viverra. Donec condimentum aliquet ipsum, eget ullamcorper purus ultrices ut.</p>
+    <p>Nunc sodales quis arcu a condimentum. Aliquam condimentum sodales libero, non varius magna ornare vitae. Fusce odio sem, mattis at libero nec, cursus tincidunt dolor. Quisque vestibulum varius aliquam. Sed sit amet lectus in nunc egestas tempor. Nullam at efficitur nulla. Cras leo risus, tempor at leo non, iaculis luctus augue. Fusce pulvinar pellentesque viverra. Nulla felis tellus, lacinia in vestibulum in, commodo vitae felis.</p>
+    <p>Quisque massa lectus, iaculis ac magna sed, tempor vestibulum est. Integer faucibus nec leo sed convallis. Sed eleifend sem odio, finibus gravida risus pretium vel. Aenean tincidunt diam massa, sed dapibus leo maximus eu. Phasellus mattis nec velit sed posuere. Donec vel lectus rutrum, maximus purus ut, ultrices ligula. Aliquam iaculis rhoncus posuere. Aliquam tristique tristique ipsum vel cursus. Cras semper urna non dolor imperdiet varius. In vitae auctor nibh, id viverra tortor. Donec luctus mi nec mauris congue, non sagittis arcu mollis.</p><br>
+
+    <h4>Question 3 : Where?</h4>
+    <p>Nam tincidunt facilisis risus at tempor. Curabitur in felis et enim condimentum pharetra sed vel nunc. Sed ac accumsan magna. Donec eu congue diam. Donec maximus, metus sit amet pharetra lacinia, massa lacus venenatis ligula, quis molestie erat mauris non mauris. Fusce sed dolor non mi vestibulum gravida ut sit amet diam. Curabitur nec varius lorem. Curabitur eget elit quam. Maecenas et purus elit. Curabitur vitae nibh sodales, aliquet mauris ut, pretium eros.</p>
+    <p>Vivamus vel euismod lectus. Mauris venenatis ut risus vehicula maximus. Integer eget magna vitae mi fermentum interdum. Donec imperdiet elit a diam sollicitudin eleifend. Interdum et malesuada fames ac ante ipsum primis in faucibus. Fusce at blandit felis. Ut ac gravida nisi. Curabitur consectetur, sem eu faucibus vulputate, tellus tellus dignissim felis, a fringilla nulla sem in dolor.</p>
+    <p>Duis purus orci, placerat sed nunc eu, condimentum rhoncus odio. Phasellus at aliquet libero. Fusce dapibus, lectus vel suscipit molestie, orci tellus tempor nunc, a dignissim nibh urna vel sapien. Aenean consectetur libero vitae elit consectetur, at vestibulum magna bibendum. Maecenas venenatis dictum massa. Nunc interdum, nulla quis finibus rhoncus, tellus urna sollicitudin felis, sit amet hendrerit risus justo vel purus. Nunc quis risus convallis, vulputate quam vel, vulputate lacus. Cras vel diam arcu.</p><br>
+
+    <a href="{{ route('manager.prospect.index') }}" class="btn btn-primary">Return to prospect list</a>
+</div>
+
+@endsection

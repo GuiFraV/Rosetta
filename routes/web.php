@@ -102,6 +102,13 @@ Route::group(['as'=>'manager.','prefix' => 'manager','middleware'=>['auth','mana
     // Offer routes
     Route::resource('prospect/offer', OfferController::class);
     
+    //Route::view('prospects/faq', 'manager/prospects/faq');
+
+    Route::get('prospects/faq',function() {
+        // dd(1);
+        return view('manager.prospects.faq');
+    });
+
 
 });
  
