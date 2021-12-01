@@ -546,12 +546,14 @@ if(!function_exists("getProspectById")) {
         return Prospect::findOrFail($id);        
     }
 }
+
 if(!function_exists("getManagerType")) {
-    function getManagerType($idManager) {
-        $manager = Manager::findOrFail($idManager);
-        return $manager->type;   
+    function getManagerType() {
+        $managerType = App\Models\Manager::with('user')->where("user_id","=",Auth::user()->id)->get()[0]["type"];
+        return $managerType;   
     }
 }
+
 if(!function_exists("getStateToHuman")) {
     function getStateToHuman($state_id) {
         $state = State::findOrFail($state_id);
@@ -559,6 +561,12 @@ if(!function_exists("getStateToHuman")) {
     }
 }
 
+if(!function_exists("getManagerId")) {
+    function getManagerId() {
+        $manager_id = App\Models\Manager::with('user')->where("user_id","=",Auth::user()->id)->get()[0]["id"];
+        return $manager_id;   
+    }
+}
 
 if(!function_exists("countryCodeToCallingCode")) {
     function countryCodeToCallingCode($countryCode) {

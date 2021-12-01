@@ -51,7 +51,7 @@
             processing: true,
             serverSide: true,
             ajax: "{{ route('manager.prospects.getProspects') }}",
-            order: [ [6, 'desc'] ],
+            order: [[7, 'desc']],
             columns: [
                 {data: 'name', name: 'name'},
                 {data: 'country', name: 'country'},
@@ -66,7 +66,7 @@
                 {
                     data: 'action', 
                     name: 'action', 
-                    orderable: true, 
+                    orderable: false, 
                     searchable: true
                 },
             ]

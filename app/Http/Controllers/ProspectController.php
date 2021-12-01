@@ -91,7 +91,7 @@ class ProspectController extends Controller
                 {
                     $actionBtn = '<div class="d-flex justify-content-center align-items-center"><a href="prospect/'.$row->id.'" role="button" class="bi bi-eye" style="font-size: 1.8rem;"></a><span>&nbsp;&nbsp;'.Tracking::all()->where('id_prospect', '=', $row->id)->count().'</span></div>';
                     return $actionBtn;
-                })
+                }) 
                 ->rawColumns(['name', 'email', 'action'])
                 ->make(true);
         }  

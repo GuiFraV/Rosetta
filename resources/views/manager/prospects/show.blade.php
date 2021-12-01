@@ -10,23 +10,25 @@
         <div class="float-end">
             <div style="display: flex; font-size: 2rem;">
                 
-                @if (Auth::user()->isAdmin === 1 || (App\Models\Manager::with('user')->where("user_id","=",Auth::user()->id)->get()[0]["type"]) === ($prospect->type == "Client" ? "TM" : "LM") && $prospect->state != 4)
-                    @if (App\Models\Manager::with('user')->where("user_id","=",Auth::user()->id)->get()[0]["id"] == $prospect->actor)
+                @if (Auth::user()->role_id === 1 || getManagerType() === ($prospect->type == "Client" ? "TM" : "LM") && $prospect->state != 4)
+                    @if (getManagerId() == $prospect->actor)
                         <!-- Archive a booked prospect -->
                         <a href="{{ route('manager.result', $prospect->id) }}" role="button" class="bi bi-archive" style="margin-right: 5px; "></a>
                     @endif
 
-                    @if (($prospect->state === 1 && (!isset($prospect->unavailable_until) || $prospect->unavailable_until < date("Y-m-d H:i:s"))) || Auth::user()->isAdmin === 1)
-                        <!-- Book an available prospect -->
-                        <a href="{{ route('manager.formBooking', $prospect->id) }}" role="button" class="bi bi-bookmark" style="margin-right: 5px; "></a>
+                    @if (($prospect->state === 1 && (!isset($prospect->unavailable_until) || $prospect->unavailable_until < date("Y-m-d H:i:s"))) || Auth::user()->role_id === 1)
+                        @if(App\Models\Prospect::all()->where('actor', '=', getManagerId())->count() < 5 || Auth::user()->role_id === 1)
+                            <!-- Book an available prospect -->
+                            <a href="{{ route('manager.formBooking', $prospect->id) }}" role="button" class="bi bi-bookmark" style="margin-right: 5px; "></a>
+                        @endif
                     @endif
 
-                    @if (Auth::user()->id_manager === $prospect->creator || Auth::user()->isAdmin === 1)
+                    @if (getManagerId() === $prospect->creator || Auth::user()->role_id === 1)
                         <!-- Edit a prospect -->
                         <a href="{{ route('manager.prospect.edit', $prospect->id) }}" role="button" class="bi bi-pencil" style="margin-right: 5px; "></a>
                     @endif
 
-                    @if (Auth::user()->id_manager === $prospect->creator || Auth::user()->isAdmin === 1)
+                    @if (Auth::user()->role_id === 1)
                         <!-- Delete prospect -->
                         <form id="destroy{{ $prospect->id }}" action="{{ route('manager.prospect.destroy', $prospect->id) }}" method="POST">
                             @csrf
