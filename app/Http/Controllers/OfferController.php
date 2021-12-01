@@ -54,17 +54,6 @@ class OfferController extends Controller
     }
 
     /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
-
-    /**
      * Show the form for editing the specified resource.
      *
      * @param  int  $id
@@ -102,14 +91,4 @@ class OfferController extends Controller
         return view('manager.prospects.show', compact(['prospect', 'trackings', 'offers']))->with('offer_edited', "The prospect's offer has been edited!");
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
-    }
 }
