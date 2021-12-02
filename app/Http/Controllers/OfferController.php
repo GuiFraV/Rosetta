@@ -30,6 +30,9 @@ class OfferController extends Controller
      */
     public function store(Request $request)
     {
+        if(getManagerId() === null && Auth::user()->role_id != 1) {
+            return Redirect::back()->withErrors("You do not have the necessary rights to do this.");
+        }
         $data = $request->validate([
             'id_prospect' => 'required',                  
             'cityFrom' => 'string|required|max:255',
@@ -73,6 +76,9 @@ class OfferController extends Controller
      */
     public function update(Request $request, Offer $offer)
     {
+        if(getManagerId() != $offer->actor) {
+            return Redirect::back()->withErrors("You do not have the necessary rights to do this.");
+        }
         $data = $request->validate([
             'cityFrom' => 'string|required|max:255',
             'cityTo' => 'string|required|max:255',

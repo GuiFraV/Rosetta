@@ -90,10 +90,24 @@ class ProspectController extends Controller
                 })
                 ->addColumn('action', function($row)
                 {
-                    $actionBtn = '<div class="d-flex justify-content-center align-items-center"><a href="prospect/'.$row->id.'" role="button" class="bi bi-eye" style="font-size: 1.8rem;"></a><span>&nbsp;&nbsp;'.Tracking::all()->where('id_prospect', '=', $row->id)->count().'</span></div>';
+                    $actionBtn = '<div class="d-flex justify-content-center align-items-center"><a href="prospect/'.$row->id.'" role="button" class="bi bi-eye" style="font-size: 1.8rem;"></a></div>';
                     return $actionBtn;
                 }) 
-                ->rawColumns(['name', 'email', 'action'])
+                ->addColumn('counter', function($row)
+                {
+                    $nb = Tracking::all()->where('id_prospect', '=', $row->id)->count();
+                    if($nb <= 0) {
+                        $countDisplay = "<span class='fw-bold' style='color: #6610f2'>&nbsp;&nbsp;".$nb."</span>";
+                    } else if ($nb === 1) {
+                        $countDisplay = "<span class='text-success fw-bold'>&nbsp;&nbsp;".$nb."</span>";
+                    } else if ($nb > 1 && $nb < 6) {
+                        $countDisplay = "<span class='text-warning fw-bold'>&nbsp;&nbsp;".$nb."</span>";
+                    } else if ($nb > 6) {
+                        $countDisplay = "<span class='text-danger fw-bold'>&nbsp;&nbsp;".$nb."</span>";
+                    }
+                    return $countDisplay;
+                })
+                ->rawColumns(['name', 'email', 'action', 'counter'])
                 ->make(true);
         }  
     }
@@ -115,6 +129,9 @@ class ProspectController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request) {
+        if(getManagerId() === null && Auth::user()->role_id != 1) {
+            return Redirect::back()->withErrors("You do not have the necessary rights to do this.");
+        }
         $data = $request->validate([
             'name' => 'required|max:255',
             'country' => 'required|max:255',
@@ -176,6 +193,9 @@ class ProspectController extends Controller
      */
     public function update(Request $request, Prospect $prospect)
     {
+        if(getManagerId() != $prospect->creator && Auth::user()->role_id != 1) {
+            return Redirect::back()->withErrors("You do not have the necessary rights to do this.");
+        }
         $data = $request->validate([
             'name' => 'required|max:255',
             'country' => 'required|max:255',
@@ -205,6 +225,9 @@ class ProspectController extends Controller
      */
     public function destroy(Prospect $prospect)
     {
+        if(Auth::user()->role_id != 1) {
+            return Redirect::back()->withErrors("You do not have the necessary rights to do this.");
+        }
         $prospect->delete();
         return redirect('manager/prospects')->with('deleted', 'This prospect has been deleted.');            
     }
@@ -229,10 +252,13 @@ class ProspectController extends Controller
     public function book($id)
     {
         $prospect = Prospect::findOrFail($id);        
-        // auth security
-        if ($prospect->state != 1 && Auth::user()->isAdmin === 0) 
-            return app()->call('App\Http\Controllers\ProspectController@show', ['prospect' => $prospect]);
-        $prospect->actor = Manager::with('user')->where("user_id","=",Auth::user()->id)->get()[0]["id"];
+        if(getManagerType() === "TM" && $prospect->type === "Client" || getManagerType() === "LM" && $prospect->type === "Carrier"){
+            return Redirect::back()->withErrors("You do not have the necessary rights to do this.");
+        }
+        if(Auth::user()->role_id != 1 || $prospect->state != 1) {
+            return Redirect::back()->withErrors("You do not have the necessary rights to do this.");
+        }
+        $prospect->actor = getManagerId();
         $prospect->state = 2;
         $prospect->deadline = date("Y-m-d H:i:s", mktime(0, 0, 0, date("m")+3, date("d"), date("Y")));
         $prospect->save();

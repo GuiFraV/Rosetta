@@ -29,6 +29,9 @@ class ProspectCommentsController extends Controller
      */
     public function store(Request $request)
     {
+        if(getManagerId() === null && Auth::user()->role_id != 1) {
+            return Redirect::back()->withErrors("You do not have the necessary rights to do this.");
+        }
         $data = $request->validate([
             'id_prospect' => 'required',
             'comment' => 'required|max:191'
@@ -67,6 +70,9 @@ class ProspectCommentsController extends Controller
      */
     public function update(Request $request, ProspectComments $comment)
     {
+        if(getManagerId() != $comment->author) {
+            return Redirect::back()->withErrors("You do not have the necessary rights to do this.");
+        }
         $data = $request->validate([
             'comment' => 'required|max:191'
         ]);

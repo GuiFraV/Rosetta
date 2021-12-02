@@ -26,14 +26,18 @@ class TrackingController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
-    {        
+    {   
+        $prospect = Prospect::findOrFail($request->id);   
+        if(getManagerId() != $prospect->actor && Auth::user()->role_id != 1) {
+            return Redirect::back()->withErrors("You do not have the necessary rights to do this.");
+        }  
         if ($request->result === '0') {
             $data = $request->validate([
                 'id' => 'required',
                 'result' => 'required',
                 'comment' => 'required|max:255'
             ]);                
-            $prospect = Prospect::findOrFail($request->id);
+            
             $tracking = new Tracking;
             $tracking->id_prospect = $prospect->id;
             $tracking->actor = isset($prospect->actor) ? $prospect->actor : getManagerId();
@@ -53,7 +57,6 @@ class TrackingController extends Controller
                 'result' => 'required',
                 'loadNumber' => 'required|max:255'
             ]);            
-            $prospect = Prospect::findOrFail($request->id);
             $prospect->deadline = null;
             if(!isset($prospect->actor))
                 $prospect->actor = getManagerId();
@@ -85,6 +88,9 @@ class TrackingController extends Controller
      */
     public function update(Request $request, Tracking $tracking)
     {
+        if(getManagerId() != $tracking->actor) {
+            return Redirect::back()->withErrors("You do not have the necessary rights to do this.");
+        }
         $data = $request->validate([
             'comment' => 'required|max:255'
         ]);

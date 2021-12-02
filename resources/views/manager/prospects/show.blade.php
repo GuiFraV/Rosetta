@@ -11,25 +11,26 @@
             <div style="display: flex; font-size: 2rem;">
                 
                 @if (Auth::user()->role_id === 1 || getManagerType() === ($prospect->type == "Client" ? "TM" : "LM") && $prospect->state != 4)
+                    
+                    <!-- Archive a booked prospect -->
                     @if (getManagerId() == $prospect->actor)
-                        <!-- Archive a booked prospect -->
                         <a href="{{ route('manager.result', $prospect->id) }}" role="button" class="bi bi-archive" style="margin-right: 5px; "></a>
                     @endif
 
+                    <!-- Book an available prospect -->
                     @if (($prospect->state === 1 && (!isset($prospect->unavailable_until) || $prospect->unavailable_until < date("Y-m-d H:i:s"))) || Auth::user()->role_id === 1)
                         @if(App\Models\Prospect::all()->where('actor', '=', getManagerId())->count() < 5 || Auth::user()->role_id === 1)
-                            <!-- Book an available prospect -->
                             <a href="{{ route('manager.formBooking', $prospect->id) }}" role="button" class="bi bi-bookmark" style="margin-right: 5px; "></a>
                         @endif
                     @endif
 
+                    <!-- Edit a prospect -->
                     @if (getManagerId() === $prospect->creator || Auth::user()->role_id === 1)
-                        <!-- Edit a prospect -->
                         <a href="{{ route('manager.prospect.edit', $prospect->id) }}" role="button" class="bi bi-pencil" style="margin-right: 5px; "></a>
                     @endif
 
+                    <!-- Delete prospect -->
                     @if (Auth::user()->role_id === 1)
-                        <!-- Delete prospect -->
                         <form id="destroy{{ $prospect->id }}" action="{{ route('manager.prospect.destroy', $prospect->id) }}" method="POST">
                             @csrf
                             @method('DELETE')                      

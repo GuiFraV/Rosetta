@@ -23,7 +23,7 @@
         <script>toastr.warning('{{ Session::get('deleted') }}');</script>
     @endif
 
-    <table class="table table-hover yajra-datatable disable-select">
+    <table class="table table-striped table-hover yajra-datatable disable-select">
         <thead>
             <tr>
                 <th scope="col">Name</th>
@@ -36,9 +36,10 @@
                 <th scope="col">Creation</th>
                 <th scope="col">Deadline</th>
                 <th scope="col"></th>
+                <th scope="col"></th>
             </tr>
         </thead>
-        <tbody>
+        <tbody class="align-middle">
         </tbody>
     </table><br>
     <a href="prospects/faq" role="button" class="float-end bi bi-question">F.A.Q</a>
@@ -66,6 +67,12 @@
                     data: 'action', 
                     name: 'action', 
                     orderable: false, 
+                    searchable: true
+                },
+                {
+                    data: 'counter', 
+                    name: 'counter', 
+                    orderable: true, 
                     searchable: true
                 },
             ]
