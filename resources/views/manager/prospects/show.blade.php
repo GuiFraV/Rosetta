@@ -52,6 +52,10 @@
             <script>toastr.success('{{ $offer_edited }}');</script>
         @elseif(!empty($offer_deleted))
             <script>toastr.warning('{{ $offer_deleted }}');</script>
+        @elseif(!empty($comment_created))
+            <script>toastr.success('{{ $comment_created }}');</script>
+        @elseif(!empty($comment_edited))
+            <script>toastr.warning('{{ $comment_edited }}');</script>
         @endif
 
         <h2>Prospect details @if ($prospect->state === 4 && !isset($prospect->deadline)) <div class="text-success">(Validated)</div> @endif</h2>
@@ -139,7 +143,7 @@
                                 <td>{{ getManagerName($tracking->actor, "all") }}</td>
                                 <td>{{ $tracking->created_at->format('Y-m-d') }}</td>
                                 <td>{{ $tracking->comment }}</td>
-                                @if (Auth::user()->id_manager === $tracking->actor)
+                                @if (getManagerId() === $tracking->actor)
                                     <td><a href="{{ route('manager.tracking.edit', $tracking->id) }}" role="button" class="bi bi-pencil" style="font-size: 1.3rem;"></a></td>
                                 @else
                                     <td></td> 
@@ -181,7 +185,7 @@
                                 <td>{{ $offer->offer ."€" }} </td>
                                 <td>{{ $offer->comment }}</td>
                                 <td>{{ $offer->created_at->format('Y-m-d') }}</td>
-                                @if (Auth::user()->id_manager === $offer->actor)
+                                @if (getManagerId() === $offer->actor)
                                     <td><a href="{{ route('manager.offer.edit', $offer->id) }}" role="button" class="bi bi-pencil" style="font-size: 1.3rem;"></a></td>
                                 @else
                                     <td></td> 
@@ -196,6 +200,33 @@
                 <br>
                 <a href="{{ route('manager.offer.create', ['prospect' => $prospect->id]) }}" role="button" class="float-end btn btn-success" style="margin-right: 5px;">Add a new offer</a>
                 <p>There is no offer for this prospect!</p>
+            </div>
+        @endif
+
+        @if(!$comments->isEmpty())
+            <div class="container">
+                <br>
+                <a href="{{ route('manager.comment.create', ['prospect' => $prospect->id]) }}" role="button" class="float-end bi bi-plus-lg text-success" style="margin-right: 5px; font-size: 2rem;"></a>
+                <h2>Comments</h2><br>                
+                @foreach($comments as $comment)
+                <div class="list-group">
+                    <div class="list-group-item list-group-item-action" aria-current="true">
+                        <div class="d-flex w-100 justify-content-between">
+                            <small>By {{ getManagerName($comment->author, "all") }}, the {{ $comment->created_at->format('Y-m-d \a\t H:i') }}</small>
+                            @if (getManagerId() === $comment->author || Auth::user()->role_id === 1)
+                                <small><a href="{{ route('manager.comment.edit', $comment->id) }}" role="button" class="float-end bi bi-pencil"></a></small>
+                            @endif
+                        </div>
+                        <p class="mb-1" style="margin-top: 10px;">{{ $comment->comment }}</p>
+                    </div>
+                </div>
+                @endforeach
+            </div>
+        @else
+            <div class="container col-6">
+                <br>
+                <a href="{{ route('manager.comment.create', ['prospect' => $prospect->id]) }}" role="button" class="float-end btn btn-success" style="margin-right: 5px;">Add a new comment</a>
+                <p>There is no comment on this prospect!</p>
             </div>
         @endif
 @endsection

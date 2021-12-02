@@ -11,6 +11,7 @@ use App\Http\Controllers\GroupController as GroupController;
 use App\Http\Controllers\ProspectController;
 use App\Http\Controllers\TrackingController as TrackingController;
 use App\Http\Controllers\OfferController as OfferController;
+use App\Http\Controllers\ProspectCommentsController as ProspectCommentsController;
 use App\Http\Controllers\RelationshipController as RelationshipController;
 /*
 |--------------------------------------------------------------------------
@@ -108,6 +109,12 @@ Route::group(['as'=>'manager.','prefix' => 'manager','middleware'=>['auth','mana
         'except' => ['index', 'show', 'destroy']
     ]);
     
+    // Comments routes
+    Route::resource('prospect/comment', ProspectCommentsController::class, [
+        'only' => ['create', 'store', 'edit', 'update'],
+        'except' => ['index', 'show', 'destroy']
+    ]);
+
     // Prospect FAQ
     Route::get('prospects/faq',function() {
         return view('manager.prospects.faq');

@@ -8,6 +8,7 @@ use App\Models\Prospect;
 use App\Models\Manager;
 use App\Models\Tracking;
 use App\Models\Offer;
+use App\Models\ProspectComments;
 use DB;
 
 class ProspectController extends Controller
@@ -137,7 +138,8 @@ class ProspectController extends Controller
         
         $trackings = collect();
         $offers = collect();
-        return view('manager.prospects.show', compact(['prospect', 'trackings', 'offers']))->with('created', "The prospect has been created!");
+        $comments = collect();
+        return view('manager.prospects.show', compact(['prospect', 'trackings', 'offers', 'comments']))->with('created', "The prospect has been created!");
     }
 
     /**
@@ -150,7 +152,8 @@ class ProspectController extends Controller
     {
         $trackings = Tracking::all()->where('id_prospect', $prospect->id)->sortByDesc('created_at');
         $offers = Offer::all()->where('id_prospect', $prospect->id)->sortByDesc('created_at');
-        return view('manager.prospects.show', compact(['prospect', 'trackings', 'offers']));
+        $comments = ProspectComments::all()->where('prospect_id', $prospect->id)->sortByDesc('created_at');
+        return view('manager.prospects.show', compact(['prospect', 'trackings', 'offers', 'comments']));
     }
 
     /**
@@ -190,7 +193,8 @@ class ProspectController extends Controller
         
         $trackings = Tracking::all()->where('id_prospect', $prospect->id)->sortByDesc('created_at');
         $offers = Offer::all()->where('id_prospect', $prospect->id)->sortByDesc('created_at');
-        return view('manager.prospects.show', compact(['prospect', 'trackings', 'offers']))->with('created', "The prospect has been updated!");
+        $comments = ProspectComments::all()->where('prospect_id', $prospect->id)->sortByDesc('created_at');
+        return view('manager.prospects.show', compact(['prospect', 'trackings', 'offers', 'comments']))->with('created', "The prospect has been updated!");
     }
 
     /**
@@ -202,7 +206,7 @@ class ProspectController extends Controller
     public function destroy(Prospect $prospect)
     {
         $prospect->delete();
-        return view('manager.prospects.index')->with('deleted', 'This prospect has been deleted.');            
+        return redirect('manager/prospects')->with('deleted', 'This prospect has been deleted.');            
     }
 
     /**
@@ -235,7 +239,8 @@ class ProspectController extends Controller
         
         $trackings = Tracking::all()->where('id_prospect', $prospect->id)->sortByDesc('created_at');
         $offers = Offer::all()->where('id_prospect', $prospect->id)->sortByDesc('created_at');
-        return view('manager.prospects.show', compact(['prospect', 'trackings', 'offers']))->with('booked', "The prospect has been booked!");
+        $comments = ProspectComments::all()->where('prospect_id', $prospect->id)->sortByDesc('created_at');
+        return view('manager.prospects.show', compact(['prospect', 'trackings', 'offers', 'comments']))->with('booked', "The prospect has been booked!");
     }
 
 }

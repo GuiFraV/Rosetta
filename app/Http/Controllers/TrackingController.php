@@ -36,7 +36,7 @@ class TrackingController extends Controller
             $prospect = Prospect::findOrFail($request->id);
             $tracking = new Tracking;
             $tracking->id_prospect = $prospect->id;
-            $tracking->actor = isset($prospect->actor) ? $prospect->actor : Auth::user()->id_manager;
+            $tracking->actor = isset($prospect->actor) ? $prospect->actor : getManagerId();
             $tracking->comment = $request->comment;
             $tracking->save();
 
@@ -46,7 +46,7 @@ class TrackingController extends Controller
             // Actually set on 6 months, but modify to change the time necessary to wait before new booking
             $prospect->unavailable_until = date("Y-m-d H:i:s", mktime(0, 0, 0, date('n')+6, 1, date('y')));
             $prospect->save();            
-            return view('manager.prospects.index')->with('archived', 'The archive of this prospect has been done.');            
+            return redirect('manager/prospects')->with('archived', 'The archive of this prospect has been done.');            
         } else if ($request->result === '1') {            
             $data = $request->validate([
                 'id' => 'required',
@@ -56,12 +56,12 @@ class TrackingController extends Controller
             $prospect = Prospect::findOrFail($request->id);
             $prospect->deadline = null;
             if(!isset($prospect->actor))
-                $prospect->actor = Auth::user()->id_manager;
+                $prospect->actor = getManagerId();
             $prospect->unavailable_until = null;
             $prospect->state = 4;
             $prospect->loadNumber = $request->loadNumber;
             $prospect->save();
-            return view('manager.prospects.index')->with('validated', "The prospect has been validated, good work!"); 
+            return redirect('manager/prospects')->with('validated', "The prospect has been validated, good work!"); 
         } 
     }
 

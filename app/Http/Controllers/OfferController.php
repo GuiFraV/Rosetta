@@ -2,11 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use Auth;
 use Illuminate\Http\Request;
 use App\Models\Offer;
-use App\Models\Manager;
 use App\Models\Prospect;
+use App\Models\ProspectComments;
 use App\Models\Tracking;
 
 class OfferController extends Controller
@@ -40,7 +39,7 @@ class OfferController extends Controller
         ]);
         $offer = new Offer;
         $offer->id_prospect = $request->id_prospect;
-        $offer->actor = Manager::with('user')->where("user_id","=",Auth::user()->id)->get()[0]["id"];
+        $offer->actor = getManagerId();
         $offer->cityFrom = $request->cityFrom;
         $offer->cityTo = $request->cityTo;
         $offer->offer = $request->offer;
@@ -50,7 +49,8 @@ class OfferController extends Controller
         $prospect = Prospect::findOrFail($request->id_prospect);
         $trackings = Tracking::all()->where('id_prospect', $prospect->id)->sortByDesc('created_at');
         $offers = Offer::all()->where('id_prospect', $prospect->id)->sortByDesc('created_at');
-        return view('manager.prospects.show', compact(['prospect', 'trackings', 'offers']))->with('offer_created', "The prospect's offer has been created!");
+        $comments = ProspectComments::all()->where('prospect_id', $prospect->id)->sortByDesc('created_at');
+        return view('manager.prospects.show', compact(['prospect', 'trackings', 'offers', 'comments']))->with('offer_created', "The prospect's offer has been created!");
     }
 
     /**
@@ -88,7 +88,8 @@ class OfferController extends Controller
         $prospect = Prospect::findOrFail($offer->id_prospect);
         $trackings = Tracking::all()->where('id_prospect', $prospect->id)->sortByDesc('created_at');
         $offers = Offer::all()->where('id_prospect', $prospect->id)->sortByDesc('created_at');
-        return view('manager.prospects.show', compact(['prospect', 'trackings', 'offers']))->with('offer_edited', "The prospect's offer has been edited!");
+        $comments = ProspectComments::all()->where('prospect_id', $prospect->id)->sortByDesc('created_at');
+        return view('manager.prospects.show', compact(['prospect', 'trackings', 'offers', 'comments']))->with('offer_edited', "The prospect's offer has been edited!");
     }
 
 }
