@@ -129,7 +129,7 @@
             <div class="container">
                 <br>
                 <h2>History</h2>
-                <table class="table table-hover" style="font-size: 95%">
+                <table class="table table-striped table-hover" style="font-size: 95%">
                     <thead>
                         <tr>
                             <th scope="col">Actor</th>
@@ -165,7 +165,7 @@
                 <br>
                 <a href="{{ route('manager.offer.create', ['prospect' => $prospect->id]) }}" role="button" class="float-end bi bi-plus-lg text-success" style="margin-right: 5px; font-size: 2rem;"></a>
                 <h2>Offers</h2>                
-                <table class="table table-hover" style="font-size: 95%">
+                <table class="table table-striped table-hover" style="font-size: 95%">
                     <thead>
                         <tr>
                             <th scope="col">Actor</th>

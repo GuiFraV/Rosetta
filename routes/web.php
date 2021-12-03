@@ -13,6 +13,8 @@ use App\Http\Controllers\TrackingController as TrackingController;
 use App\Http\Controllers\OfferController as OfferController;
 use App\Http\Controllers\ProspectCommentsController as ProspectCommentsController;
 use App\Http\Controllers\RelationshipController as RelationshipController;
+use App\Http\Controllers\MarketingSearchController as MarketingSearchController;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -81,18 +83,32 @@ Route::group(['as'=>'manager.','prefix' => 'manager','middleware'=>['auth','mana
     Route::get('groups/showPartner/{group_id}', [RelationshipController::class, 'showPartner'])->name('groups.showPartner');
     Route::post('groups/savePartnerToGroup', [RelationshipController::class, 'savePartnerToGroup'])->name('groups.savePartnerToGroup');
     Route::get('groups/deletePartnerFromGroup/{group_id}/{partner_id}', [RelationshipController::class, 'deletePartnerFromGroup'])->name('groups.deletePartnerFromGroup');
-    // Prospects
+    
+    // Prospects //
+
+    // Marketing Search routes
+    Route::resource('prospect/marketingsearch', MarketingSearchController::class, [
+        'except' => ['show']
+    ]);
+    Route::get('prospect/marketingsearch', [MarketingSearchController::class, 'index']);
+    Route::get('prospect/marketingsearch/getMarketingSearches', [MarketingSearchController::class, 'getMarketingSearches'])->name('marketingsearch.getMarketingSearches');
+    
+    /* TO DO - For new prospect from marketing search
+    Route::get('result/{id}', function ($id) {
+        return view('manager/prospects/trackings/create', ['id' => $id]);
+    })->name('result');
+    */
+
+    // Prospect routes
     Route::put('prospect/book/{id}', 'App\Http\Controllers\ProspectController@book')->name('prospect.book');
     Route::resource('prospect', ProspectController::class);
     Route::get('prospects', [ProspectController::class, 'index']);
     Route::get('prospects/getProspects', [ProspectController::class, 'getProspects'])->name('prospects.getProspects');
-
-    // Redo this route because the solution is weak
+    
     Route::get('formBooking/{id}', function ($id) {
         return view('manager.prospects.booking', ['id' => $id]);
     })->name('formBooking');
 
-    // Redo this route because the solution is weak
     Route::get('result/{id}', function ($id) {
         return view('manager/prospects/trackings/create', ['id' => $id]);
     })->name('result');

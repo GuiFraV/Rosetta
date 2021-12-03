@@ -1,12 +1,11 @@
 @extends('manager.navbar')
 
 @section('content') 
-    @if (Auth::user()->id_manager != $offer->actor && Auth::user()->isAdmin === 0) 
+    @if (getManagerId() != $offer->actor && Auth::user()->role_id != 1) 
         {{ app()->call('App\Http\Controllers\ProspectController@index'); }}
     @endif
     <div class="container col-6">
         <h2>Edit an existing offer</h2><br>
-        
         @if ($errors->any())
             <div class="alert alert-danger d-flex align-items-center" role="alert">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-exclamation-triangle-fill" viewBox="0 0 16 16">
@@ -20,7 +19,6 @@
                 </ul>
             </div>
         @endif
-
         <form method="post" action="{{ route('manager.offer.update', $offer->id) }}">
             @csrf
             @method('put')

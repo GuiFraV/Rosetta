@@ -42,7 +42,10 @@
         <tbody class="align-middle">
         </tbody>
     </table><br>
-    <a href="prospects/faq" role="button" class="float-end bi bi-question">F.A.Q</a>
+    <div class="float-end">
+        {{-- <a href="prospect/marketingsearch" role="button" class="bi bi-search">My marketing search</a> --}}
+        <a href="prospects/faq" role="button" class="bi bi-question">F.A.Q</a>
+    </div>
     <input type="text" id="mailCopy" style="display: none;">
 </div>
 

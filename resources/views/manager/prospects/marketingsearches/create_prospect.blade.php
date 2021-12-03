@@ -1,11 +1,8 @@
 @extends('manager.navbar')
 
 @section('content')
-    @if (getManagerId() != $prospect->creator && Auth::user()->role_id != 1) 
-        {{ app()->call('App\Http\Controllers\ProspectController@show',  ["prospect" => $prospect]); }}
-    @endif
     <div class="container col-6">
-        <h2>Edit an existing prospect</h2><br>
+        <h2>Add a new prospect</h2><br>
         @if ($errors->any())
             <div class="alert alert-danger d-flex align-items-center" role="alert">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-exclamation-triangle-fill" viewBox="0 0 16 16">
@@ -19,67 +16,68 @@
                 </ul>
             </div>
         @endif
-        <form action="{{ route('manager.prospect.update', $prospect->id) }}" method="post">
-            @csrf
-            @method('put')
+        <form method="post" action="{{ route('manager.prospect.store') }}">
+            @csrf    
             <div class="row">
                 <div class="col">
                     <label for="name" class="form-label">Company name</label>
-                    <input type="text" class="form-control" name="name" value="{{ $prospect->name }}" required>
+                    <input type="text" class="form-control" name="name" required>
                 </div>
                 <div class="col">
                     <label for="country" class="form-label">Country</label>
-                    <input type="text" class="form-control" id="countryAuto" value="{{ countryCodeToEmojiName($prospect->country) }}">
-                    <input type="hidden" name="country" value="{{ $prospect->country }}">
+                    <input type="text" class="form-control" id="countryAuto">
+                    <input type="hidden" name="country">
                 </div>
             </div><br>
+        
             <div class="row">
                 <div class="col">
                     <label for="email" class="form-label">Email</label>
-                    <input type="email" class="form-control" name="email" value="{{$prospect->email}}">
+                    <input type="email" class="form-control" name="email">
                 </div>
                 <div class="col">
                     <label for="phone" class="form-label">Phone number</label>
                     <div class="input-group">
                         <span class="input-group-text" id="callingCode"></span>
                         <input type="hidden" name="callingCodeForm">
-                        <input type="text" class="form-control" aria-label="Phone number" aria-describedby="Phone number" name="phone" value="{{ $prospect->phone }}">
+                        <input type="text" class="form-control" aria-label="Phone number" aria-describedby="Phone number" name="phone">
                     </div>
                 </div>
             </div><br>
+
             <div class="row">
                 <div class="col">
                     <label for="type" class="form-label">Type :&nbsp;&nbsp;&nbsp;</label>
-                    @if ($prospect->type === "Client")
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="type" name="typeProspectClient" value="Client" checked>
-                        <label class="form-check-label" for="typeProspectClient">Client</label>
-                    </div>
-                    @elseif ($prospect->type === "Carrier")
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="type" name="typeProspectCarrier" value="Carrier" checked>
-                        <label class="form-check-label" for="typeProspectCarrier">Carrier</label>
-                    </div>
+                    @if (\App\Models\Manager::with('user')->where("user_id","=",Auth::user()->id)->get()[0]["type"] === "TM")
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="type" name="typeProspectClient" value="Client" checked>
+                            <label class="form-check-label" for="typeProspectClient">Client</label>
+                        </div>
+                    @endif
+                    @if (App\Models\Manager::with('user')->where("user_id","=",Auth::user()->id)->get()[0]["type"] === "LM")
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="type" name="typeProspectCarrier" value="Carrier" checked>
+                            <label class="form-check-label" for="typeProspectCarrier">Carrier</label>
+                        </div>
                     @endif
                 </div>
             </div><br>
+
             <div class="float-end">
-                <a href="{{ route('manager.prospect.show', $prospect->id) }}" class="btn btn-danger">Return</a>
-                <button type="submit" class="btn btn-primary">Update prospect</button>
+                <a href="{{ route('manager.prospect.index') }}" class="btn btn-danger">Return</a>
+                <button type="submit" class="btn btn-primary">Add prospect</button>
             </div>
         </form>
     </div>
 
     <script>
         
-        // Manipulate the country code value onload to set the calling code
-        $(function() {
+        // Test if onload the country value is already set, and if so set the calling code
+        $( function() {
             if($('[name="country"]').val() != "") {
                 let code = '+'+countryCodeToCallingCode($('[name="country"]').val());
                 $('#callingCode').html(code);    
                 $('[name="callingCodeForm"]').val(code);
-                let tmpVal = $('[name="phone"]').val();
-                $('[name="phone"]').val(tmpVal.substr(code.length));
             }
         });
 
@@ -672,6 +670,7 @@
                     return "n.a";
             }
         }
+
     </script>
 
 @endsection

@@ -10,6 +10,7 @@ use App\Models\Tracking;
 use App\Models\Offer;
 use App\Models\ProspectComments;
 use DB;
+use Illuminate\Support\Facades\Redirect;
 
 class ProspectController extends Controller
 {
@@ -150,7 +151,7 @@ class ProspectController extends Controller
         $prospect->state = 2;
         // Automatically booked for 3 months
         $prospect->deadline = date("Y-m-d H:i:s", mktime(0, 0, 0, date("m")+3, date("d"), date("Y")));
-        $prospect->creator = Manager::with('user')->where("user_id","=",Auth::user()->id)->get()[0]["id"];
+        $prospect->creator = getManagerId();
         $prospect->save();
         
         $trackings = collect();
@@ -252,17 +253,19 @@ class ProspectController extends Controller
     public function book($id)
     {
         $prospect = Prospect::findOrFail($id);        
-        if(getManagerType() === "TM" && $prospect->type === "Client" || getManagerType() === "LM" && $prospect->type === "Carrier"){
+        
+        
+        if(getManagerType() === "TM" && $prospect->type === "Carrier" || getManagerType() === "LM" && $prospect->type === "Client") {
+            return Redirect::back()->withErrors("You do not have the necessary rights to do this.");
+        } else if($prospect->state != 1 && Auth::user()->role_id != 1) {
             return Redirect::back()->withErrors("You do not have the necessary rights to do this.");
         }
-        if(Auth::user()->role_id != 1 || $prospect->state != 1) {
-            return Redirect::back()->withErrors("You do not have the necessary rights to do this.");
-        }
+        
         $prospect->actor = getManagerId();
         $prospect->state = 2;
         $prospect->deadline = date("Y-m-d H:i:s", mktime(0, 0, 0, date("m")+3, date("d"), date("Y")));
         $prospect->save();
-        
+
         $trackings = Tracking::all()->where('id_prospect', $prospect->id)->sortByDesc('created_at');
         $offers = Offer::all()->where('id_prospect', $prospect->id)->sortByDesc('created_at');
         $comments = ProspectComments::all()->where('prospect_id', $prospect->id)->sortByDesc('created_at');
