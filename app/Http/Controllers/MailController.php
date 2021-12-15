@@ -93,6 +93,13 @@ class MailController extends Controller
      */
     public function store(Request $request)
     {
+        /* Make form validation when possible
+        $request->validate([
+            'object' => 'required',
+            'message' => 'required'
+        ]);
+        */
+
         $mail = Mail::create([
             'object' => $request->object,
             'message' => $request->message,
@@ -149,6 +156,7 @@ class MailController extends Controller
                 "object"=>$mail->object,
                 "message"=>$mail->message,
                 "autoSend"=>$mail->autoSend,
+                "id"=>$id
             ));
         } catch(ModelNotFoundException $e) {
             return json_encode(
@@ -169,7 +177,33 @@ class MailController extends Controller
      */
     public function update(Request $request, $id)
     {
-        dd("update");
+        $request->validate([
+            'emailEditObject' => 'required',
+            'emailEditContent' => 'required'
+        ]);
+        
+        try {
+            $mail = Mail::findOrFail($id);
+            $mail->object = $request->emailEditObject;
+            $mail->message = $request->emailEditContent;
+            $mail->save();
+            return json_encode(array(
+                "statusCode"=>200
+            ));
+        } catch(ModelNotFoundException $e) {
+            return json_encode(
+                array(
+                    "statusCode"=>400,
+                    "error"=>$e
+                )
+            );
+        }
+        /*
+        return json_encode(array(
+            "statusCode"=>200,
+            "data"=>$mail
+        ));
+        */
         /*
         $this->validate($request, [
              'object' => 'required',

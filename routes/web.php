@@ -73,8 +73,8 @@ Route::group(['as'=>'manager.','prefix' => 'manager','middleware'=>['auth','mana
     
     /// Emails ///
     Route::resource('mails', MailController::class, [
-        'only' => ['index', 'store', 'update'],
-        'except' => ['create', 'edit', 'destroy', 'show']
+        'only' => ['index', 'store'],
+        'except' => ['create', 'edit', 'destroy', 'show', 'update']
     ]);
 
     Route::get('mails', [MailController::class, 'index'])->name('mails.index');
@@ -82,6 +82,7 @@ Route::group(['as'=>'manager.','prefix' => 'manager','middleware'=>['auth','mana
     Route::delete('mails/destroyer/{id}', 'App\Http\Controllers\MailController@destroyer');
     Route::get('mails/{id}', 'App\Http\Controllers\MailController@show');
     Route::get('mails/edit/{id}', 'App\Http\Controllers\MailController@edit');
+    Route::post('mails/update/{id}', 'App\Http\Controllers\MailController@update');
 
     /// Prospects ///
     // Marketing Search routes

@@ -5,22 +5,20 @@
                 <h5 class="modal-title" id="createMailModalLabel">New Email</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form name="appbundle_mailing" id="formNewMail" method="POST" action="{{Route('manager.mails.store')}}">
+            <form name="appbundle_mailing" id="formNewMail" method="POST" action="{{ Route('manager.mails.store') }}">
                 @csrf
                 <div class="modal-body" id="modal_content">
                     <div id="appbundle_mailing">
-                        <br/>
                         <div class="form-group">
                             <label class="control-label required" for="object">Subject</label>
                             <input type="text" id="object" name="object" maxlength="255" class="form-control" required="required"/>
                         </div>
-                        <br/>
+                        <br>
                         <div class="form-group">
                             <label class="control-label required" for="message">Message</label>
                             <textarea class="mce-editor" id="message" name="message" cols="50" rows="5" class="id-"></textarea>
                         </div>
                     </div>
-                    <br/>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" >Close</button>
