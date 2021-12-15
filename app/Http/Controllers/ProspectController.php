@@ -57,10 +57,10 @@ class ProspectController extends Controller
                         
                     }
                 })
-                ->editColumn('country', function($row)
-                {
-                    return countryCodeToEmojiName($row->country);
-                })
+                // ->editColumn('country', function($row)
+                // {
+                //     return countryCodeToEmojiName($row->country);
+                // })
                 ->editColumn('email', function($row)
                 {
                     $actionBtn = '<a role="button" class="bi bi-clipboard" style="font-size: 1.3rem; white-space: nowrap;" onclick="let ref = getElementById(\'mailCopy\'); ref.value = \''.$row->email.'\'; ref.style.display=\'block\'; ref.select(); document.execCommand(\'copy\'); ref.style.display=\'none\'; ref.value =\'\';"></a>';
@@ -74,13 +74,13 @@ class ProspectController extends Controller
                 })
                 ->editColumn('created_at', function($row)
                 {
-                   $created_at = $row->created_at->format('Y-m-d');
+                   $created_at = $row->created_at->format('d-m-Y');
                    return $created_at;
                 })
                 ->editColumn('deadline', function($row)
                 {
                     if (isset($row->deadline)) {
-                        $deadline = $row->deadline->format('Y-m-d');
+                        $deadline = $row->deadline->format('d-m-Y');
                         return $deadline;
                     }
                 })

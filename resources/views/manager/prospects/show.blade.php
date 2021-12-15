@@ -94,14 +94,14 @@
         @if ($prospect->state == 2)
             <div class="row">
                 <div class="col">
-                    <p>Booked by <b>{{ getManagerName($prospect->actor, "all") }}</b>, until <b>{{ $prospect->deadline->format('Y-m-d') }}</b>.</p>
+                    <p>Booked by <b>{{ getManagerName($prospect->actor, "all") }}</b>, until <b>{{ $prospect->deadline->format('d-m-Y') }}</b>.</p>
                 </div>
             </div>
         @endif
         @if (isset($prospect->unavailable_until) && $prospect->unavailable_until > date("Y-m-d H:i:s"))
             <div class="row">
                 <div class="col">
-                    <p>This prospect is currently <b>on stand-by</b> until <b>{{ $prospect->unavailable_until->format('Y-m-d') }}</b>.</p>
+                    <p>This prospect is currently <b>on stand-by</b> until <b>{{ $prospect->unavailable_until->format('d-m-Y') }}</b>.</p>
                 </div>
             </div>
         @endif
@@ -115,12 +115,12 @@
         <div class="row">
             <div class="col">
                 <h5 class="lbl-color">Created</h5>
-                <p>{{ $prospect->created_at->format('Y-m-d h:m') }}</p>
+                <p>{{ $prospect->created_at->format('d-m-Y H:i') }}</p>
             </div>
             @if ($prospect->updated_at != $prospect->created_at)
                 <div class="col">    
                     <h5 class="lbl-color">Last update</h5>
-                    <p>{{ $prospect->updated_at->format('Y-m-d h:m') }}</p>        
+                    <p>{{ $prospect->updated_at->format('d-m-Y H:i') }}</p>        
                 </div>
             @endif
         </div>
@@ -142,7 +142,7 @@
                         @foreach($trackings as $tracking)
                             <tr style="vertical-align : middle;">
                                 <td>{{ getManagerName($tracking->actor, "all") }}</td>
-                                <td>{{ $tracking->created_at->format('Y-m-d') }}</td>
+                                <td>{{ $tracking->created_at->format('d-m-Y') }}</td>
                                 <td>{{ $tracking->comment }}</td>
                                 @if (getManagerId() === $tracking->actor)
                                     <td><a href="{{ route('manager.tracking.edit', $tracking->id) }}" role="button" class="bi bi-pencil" style="font-size: 1.3rem;"></a></td>
@@ -185,7 +185,7 @@
                                 <td>{{ $offer->cityTo }}</td>
                                 <td>{{ $offer->offer ."€" }} </td>
                                 <td>{{ $offer->comment }}</td>
-                                <td>{{ $offer->created_at->format('Y-m-d') }}</td>
+                                <td>{{ $offer->created_at->format('d-m-Y') }}</td>
                                 @if (getManagerId() === $offer->actor)
                                     <td><a href="{{ route('manager.offer.edit', $offer->id) }}" role="button" class="bi bi-pencil" style="font-size: 1.3rem;"></a></td>
                                 @else
@@ -213,7 +213,7 @@
                 <div class="list-group">
                     <div class="list-group-item list-group-item-action" aria-current="true">
                         <div class="d-flex w-100 justify-content-between">
-                            <small>By {{ getManagerName($comment->author, "all") }}, the {{ $comment->created_at->format('Y-m-d \a\t H:i') }}</small>
+                            <small>By {{ getManagerName($comment->author, "all") }}, the {{ $comment->created_at->format('d-m-Y \a\t H:i') }}</small>
                             @if (getManagerId() === $comment->author || Auth::user()->role_id === 1)
                                 <small><a href="{{ route('manager.comment.edit', $comment->id) }}" role="button" class="float-end bi bi-pencil"></a></small>
                             @endif

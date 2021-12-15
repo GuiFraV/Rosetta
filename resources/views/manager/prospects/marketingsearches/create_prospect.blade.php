@@ -2,7 +2,7 @@
 
 @section('content')
     <div class="container col-6">
-        <h2>Add a new prospect</h2><br>
+        <h2>Turn your marketing search into a new prospect</h2><br>
         @if ($errors->any())
             <div class="alert alert-danger d-flex align-items-center" role="alert">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-exclamation-triangle-fill" viewBox="0 0 16 16">
@@ -21,26 +21,26 @@
             <div class="row">
                 <div class="col">
                     <label for="name" class="form-label">Company name</label>
-                    <input type="text" class="form-control" name="name" required>
+                    <input type="text" class="form-control" name="name" value="{{ $marketingSearch->name }}" required>
                 </div>
                 <div class="col">
                     <label for="country" class="form-label">Country</label>
-                    <input type="text" class="form-control" id="countryAuto">
-                    <input type="hidden" name="country">
+                    <input type="text" class="form-control" id="countryAuto" value="{{ countryCodeToEmojiName($marketingSearch->country) }}">
+                    <input type="hidden" name="country" value="{{ $marketingSearch->country }}">
                 </div>
             </div><br>
         
             <div class="row">
                 <div class="col">
                     <label for="email" class="form-label">Email</label>
-                    <input type="email" class="form-control" name="email">
+                    <input type="email" class="form-control" name="email" value="{{ $marketingSearch->email }}">
                 </div>
                 <div class="col">
                     <label for="phone" class="form-label">Phone number</label>
                     <div class="input-group">
                         <span class="input-group-text" id="callingCode"></span>
                         <input type="hidden" name="callingCodeForm">
-                        <input type="text" class="form-control" aria-label="Phone number" aria-describedby="Phone number" name="phone">
+                        <input type="text" class="form-control" aria-label="Phone number" aria-describedby="Phone number" name="phone" value="{{ $marketingSearch->phone }}">
                     </div>
                 </div>
             </div><br>
@@ -78,6 +78,8 @@
                 let code = '+'+countryCodeToCallingCode($('[name="country"]').val());
                 $('#callingCode').html(code);    
                 $('[name="callingCodeForm"]').val(code);
+                let tmpVal = $('[name="phone"]').val();
+                $('[name="phone"]').val(tmpVal.substr(code.length));
             }
         });
 

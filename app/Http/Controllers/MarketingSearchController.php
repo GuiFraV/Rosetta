@@ -47,7 +47,7 @@ class MarketingSearchController extends Controller
                 })
                 ->addColumn('transformBtn', function($row)
                 {
-                    $transformBtn = '<div class="d-flex justify-content-center align-items-center"><a href="marketingsearch/'.$row->id.'/transform" role="button" class="bi bi-check2" style="font-size: 1.8rem;"></a></div>';
+                    $transformBtn = '<div class="d-flex justify-content-center align-items-center"><a href="transform/'.$row->id.'" role="button" class="bi bi-check2" style="font-size: 1.8rem;"></a></div>';
                     return $transformBtn;
                 })
                 ->addColumn('deleteBtn', function($row)
@@ -59,7 +59,7 @@ class MarketingSearchController extends Controller
                                 </form>';
                     return $deleteBtn;
                 }) 
-                ->rawColumns(['email', 'editBtn', 'deleteBtn'])
+                ->rawColumns(['email', 'editBtn', 'transformBtn', 'deleteBtn'])
                 ->make(true);
         }  
     }
@@ -157,8 +157,9 @@ class MarketingSearchController extends Controller
     }
 
     public function transform($id) {
+        // dd($id);
         $marketingSearch = MarketingSearch::findOrFail($id);
-        return view('manager.prospects.marketingsearches.create_prospect', compact('marketingSearch'));        
+        return view('manager.prospects.marketingsearches.create_prospect', compact(['marketingSearch']));        
     }
 
 }

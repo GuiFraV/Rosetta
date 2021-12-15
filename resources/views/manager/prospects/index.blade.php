@@ -32,7 +32,7 @@
                 <th scope="col">Email</th>
                 <th scope="col">Phone</th>
                 <th scope="col">State</th>
-                <th scope="col">Actor</th>
+                <th scope="col">Manager</th>
                 <th scope="col">Creation</th>
                 <th scope="col">Deadline</th>
                 <th scope="col"></th>

@@ -34,6 +34,7 @@
                 <th scope="col">Creation</th>                
                 <th scope="col"></th>
                 <th scope="col"></th>
+                <th scope="col"></th>
             </tr>
         </thead>
         <tbody class="align-middle"></tbody>
