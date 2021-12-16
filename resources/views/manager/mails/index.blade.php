@@ -4,9 +4,7 @@
 <div class="container">
   <br>
   <div class="jumbotron text-center">
-      <form class="form-inline">
-          <h1 class="display-5" style="font-family: Segoe UI;">Email Management</h1>
-      </form>
+    <h1 class="display-5" style="font-family: Segoe UI;">Email Management</h1>
   </div>
   <br>
   
@@ -50,6 +48,7 @@
         <th scope="col">id</th>
         <th scope="col">Subject</th>
         <th scope="col">Automatic Sending</th>
+        <th scope="col">Author</th>
         <th scope="col">Created At</th>
         <th scope="col">Updated At</th>
         <th scope="col"></th>
@@ -90,6 +89,7 @@
         {data: 'id', name: 'id'},
         {data: 'object', name: 'object'},
         {data: 'autoSend', name: 'autoSend'},
+        {data: 'author', name: 'author'},
         {data: 'created_at', name: 'created_at'},
         {data: 'updated_at', name: 'updated_at'},
         {

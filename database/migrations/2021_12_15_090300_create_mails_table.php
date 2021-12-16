@@ -17,8 +17,10 @@ class CreateMailsTable extends Migration
         Schema::create('mails', function (Blueprint $table) {
             $table->id();
             $table->string('object', 255);
-            $table->string('message', 600);
+            $table->string('message', 3000);
             $table->boolean('autoSend')->default(0);
+            $table->unsignedBigInteger('author');
+            $table->foreign('author')->references('id')->on('managers'); 
             $table->timestamps();
         });
     }

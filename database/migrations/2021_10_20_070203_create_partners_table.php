@@ -23,9 +23,8 @@ class CreatePartnersTable extends Migration
             $table->string('email', 30)->unique();
             $table->string('type');
             $table->boolean('status')->default(1);
-            $table->timestamp('created_at')->default(DB::raw('CURRENT_TIMESTAMP'));
-            $table->timestamp('updated_at')->default(DB::raw('CURRENT_TIMESTAMP'));
             $table->foreign('manager_id')->references('id')->on('managers');
+            $table->timestamps();
         });
     }
 

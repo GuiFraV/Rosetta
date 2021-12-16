@@ -8,4 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 class group_partner extends Model
 {
     use HasFactory;
+
+    public $timestamps = false;
 }

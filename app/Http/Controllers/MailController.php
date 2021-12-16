@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Redirect;
 use App\Models\Mail;
 use App\Models\Group;
+use App\Models\Manager;
 use Carbon\Carbon;
 use DateTime;
 use GuzzleHttp\Client;
@@ -14,9 +15,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail as MailG;
 use Yajra\DataTables\DataTables;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-
-
-
+use Illuminate\Support\Facades\Auth;
 
 class MailController extends Controller
 {
@@ -54,6 +53,12 @@ class MailController extends Controller
                         $ret = "Erreur";
                     }
                     return $ret;
+                })
+                ->addColumn('author', function($row) 
+                {
+                    $managerName = DB::table('managers')->select('first_name', 'last_name')->where('id', $row->author)->get();
+                    foreach($managerName as $name)
+                        return $name->first_name.' '.$name->last_name;
                 })
                 ->editColumn('created_at', function($row)
                 {
@@ -100,10 +105,20 @@ class MailController extends Controller
         ]);
         */
 
+        /*
         $mail = Mail::create([
             'object' => $request->object,
             'message' => $request->message,
+            'author' => Manager::with('user')->where("user_id","=",Auth::user()->id)->get()[0]["id"]
         ]);
+        */
+
+        $mail = new Mail;
+        $mail->object = $request->object;
+        $mail->message = $request->message;
+        $mail->author = Manager::with('user')->where("user_id","=",Auth::user()->id)->get()[0]["id"];
+        $mail->save();
+
         return json_encode(array(
             "statusCode"=>200,
             "data"=>$mail
@@ -128,8 +143,8 @@ class MailController extends Controller
                 "message"=>$mail->message,
                 "autoSend"=>$autoDisplay,
                 "created_at"=>$mail->created_at->format('d-m-Y H:i'),
-                "updated_at"=>$updated_at
-                //"creator" => $mail->creator
+                "updated_at"=>$updated_at,
+                "author" => getManagerName($mail->author, 'all')
             ));
         } catch(ModelNotFoundException $e) {
             return json_encode(

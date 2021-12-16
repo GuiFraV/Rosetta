@@ -62,16 +62,12 @@ Route::group(['as'=>'manager.','prefix' => 'manager','middleware'=>['auth','mana
     Route::get('dashboard', [App\Http\Controllers\Manager\DashboardController::class, 'index'])->name('dashboard');
     Route::resource('trajets',TrajetController::class);
     Route::resource('partners',PartnerController::class);
-    Route::resource('groups',GroupController::class);
     Route::get('searchcity', [TrajetController::class, 'searchcity'])->name('searchcity');
     Route::get('duplicate', [TrajetController::class, 'duplicate'])->name('duplicate');
     Route::get('matching', [TrajetController::class, 'matching'])->name('matching');
-    Route::get('showGroup/{showGroup}', [RelationshipController::class, 'showGroup']);
-    Route::get('groups/showPartner/{group_id}', [RelationshipController::class, 'showPartner'])->name('groups.showPartner');
-    Route::post('groups/savePartnerToGroup', [RelationshipController::class, 'savePartnerToGroup'])->name('groups.savePartnerToGroup');
-    Route::get('groups/deletePartnerFromGroup/{group_id}/{partner_id}', [RelationshipController::class, 'deletePartnerFromGroup'])->name('groups.deletePartnerFromGroup');
     
     /// Emails ///
+    // Email routes
     Route::resource('mails', MailController::class, [
         'only' => ['index', 'store'],
         'except' => ['create', 'edit', 'destroy', 'show', 'update']
@@ -84,6 +80,23 @@ Route::group(['as'=>'manager.','prefix' => 'manager','middleware'=>['auth','mana
     Route::get('mails/edit/{id}', 'App\Http\Controllers\MailController@edit');
     Route::post('mails/update/{id}', 'App\Http\Controllers\MailController@update');
 
+    // Group routes
+    Route::resource('groups',GroupController::class, [
+      'only' => ['index', 'store'],
+      'except' => ['create', 'edit', 'destroy', 'show', 'update']
+    ]);
+
+    Route::get('groups', [GroupController::class, 'index'])->name('groups.index');
+    Route::get('groups/getGroups', [GroupController::class, 'getGroups'])->name('groups.getGroups');
+
+    Route::get('groups/openModalNew', [GroupController::class, 'openModalNew'])->name('groups.openModalNew');
+
+    Route::get('showGroup/{showGroup}', [RelationshipController::class, 'showGroup']);
+    Route::get('groups/showPartner/{group_id}', [RelationshipController::class, 'showPartner'])->name('groups.showPartner');
+    Route::post('groups/savePartnerToGroup', [RelationshipController::class, 'savePartnerToGroup'])->name('groups.savePartnerToGroup');
+    Route::get('groups/deletePartnerFromGroup/{group_id}/{partner_id}', [RelationshipController::class, 'deletePartnerFromGroup'])->name('groups.deletePartnerFromGroup');
+
+
     /// Prospects ///
     // Marketing Search routes
     Route::resource('prospect/marketingsearch', MarketingSearchController::class, [
@@ -91,7 +104,6 @@ Route::group(['as'=>'manager.','prefix' => 'manager','middleware'=>['auth','mana
     ]);
     Route::get('prospect/marketingsearch', [MarketingSearchController::class, 'index']);
     Route::get('prospect/marketingsearch/getMarketingSearches', [MarketingSearchController::class, 'getMarketingSearches'])->name('marketingsearch.getMarketingSearches');
-    
     Route::get('prospect/transform/{id}', [MarketingSearchController::class, 'transform'])->name('transform');
     /*
     Route::get('prospect/transform/{id}', function ($id) {

@@ -3,8 +3,12 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Manager\Group;
+use App\Models\Group;
 use App\Models\Partner;
+use App\Models\GroupPartner;
+use App\Models\Manager;
+use Illuminate\Support\Facades\Auth;
+use Yajra\DataTables\DataTables;
 
 class GroupController extends Controller
 {
@@ -13,37 +17,49 @@ class GroupController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
+    public function index()
     {
-        $title = 'Group Management';
-        // $groups = Group::all();
-        // $groups = Group::orderBy('id','asc')->paginate(10);
-        try {
-            $search = $request->get('searchbar');
-            // $cities = City::whereNotNull('city_name')->where('city_name','like','%'.$search.'%')->orderBy('city_name')->paginate(10);    
-            $groups = Group::where('groupName','like','%'.$search.'%')->orderBy('id','asc')->paginate(10);
-        } catch (\Throwable $th) {
-            // $cities = City::whereNotNull('city_name')->orderBy('city_name')->paginate(10);
-            $groups = Group::orderBy('id','asc'
-            )->paginate(10);
+        return view('manager.groups.index'); //->with('title',$title)->with('mails', $mails)->with('lastMail',$lastMail)->with('groups',$groups);
+    }
+
+    public function getGroups(Request $request)
+    {
+        if ($request->ajax()) {      
+            $data = Group::all();
+            return DataTables::of($data)                
+                ->addIndexColumn()                
+                ->editColumn('created_at', function($row)
+                {
+                   $created_at = $row->created_at->format('d-m-Y');
+                   return $created_at;
+                })
+                ->editColumn('updated_at', function($row)
+                {
+                   $updated_at = $row->updated_at->format('d-m-Y');
+                   return $updated_at;
+                })
+                ->addColumn('testBtn', function($row)
+                {
+                    $testBtn = '<a role="button" class="bi bi-trash text-danger" style="font-size: 1.4rem;"></a>';
+                    return $testBtn;
+                })                
+                ->rawColumns(['testBtn'])
+                ->make(true);
         }  
-        return view('manager.groups.index')->with('groups', $groups);
-        // return view('manager.groups.index');
     }
 
     /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        
-        $groups = Group::get();
-        $partners = Partner::where('type', '=', 'Client')
-                            ->where('status', '=', 1)
-                            ->get();
-        return view('manager.groups.create')->with('partners',$partners)->with('groups',$groups);
+    * Return the partners list of the current manager to the modal new group.
+    *
+    * @return \Illuminate\Http\Response
+    */
+    public function openModalNew() {
+        $partners = Partner::all()->where('manager_id', '=', getManagerId());        
+        $responseArray = array();
+        foreach($partners as $partner) {
+            array_push($responseArray, ["label" => $partner['company'] . " | " . $partner['type'] . " | " . $partner['origin'], "value" => $partner['id']]);
+        }
+        return json_encode($responseArray);        
     }
 
     /**
@@ -54,11 +70,26 @@ class GroupController extends Controller
      */
     public function store(Request $request)
     {
+        $request->validate([
+          'groupName' => 'required',
+          'partnersId' => 'required'
+        ]);   
+        
         $group = new Group;
-        $group->groupName = $request->input('groupName');
-
+        $group->groupName = $request->groupName;
+        $group->creator = Manager::with('user')->where("user_id","=",Auth::user()->id)->get()[0]["id"];
         $group->save();
-        return redirect('groups');
+        
+        foreach($request->partnersId as $id) {
+            $rel = new GroupPartner;
+            $rel->group_id = $group->id;
+            $rel->partner_id = $id;
+            $rel->save();
+        }
+
+        return json_encode(array(
+          "statusCode"=>200
+        ));
     }
 
     /**

@@ -14,11 +14,13 @@ class CreateGroupPartnersTable extends Migration
     public function up()
     {
         Schema::create('group_partner', function (Blueprint $table) {
-            $table->integer('group_id')->unsigned();
-            $table->foreign('group_id')->references('id')->on('groups');
-
-            $table->integer('partner_id')->unsigned();
-            $table->foreign('partner_id')->references('id')->on('partners');
+            $table->engine = 'InnoDB';
+          
+            $table->bigInteger('group_id')->unsigned();
+            $table->foreign('group_id')->references('id')->on('groups')->onDelete('cascade');
+          
+            $table->bigInteger('partner_id')->unsigned();
+            $table->foreign('partner_id')->references('id')->on('partners')->onDelete('cascade');
         });
     }
 

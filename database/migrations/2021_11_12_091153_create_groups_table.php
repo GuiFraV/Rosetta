@@ -16,9 +16,9 @@ class CreateGroupsTable extends Migration
         Schema::create('groups', function (Blueprint $table) {
             $table->id();
             $table->string('groupName');
-            $table->timestamp('created_at')->default(DB::raw('CURRENT_TIMESTAMP'));
-            $table->timestamp('updated_at')->default(DB::raw('CURRENT_TIMESTAMP'));
-        
+            $table->unsignedBigInteger('creator')->nullable();
+            $table->foreign('creator')->references('id')->on('managers');
+            $table->timestamps();
         });
     }
 
