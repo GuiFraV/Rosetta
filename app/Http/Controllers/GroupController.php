@@ -38,12 +38,22 @@ class GroupController extends Controller
                    $updated_at = $row->updated_at->format('d-m-Y');
                    return $updated_at;
                 })
-                ->addColumn('testBtn', function($row)
+                ->addColumn('showBtn', function($row)
                 {
-                    $testBtn = '<a role="button" class="bi bi-trash text-danger" style="font-size: 1.4rem;"></a>';
-                    return $testBtn;
+                    $showBtn = '<a role="button" class="bi bi-eye text-primary" style="font-size: 1.4rem;" onclick="openShowModal('.$row->id.');"></a>';
+                    return $showBtn;
+                })
+                ->addColumn('editBtn', function($row)
+                {
+                    $editBtn = '<a role="button" class="bi bi-pencil text-warning" style="font-size: 1.4rem;" onclick="openModalEdit('.$row->id.');"></a>';
+                    return $editBtn;
+                })
+                ->addColumn('deleteBtn', function($row)
+                {
+                    $deleteBtn = '<a role="button" class="bi bi-trash text-danger" style="font-size: 1.4rem;" onclick="$(\'#destroyModal\').modal(\'show\'); $(\'#destroyedId\').val('.$row->id.');"></a>';
+                    return $deleteBtn;
                 })                
-                ->rawColumns(['testBtn'])
+                ->rawColumns(['showBtn', 'editBtn', 'deleteBtn'])
                 ->make(true);
         }  
     }
@@ -100,7 +110,42 @@ class GroupController extends Controller
      */
     public function show($id)
     {
-        // $group = Group::find($id);
+        try {
+            $group = Group::findOrFail($id);
+            $responseArray = array();
+            $updated_at = ($group->created_at == $group->updated_at) ? "none" : $group->updated_at->format('d-m-Y H:i');
+            array_push($responseArray, [
+                "group" => [
+                    "name" => $group->groupName, 
+                    "creator" => getManagerName($group->creator, 'all'), 
+                    "created_at" => $group->created_at->format('d-m-Y H:i'), 
+                    "updated_at" => $updated_at
+                ]
+            ]);
+
+            $groupPartnerIds = GroupPartner::all()->where('group_id', '=', $id);
+            foreach($groupPartnerIds as $groupPartnerId) {
+                $partner = Partner::find($groupPartnerId->partner_id);
+                array_push($responseArray, [
+                    "partner" => [
+                        "company" => $partner['company'],
+                        "origin" => $partner['origin'],
+                        "phone" => $partner['phone'],
+                        "email" => $partner['email']
+                    ]
+                ]);
+            }
+            array_push($responseArray, ["statusCode"=>200]);
+            return json_encode($responseArray);       
+        } catch(ModelNotFoundException $e) {
+            return json_encode(
+                array(
+                    "statusCode"=>400,
+                    "error"=>$e
+                )
+            );
+        }
+
         // var_dump($group->partners);
         // return view('manager.groups.index')->with('group', $group);
     }
@@ -151,13 +196,17 @@ class GroupController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
+    * Remove the specified resource from storage.
+    *
+    * @param  Request $request
+    * @return \Illuminate\Http\Response
+    */
+    public function destroyer(Request $request) 
     {
-        //
+        $ret = Group::destroy($request->id);
+        return json_encode(array(
+            "statusCode"=>200,
+            "destroyStatus"=>$ret
+        ));
     }
 }

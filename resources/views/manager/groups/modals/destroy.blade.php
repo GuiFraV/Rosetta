@@ -3,11 +3,11 @@
   <div class="modal-dialog ">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="destroyModalLabel">Please confirm email deletion</h5>
+        <h5 class="modal-title" id="destroyModalLabel">Please confirm group deletion</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <span>Are you sure you want to delete this Email?</span>
+        <span>Are you sure you want to delete this group?</span>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-success" data-bs-dismiss="modal">Close</button>
@@ -28,7 +28,7 @@
     $.ajax({
       async: true,
       type: "DELETE",
-      url: "mails/destroyer/"+id,
+      url: "groups/destroyer/"+id,
       dataType: "JSON",
       data: {"id": id},
       cache: false,
@@ -36,9 +36,9 @@
       contentType: false,    
       success: function(data) {
           $('#destroyedId').val("");
-          $('#emailDataTable').DataTable().ajax.reload();
+          $('#groupDataTable').DataTable().ajax.reload();
           $('#destroyModal').modal('hide');
-          toastr.warning("This email has been deleted");
+          toastr.warning("This group has been deleted");
       },
       error: function (request, status, error) {
           console.log(error);

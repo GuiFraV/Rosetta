@@ -1,6 +1,6 @@
 <style>
   .lbl-color {
-      color: #1f3d7a;
+      color: #1f3d7a; 
   }
 </style>
 
@@ -12,38 +12,38 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <div class="col">
-          <h5 class="lbl-color">Email subject :</h5>
-          {{-- <p id="emailShowSubject"></p> --}}
-          <input id="emailShowSubject" class="form-control" type="text" disabled readonly>
-        </div><br>
-        <h5 class="lbl-color">Email content :</h5>
-        {{-- <p id="emailShowContent"></p><br> --}}
-        <textarea class="form-control mce-editor" id="emailShowContent"></textarea><br>
+        <table class="table table-striped table-hover">
+          <h5 class="lbl-color">Partners in this group :</h5>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Origin</th>
+              <th>Phone</th>
+              <th>Email</th>
+              {{-- <th>Go to partner details</th> --}}
+            </tr>
+          </thead>
+          <tbody id="groupShowTable"></tbody>
+        </table>
         <div class="row text-center">
           <div class="col">
-            <h5 class="lbl-color">Automatic sending :</h5>
-            <p id="emailShowAutoSend"></p>
-          </div>
-          <div class="col">
-            <h5 class="lbl-color">Author :</h5>
-            <p id="emailShowAuthor"></p>
+            <h5 class="lbl-color">Creator :</h5>
+            <p id="groupShowCreator"></p>
           </div>
         </div>
         <div class="row text-center">
           <div class="col">          
             <h5 class="lbl-color">Created at :</h5>
-            <p id="emailShowCreatedAt"></p>
+            <p id="groupShowCreatedAt"></p>
           </div>
           <div class="col" id="hideShowUpdated">
             <h5 class="lbl-color">Updated at :</h5>
-            <p id="emailShowUpdatedAt"></p>
+            <p id="groupShowUpdatedAt"></p>
           </div>
         </div>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        {{-- s<button type="button" class="btn btn-primary">Save changes</button> --}}
       </div>
     </div>
   </div>
@@ -54,7 +54,7 @@
     $.ajax({
       async: true,
       type: "GET",
-      url: "mails/"+id,
+      url: "groups/"+id,
       dataType: "JSON",
       data: {"id": id},
       cache: false,
@@ -62,26 +62,37 @@
       contentType: false,    
       success: function(data) {
         /// Debug on send
-        //console.log(data);
-        if(data['statusCode'] === 400) {
-          toastr.warning("Specified email has not been found. Try to reload the page.")
-        } else if (data['statusCode'] === 200){
-          $('#showModalLabel').html("Mail N°"+id);
-          $('#emailShowSubject').val(data['object']);
-          tinymce.get('emailShowContent').setContent(data['message']);
-          // Commented because it doesn't works, but the idea is to hide the toolbar with Jquery / CSS
-          //$('#emailShowContent').children(".tox-editor-header").css('display','none');
-          tinymce.get('emailShowContent').setMode('readonly');
-          $('#emailShowAutoSend').html(data['autoSend']);
-          $('#emailShowAuthor').html(data['author']);
-          $('#emailShowCreatedAt').html(data['created_at']);
-          if(data['updated_at'] === "none") {
-            $('#hideShowUpdated').hide();
-          } else {
-            $('#hideShowUpdated').show();
-            $('#emailShowUpdatedAt').html(data['updated_at']);
-          }
-          $('#showModal').modal('show');
+        console.log(data);
+        // console.log(data[2]['statusCode']);
+        let boolCheck = false;
+        data.forEach(row => {            
+          if(row['statusCode'] != undefined && row['statusCode'] === 200) {
+            boolCheck = true;
+          } 
+        });
+        if(boolCheck) {
+          $('#groupShowTable').html('');
+          data.forEach(row => {            
+            if(row['group'] != undefined) {
+              console.log(row['group']);
+              $('#showModalLabel').html("Group "+row['group']['name']);
+              $('#groupShowCreator').html(row['group']['creator']);
+              $('#groupShowCreatedAt').html(row['group']['created_at']);
+              if(row['group']['updated_at'] === "none") {
+                $('#hideShowUpdated').hide();
+              } else {
+                $('#groupShowUpdatedAt').html(row['group']['updated_at']);
+                $('#hideShowUpdated').show();                
+              }
+              $('#showModal').modal('show');              
+            } else if(row['partner'] != undefined) {
+              console.log(row['partner']);
+              $('#groupShowTable').append("<tr><td>"+row['partner']['company']+"</td><td>"+row['partner']['origin']+"</td><td>"+row['partner']['phone']+"</td><td>"+row['partner']['email']+"</td></tr>");
+            }
+          });
+        } else {
+          // Error case, status code === 400
+          // toastr.warning("The specified group has not been found. Try to reload the page.")
         }
       },
       error: function (request, status, error) {

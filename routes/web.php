@@ -88,8 +88,9 @@ Route::group(['as'=>'manager.','prefix' => 'manager','middleware'=>['auth','mana
 
     Route::get('groups', [GroupController::class, 'index'])->name('groups.index');
     Route::get('groups/getGroups', [GroupController::class, 'getGroups'])->name('groups.getGroups');
-
     Route::get('groups/openModalNew', [GroupController::class, 'openModalNew'])->name('groups.openModalNew');
+    Route::delete('groups/destroyer/{id}', 'App\Http\Controllers\GroupController@destroyer');
+    Route::get('groups/{id}', 'App\Http\Controllers\GroupController@show');
 
     Route::get('showGroup/{showGroup}', [RelationshipController::class, 'showGroup']);
     Route::get('groups/showPartner/{group_id}', [RelationshipController::class, 'showPartner'])->name('groups.showPartner');
