@@ -1,27 +1,29 @@
-<div class="modal fade" id="editEmailModal" data-bs-backdrop="static" aria-hidden="true" aria-labelledby="editEmailModalLabel" tabindex="-1">
+<div class="modal fade" id="editGroupModal" data-bs-backdrop="static" aria-hidden="true" aria-labelledby="editGroupModalLabel" tabindex="-1">
   <div class="modal-dialog modal-dialog-centered modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="editEmailModalLabel">Edit Email</h5>
+        <h5 class="modal-title" id="editGroupModalLabel"></h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <form id="formEditMail" method="POST" enctype="multipart/form-data"">
+      <form id="formEditGroup" method="POST" enctype="multipart/form-data">
         @csrf
         <input type="text" name="editedId" id="editedId" hidden/>
-        <div class="modal-body">          
+        <div class="modal-body" id="modal_content">
           <div class="form-group">
-              <label class="control-label required" for="modal-input-object">Subject</label>
-              <input type="text" id="emailEditObject" name="emailEditObject" required="required" maxlength="255" class="form-control"/>
+            <label class="control-label required" for="groupName">Group name</label>
+            <input type="text" id="groupName" name="groupName" maxlength="191" class="form-control" required="required"/>
           </div>
           <br>
           <div class="form-group">
-            <label class="control-label required" for="modal-input-message">Message</label>
-            <textarea id="emailEditContent" name="emailEditContent" class="mce-editor" data-theme="bh" rows="10"></textarea>
+            <div class="form-group">
+              <label class="control-label required" for="article-ckeditor">Partners</label>
+              <select class="selectpicker" data-actions-box="true" data-width="fit" name="partnersId[]" data-live-search="true" data-selected-text-format="count > 2" data-size="5" multiple></select>
+            </div>
           </div>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <button type="submit" id="btn_update" class="btn btn-warning">Edit</button>
+          <input class="btn btn-primary" id="createBt" type="submit" value="Edit group"/>
         </div>
       </form>
     </div>
@@ -29,11 +31,11 @@
 </div>
 
 <script>
-  function openModalEditMail(id) {
+  function openModalEdit(id) {
     $.ajax({
       async: true,
       type: "GET",
-      url: "mails/edit/"+id,
+      url: "groups/edit/"+id,
       dataType: "JSON",
       data: {"id": id},
       cache: false,
@@ -41,15 +43,26 @@
       contentType: false,    
       success: function(data) {
         /// Debug JSON response
-        console.log(data);
+        // console.log(data);        
         if(data['statusCode'] === 400) {
-          toastr.warning("Specified email has not been found. Try to reload the page.")
+          toastr.warning("Error while loading the group. Try to reload the page.");
+          return 1;
         } else if (data['statusCode'] === 200) {
-          $('#editedId').val(data['id']);
-          $('#emailEditObject').val(data['object']);
-          tinymce.get('emailEditContent').setContent(data['message']);
-          $('#emailEditAutoSend').html(data['autoSend']);
-          $('#editEmailModal').modal('show');
+          if(data['partnersOptions'] == []) {
+            toastr.error("You don't have any partner on your manager account.");
+            return 1;
+          } else {
+            $('#editedId').val(data['editedId']);
+            $('#editGroupModalLabel').html("Edit group "+data['groupName']);
+            $('input[name="groupName"]').val(data['groupName']);
+            $('.selectpicker').empty();
+            data['partnersOptions'].forEach(row => {            
+              $('.selectpicker').append("<option value='"+row['value']+"'>"+row['label']+"</option>");
+            });
+            $('select[name="partnersId[]"]').val(data['id']);
+            $('.selectpicker').selectpicker('refresh');
+            $('#editGroupModal').modal('show');
+          }
         }
       },
       error: function (request, status, error) {
@@ -58,25 +71,30 @@
     });  
   }
 
-  let formEditMail = $("#formEditMail");
-  formEditMail.submit(function (e) {
+  let formEditGroup = $("#formEditGroup");
+  formEditGroup.submit(function (e) {
     e.preventDefault(e);
-    tinyMCE.triggerSave();
     let fd = new FormData(this);
     $.ajax({
       async: true,
       type: "POST",
-      url: "mails/update/"+$('#editedId').val(),
+      url: "groups/update/"+$('#editedId').val(),
       data: fd,     
       cache: false,
       processData: false,
       contentType: false,    
       success: function(data) {
-        /// Debug on send
-        //console.log(data);
-        $('#emailDataTable').DataTable().ajax.reload();
-        $('#editEmailModal').modal('hide');
-        toastr.success("The email has been edited!");
+        /// Debug the response
+        let res = JSON.parse(data);
+        console.log(res);
+        if(res['statusCode'] === 200) {
+          $('#groupDataTable').DataTable().ajax.reload();
+          $('#editGroupModal').modal('hide');
+          toastr.success("The group has been edited!");
+        } else if(res['statusCode'] === 400) {
+          toastr.warning("There has been an error during the edition of the group. Try to reload the page.")
+        }
+        
       },
       error: function (request, status, error) {
         console.log("error");

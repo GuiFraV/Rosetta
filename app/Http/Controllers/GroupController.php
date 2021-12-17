@@ -158,6 +158,36 @@ class GroupController extends Controller
      */
     public function edit($id)
     {
+      try {
+          $group = Group::findOrFail($id);          
+          $groupPartnerIds = GroupPartner::all()->where('group_id', '=', $id);
+          $arrayIds = array();
+          foreach($groupPartnerIds as $groupPartnerId) {              
+              array_push($arrayIds, $groupPartnerId->partner_id);              
+          }
+          $partners = Partner::all()->where('manager_id', '=', getManagerId());        
+          $selectOptionsArray = array();
+          foreach($partners as $partner) {
+              array_push($selectOptionsArray, ["label" => $partner['company'] . " | " . $partner['type'] . " | " . $partner['origin'], "value" => $partner['id']]);
+          }
+          return json_encode(
+              array(
+                  "statusCode"=>200,
+                  "editedId" => $id,
+                  "groupName"=>$group->groupName,
+                  "id" => $arrayIds,                  
+                  "partnersOptions" => $selectOptionsArray
+              )
+          );
+      } catch(ModelNotFoundException $e) {                
+          return json_encode(
+              array(
+                  "statusCode"=>400,
+                  "error"=>$e
+              )
+          );        
+      }
+        /*
         $partners = Partner::where('type', '=', 'Client')
                             ->where('status', '=', 1)
                             ->get();
@@ -171,6 +201,7 @@ class GroupController extends Controller
         return view('manager.groups.edit')->with('group',$group)->with('title',$title)
                                 ->with('partners_gr',$partners_gr)
                                 ->with('partners',$partners);
+        */
     }
 
     /**
@@ -182,17 +213,34 @@ class GroupController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $group = Group::find($id);
-        $group->groupName = $request->groupName;
-        $group->save();
-        // $group->update($request->input('groupName'));
-        $groupId = $group->id;
-            $group1 = Group::find($groupId);
-            if(!$group1)
-                return abort('404');    
-        $group1 -> partners()->sync($request -> partnersId);    
-        return redirect()->route('manager.groups.index')
-                        ->with('success','Group updated successfully');
+        $request->validate([
+            'editedId' => 'required',
+            'groupName' => 'required',
+            'partnersId' => 'required'
+        ]);   
+
+        try {
+            $group = Group::findOrFail($id);       
+            $group->groupName = $request->groupName;
+            $group->save();
+            GroupPartner::where('group_id', '=', $id)->delete();
+            foreach ($request->partnersId as $id) {
+                $rel = new GroupPartner;
+                $rel->group_id = $group->id;
+                $rel->partner_id = $id;
+                $rel->save();
+            }
+            return json_encode(array(
+                "statusCode"=>200
+            ));
+        } catch(ModelNotFoundException $e) {                
+            return json_encode(
+                array(
+                    "statusCode"=>400,
+                    "error"=>$e
+                )
+            );        
+        }
     }
 
     /**

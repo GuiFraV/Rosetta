@@ -41,6 +41,7 @@
 
 @include('manager.groups.modals.create')
 @include('manager.groups.modals.show')
+@include('manager.groups.modals.edit')
 @include('manager.groups.modals.destroy')
 
 <script>

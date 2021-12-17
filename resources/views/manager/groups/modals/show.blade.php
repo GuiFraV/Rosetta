@@ -63,7 +63,6 @@
       success: function(data) {
         /// Debug on send
         console.log(data);
-        // console.log(data[2]['statusCode']);
         let boolCheck = false;
         data.forEach(row => {            
           if(row['statusCode'] != undefined && row['statusCode'] === 200) {
@@ -92,7 +91,7 @@
           });
         } else {
           // Error case, status code === 400
-          // toastr.warning("The specified group has not been found. Try to reload the page.")
+          // toastr.warning("The specified group has not been found. Try to reload the page.");
         }
       },
       error: function (request, status, error) {
