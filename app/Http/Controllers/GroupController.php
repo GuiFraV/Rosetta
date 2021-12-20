@@ -84,7 +84,7 @@ class GroupController extends Controller
           'groupName' => 'required',
           'partnersId' => 'required'
         ]);   
-        
+
         $group = new Group;
         $group->groupName = $request->groupName;
         $group->creator = Manager::with('user')->where("user_id","=",Auth::user()->id)->get()[0]["id"];
@@ -216,7 +216,7 @@ class GroupController extends Controller
         $request->validate([
             'editedId' => 'required',
             'groupName' => 'required',
-            'partnersId' => 'required'
+            'partnersIdEdit' => 'required'
         ]);   
 
         try {
@@ -224,7 +224,7 @@ class GroupController extends Controller
             $group->groupName = $request->groupName;
             $group->save();
             GroupPartner::where('group_id', '=', $id)->delete();
-            foreach ($request->partnersId as $id) {
+            foreach ($request->partnersIdEdit as $id) {
                 $rel = new GroupPartner;
                 $rel->group_id = $group->id;
                 $rel->partner_id = $id;

@@ -1,3 +1,8 @@
+<style>
+  .ms-container {
+    width: 100%;
+  }
+</style>
 <div class="modal fade" id="createGroupModal" data-bs-backdrop="static" aria-hidden="true" aria-labelledby="createGroupModalLabel" tabindex="-1">
   <div class="modal-dialog modal-dialog-centered modal-dialog modal-lg">
     <div class="modal-content">
@@ -14,10 +19,11 @@
           </div>
           <br>
           <div class="form-group">
-            <div class="form-group">
-              <label class="control-label required" for="article-ckeditor">Partners</label>
-              <select class="selectpicker" data-actions-box="true" data-width="fit" name="partnersId[]" data-live-search="true" data-selected-text-format="count > 2" data-size="5" multiple></select>
-            </div>
+            <select id="multiselect" name="partnersId[]" multiple="multiple"></select>
+            <div class="btn-group" role="group" aria-label="Basic outlined example" style="width: 100%">
+              <a role="button" class="btn btn-outline-primary bi bi-chevron-double-left" onclick="$('#multiselect').multiSelect('deselect_all');"></a>
+              <a role="button" class="btn btn-outline-primary bi bi-chevron-double-right" onclick="$('#multiselect').multiSelect('select_all');"></a>              
+            </div>  
           </div>
         </div>
         <div class="modal-footer">
@@ -50,7 +56,7 @@
           toastr.warning("Error while creating the new group. Try to reload the page.")
         } else if (data['statusCode'] === 200) {
           $('#groupName').val("");
-          $('.selectpicker').selectpicker('refresh');
+          $('#multiselect').multiSelect('refresh');
           $('#groupDataTable').DataTable().ajax.reload();
           $('#createGroupModal').modal('hide');
           toastr.success("The group has been created!")

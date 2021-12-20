@@ -93,13 +93,19 @@
           toastr.error("You don't have any partner to create a new group.");
           return 1;
         } else {
+          $('#groupName').val('');
           let options = JSON.parse(data);
-          $('.selectpicker').empty();
+          // $('.selectpicker').empty();
+          $('#multiselect').empty();
           // console.log(options);
           options.forEach(row => {            
-            $('.selectpicker').append("<option value='"+row['value']+"'>"+row['label']+"</option>");
+            $('#multiselect').append("<option value='"+row['value']+"'>"+row['label']+"</option>");
           });
-          $('.selectpicker').selectpicker('refresh');
+          $('#multiselect').multiSelect({
+            selectableHeader: "<div class='custom-header'>Available partners</div>",
+            selectionHeader: "<div class='custom-header'>Selected partners</div>",
+          });
+          $('#multiselect').multiSelect('refresh');
           $('#createGroupModal').modal('show');
         }
       },

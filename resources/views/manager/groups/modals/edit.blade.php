@@ -14,11 +14,9 @@
             <input type="text" id="groupName" name="groupName" maxlength="191" class="form-control" required="required"/>
           </div>
           <br>
-          <div class="form-group">
-            <div class="form-group">
-              <label class="control-label required" for="article-ckeditor">Partners</label>
-              <select class="selectpicker" data-actions-box="true" data-width="fit" name="partnersId[]" data-live-search="true" data-selected-text-format="count > 2" data-size="5" multiple></select>
-            </div>
+          <div class="form-group">            
+              <label class="control-label required" for="partnersIdEdit[]">Partners</label>
+              <select id="multiselectEdit" name="partnersIdEdit[]" multiple="multiple"></select>            
           </div>
         </div>
         <div class="modal-footer">
@@ -55,12 +53,16 @@
             $('#editedId').val(data['editedId']);
             $('#editGroupModalLabel').html("Edit group "+data['groupName']);
             $('input[name="groupName"]').val(data['groupName']);
-            $('.selectpicker').empty();
+            $('#multiselectEdit').empty();
             data['partnersOptions'].forEach(row => {            
-              $('.selectpicker').append("<option value='"+row['value']+"'>"+row['label']+"</option>");
+              $('#multiselectEdit').append("<option value='"+row['value']+"'>"+row['label']+"</option>");
             });
-            $('select[name="partnersId[]"]').val(data['id']);
-            $('.selectpicker').selectpicker('refresh');
+            $('select[name="partnersIdEdit[]"]').val(data['id']);
+            $('#multiselectEdit').multiSelect({
+              selectableHeader: "<div class='custom-header'>Available partners</div>",
+              selectionHeader: "<div class='custom-header'>Selected partners</div>",
+            });
+            $('#multiselectEdit').multiSelect('refresh');            
             $('#editGroupModal').modal('show');
           }
         }
