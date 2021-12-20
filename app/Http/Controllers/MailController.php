@@ -252,8 +252,8 @@ class MailController extends Controller
         [
             'form_params' => 
             [
-                "from" => "developpement2@intergate-logistic.com",
-                "to" => "developpement@intergate-logistic.com",
+                "from" => "test@test.com",#manager_email
+                "to" => ["developpement@intergate-logistic.com","developpement2@intergate-logistic.com"],#manager_group
                 // "bcc" => $partnersGroup,
                 "subject" => "Test",
                 "text"=>"Testing Mailgun"
@@ -264,7 +264,7 @@ class MailController extends Controller
             'auth' => 
             [
                 'api', 
-                '43526b2c35140be76be6dae3a2e40423-2ac825a1-5069aa70'
+                'key-c02e140e0e1bcb64d3b94bc90876e02d'
             ]
         ]);
 

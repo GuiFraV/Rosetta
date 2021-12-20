@@ -119,7 +119,7 @@
       async: true,
       type: "POST",
       // url: "manager/mails/sendMail/",
-      url: "mails.sendMail",
+      url: "mails/sendMail",
       dataType: "JSON",
       // data: {"id": id},
       cache: false,
