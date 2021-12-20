@@ -58,6 +58,7 @@
     </thead>
     <tbody class="align-middle"></tbody>
   </table><br>
+  <a role="button" class="btn btn-light" onclick="ajaxSendMail();" value="">123</a>
 </div>
 
 @include('manager.mails.modals.create')
@@ -66,8 +67,7 @@
 @include('manager.mails.modals.destroy')
 
 <script type="text/javascript">
-  
-  
+
   var isFirstLoad = 1;  
   $('#btnNewMail').on('click', function() {
     // If it is the load of the page, clears the sujet and message precedent content
@@ -113,6 +113,28 @@
       ]
     });
   });
+
+  function ajaxSendMail() {
+    $.ajax({
+      async: true,
+      type: "POST",
+      // url: "manager/mails/sendMail/",
+      url: "mails.sendMail",
+      dataType: "JSON",
+      // data: {"id": id},
+      cache: false,
+      processData: false,
+      contentType: false,    
+      success: function(data) {
+        /// Debug on send
+        console.log(data);
+      },
+      error: function (request, status, error) {
+        console.log(error);
+      }
+    });
+    return 0;
+  }
 </script>
 
 {{--

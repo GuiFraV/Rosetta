@@ -93,8 +93,7 @@
           toastr.success("The group has been edited!");
         } else if(res['statusCode'] === 400) {
           toastr.warning("There has been an error during the edition of the group. Try to reload the page.")
-        }
-        
+        }  
       },
       error: function (request, status, error) {
         console.log("error");

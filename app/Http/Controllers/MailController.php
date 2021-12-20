@@ -105,14 +105,6 @@ class MailController extends Controller
         ]);
         */
 
-        /*
-        $mail = Mail::create([
-            'object' => $request->object,
-            'message' => $request->message,
-            'author' => Manager::with('user')->where("user_id","=",Auth::user()->id)->get()[0]["id"]
-        ]);
-        */
-
         $mail = new Mail;
         $mail->object = $request->object;
         $mail->message = $request->message;
@@ -213,54 +205,7 @@ class MailController extends Controller
                 )
             );
         }
-        /*
-        return json_encode(array(
-            "statusCode"=>200,
-            "data"=>$mail
-        ));
-        */
-        /*
-        $this->validate($request, [
-             'object' => 'required',
-             'message' => 'required'
-         ]);
-        $mail = Mail::find($id);
-        $mail->object = $request->input('object');
-        $mail->message = $request->input('message');
-        $mail->save();
-        $group->update($request->input('groupName'));
-        return redirect()->route('groups.index')
-                        ->with('success','Group updated successfully');
- 
-        $mail->update();
-        return redirect('mails')->back()->with('success','Email updated');
-        */
     }
-
-    /*
-    public function update(Request $request)
-    {
-        $dt = new DateTime();
-        $mail_id = $request->input('mail_id');
-        $mail->updated_at = $dt->format('Y-m-d H:i:s');
-        $mail->update($request->all());
-        return redirect()->route('mails.index')
-                        ->with('success','Email updated successfully');
-
-        $this->validate($request, [
-            'object' => 'required',
-            'message' => 'required'
-        ]);
-        $id = $request->input('id1');
-        $mail = Mail::find($id);
-        $mail->object = $request->input('object');
-        $mail->message = $request->input('message');
-
-        $mail->update();
-        return redirect()->route('mails.index')
-                         ->with('success','Email updated successfully');
-    }
-    */
 
     /**
     * Remove the specified resource from storage.
@@ -275,5 +220,59 @@ class MailController extends Controller
             "statusCode"=>200,
             "destroyStatus"=>$ret
         ));
+    }
+
+    //Request $request
+    public function sendMail() {
+        
+        /*      
+        $mailId = $request->input('mailId1');
+        $groupId = $request->input('group_id');
+        $sendDate = $request->input('sendDate');
+        $newDate = date('D, d M Y H:i:s O', strtotime($sendDate));
+
+        $mail = Mail::find($mailId);
+        $group = Group::find($groupId);
+
+        $details = [
+            'object' => $mail->object,
+            'message' => $mail->message
+        ];
+
+        $selectedPartners = $group -> partners;
+        $partnersGroup = array();
+        foreach ($selectedPartners as $partner){
+            $partnersGroup[] = $partner->email;
+        }
+        */
+
+        $client = new Client();
+        // $res = $client->request('POST', 'https://api.mailgun.net/v3/sandboxd905481280454e0cb56438aba176aa59.mailgun.org/messages', 
+        $res = $client->request('POST', 'https://api.mailgun.net/v3/sandbox9523439c43cd469fab938c565c1f8b33.mailgun.org/messages', 
+        [
+            'form_params' => 
+            [
+                "from" => "developpement2@intergate-logistic.com",
+                "to" => "developpement@intergate-logistic.com",
+                // "bcc" => $partnersGroup,
+                "subject" => "Test",
+                "text"=>"Testing Mailgun"
+                // "o:deliverytime" => Carbon::now()->hours(2)->toRfc2822String(),
+                // "o:deliverytime" => $newDate,
+                // "html" => view('mails\myTestMail',compact('details'))->render()
+            ],
+            'auth' => 
+            [
+                'api', 
+                '43526b2c35140be76be6dae3a2e40423-2ac825a1-5069aa70'
+            ]
+        ]);
+
+        $results = json_decode($res->getBody(), true);
+        if($results) {
+            return json_encode("Success! Your E-mail has been sent.");
+        } else {
+            return json_encode("Failed! Your E-mail has not sent.");
+        }  
     }
 }

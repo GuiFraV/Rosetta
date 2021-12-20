@@ -79,6 +79,7 @@ Route::group(['as'=>'manager.','prefix' => 'manager','middleware'=>['auth','mana
     Route::get('mails/{id}', 'App\Http\Controllers\MailController@show');
     Route::get('mails/edit/{id}', 'App\Http\Controllers\MailController@edit');
     Route::post('mails/update/{id}', 'App\Http\Controllers\MailController@update');
+    Route::post('mails/sendMail/', 'App\Http\Controllers\MailController@sendMail')->name('mails.sendMail');
 
     // Group routes
     Route::resource('groups',GroupController::class, [
