@@ -61,10 +61,20 @@ Route::group(['as'=>'manager.','prefix' => 'manager','middleware'=>['auth','mana
     
     Route::get('dashboard', [App\Http\Controllers\Manager\DashboardController::class, 'index'])->name('dashboard');
     Route::resource('trajets',TrajetController::class);
-    Route::resource('partners',PartnerController::class);
     Route::get('searchcity', [TrajetController::class, 'searchcity'])->name('searchcity');
     Route::get('duplicate', [TrajetController::class, 'duplicate'])->name('duplicate');
     Route::get('matching', [TrajetController::class, 'matching'])->name('matching');
+
+    /// Partners ///
+    // Partner routes
+    Route::resource('partners',PartnerController::class, [
+      'only' => ['index', 'store'],
+      'except' => ['create', 'edit', 'destroy', 'show', 'update']
+    ]);
+
+    Route::get('partners', [PartnerController::class, 'index'])->name('partners.index');
+    Route::get('partners/getPartners', [PartnerController::class, 'getPartners'])->name('partners.getPartners');
+
     
     /// Emails ///
     // Email routes
@@ -95,11 +105,12 @@ Route::group(['as'=>'manager.','prefix' => 'manager','middleware'=>['auth','mana
     Route::get('groups/edit/{id}', 'App\Http\Controllers\GroupController@edit');
     Route::post('groups/update/{id}', 'App\Http\Controllers\GroupController@update');
 
+    /* /// Are these even used routes ? Because everything looks handled in the Group Controller.
     Route::get('showGroup/{showGroup}', [RelationshipController::class, 'showGroup']);
     Route::get('groups/showPartner/{group_id}', [RelationshipController::class, 'showPartner'])->name('groups.showPartner');
     Route::post('groups/savePartnerToGroup', [RelationshipController::class, 'savePartnerToGroup'])->name('groups.savePartnerToGroup');
     Route::get('groups/deletePartnerFromGroup/{group_id}/{partner_id}', [RelationshipController::class, 'deletePartnerFromGroup'])->name('groups.deletePartnerFromGroup');
-
+    */
 
     /// Prospects ///
     // Marketing Search routes

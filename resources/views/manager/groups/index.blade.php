@@ -7,26 +7,11 @@
     <h1 class="display-5" style="font-family: Segoe UI;">Groups Management</h1>
   </div>
   <br>        
-  
-  {{-- <a class="btn btn-primary" id="btnNewGroup" role="button" href="{{ route('manager.groups.create') }}">Create a new group</a><br><br> --}}
-  <a class="btn btn-primary" id="btnNewGroup" role="button">Create a new group</a><br><br>
-
-  {{-- 
-  <nav class="navbar navbar-light bg-light">
-    <div class="container col-sm-4">
-      <form class="d-flex">                  
-        <br>
-        <button class="btn btn-outline-success" type="submit">Add Group</button>
-        <a class="btn btn-outline-success" href="{{ route('manager.groups.create') }}" type="submit">Add Group</a>
-      </form>
-    </div>        
-  </nav>
-  --}}
-  
+  <a class="btn btn-primary" id="btnNewGroup" role="button">Create a new group</a><br><br>  
   <table class="table table-striped table-hover yajra-datatable" id="groupDataTable">
     <thead>
       <tr>
-        <th scope="col">Number</th>
+        {{-- <th scope="col">Number</th> --}}
         <th scope="col">Name</th>
         <th scope="col">Created At</th>
         <th scope="col">Updated At</th>
@@ -56,9 +41,9 @@
       processing: true,
       serverSide: true,
       ajax: "{{ route('manager.groups.getGroups') }}",
-      //order: [[1, 'desc']],
+      order: [[2, 'desc']],
       columns: [
-        {data: 'id', name: 'id'},
+        // {data: 'id', name: 'id'},
         {data: 'groupName', name: 'groupName'},
         {data: 'created_at', name: 'created_at'},
         {data: 'updated_at', name: 'updated_at'},        
