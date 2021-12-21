@@ -13,15 +13,21 @@ use Yajra\DataTables\DataTables;
 class GroupController extends Controller
 {
     /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+    * Display the index of the group management.
+    *
+    * @return \Illuminate\Http\Response
+    */
     public function index()
     {
-        return view('manager.groups.index'); //->with('title',$title)->with('mails', $mails)->with('lastMail',$lastMail)->with('groups',$groups);
+        return view('manager.groups.index');
     }
 
+    /**
+    * Generate a yajara data table of the groups.
+    *
+    * @param  \Illuminate\Http\Request  $request
+    * @return Yajra\DataTables\DataTables
+    */
     public function getGroups(Request $request)
     {
         if ($request->ajax()) {      
@@ -59,7 +65,7 @@ class GroupController extends Controller
     }
 
     /**
-    * Return the partners list of the current manager to the modal new group.
+    * Return the partners list of the current manager into the modal new group.
     *
     * @return \Illuminate\Http\Response
     */
@@ -73,17 +79,25 @@ class GroupController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
+    * Store a newly created group in the database.
+    *
+    * @param  \Illuminate\Http\Request  $request
+    * @return \Illuminate\Http\Response
+    */
     public function store(Request $request)
     {
-        $request->validate([
-          'groupName' => 'required',
-          'partnersId' => 'required'
-        ]);   
+
+        $rules = [
+            'groupName' => 'required',
+            'partnersId' => 'required'          
+        ];
+          
+        $customError = [
+            'groupName.required' => 'The group name is required.',
+            'partnersId.required' => 'You must select at least one partner for the group.'
+        ];
+  
+        $this->validate($request, $rules, $customError);
 
         $group = new Group;
         $group->groupName = $request->groupName;
@@ -98,16 +112,16 @@ class GroupController extends Controller
         }
 
         return json_encode(array(
-          "statusCode"=>200
+          "statusCode" => 200
         ));
     }
 
     /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
+    * Get the group data and returns it in JSON in order to display the specified resource into a modal.
+    *
+    * @param  int  $id
+    * @return \Illuminate\Http\Response
+    */
     public function show($id)
     {
         try {
@@ -140,22 +154,19 @@ class GroupController extends Controller
         } catch(ModelNotFoundException $e) {
             return json_encode(
                 array(
-                    "statusCode"=>400,
-                    "error"=>$e
+                    "statusCode" => 400,
+                    "error" => $e
                 )
             );
         }
-
-        // var_dump($group->partners);
-        // return view('manager.groups.index')->with('group', $group);
     }
 
     /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
+    * Load the data of the group and loads it into the editing form.
+    *
+    * @param  int  $id
+    * @return \Illuminate\Http\Response
+    */
     public function edit($id)
     {
       try {
@@ -174,7 +185,7 @@ class GroupController extends Controller
               array(
                   "statusCode"=>200,
                   "editedId" => $id,
-                  "groupName"=>$group->groupName,
+                  "groupName" => $group->groupName,
                   "id" => $arrayIds,                  
                   "partnersOptions" => $selectOptionsArray
               )
@@ -182,42 +193,37 @@ class GroupController extends Controller
       } catch(ModelNotFoundException $e) {                
           return json_encode(
               array(
-                  "statusCode"=>400,
-                  "error"=>$e
+                  "statusCode" => 400,
+                  "error" => $e
               )
           );        
       }
-        /*
-        $partners = Partner::where('type', '=', 'Client')
-                            ->where('status', '=', 1)
-                            ->get();
-        $title = 'Update Group';
-        $group = Group::find($id);
-        $partnersSelected = $group -> partners;
-        $partners_gr = array();
-        foreach ($partnersSelected as $row){
-            $partners_gr[] = $row->id;
-        }
-        return view('manager.groups.edit')->with('group',$group)->with('title',$title)
-                                ->with('partners_gr',$partners_gr)
-                                ->with('partners',$partners);
-        */
     }
 
     /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
+    * Update the group resource in the database.
+    *
+    * @param  \Illuminate\Http\Request  $request
+    * @param  int  $id
+    * @return \Illuminate\Http\Response
+    */
     public function update(Request $request, $id)
-    {
-        $request->validate([
+    {  
+
+        $rules = [
             'editedId' => 'required',
             'groupName' => 'required',
             'partnersIdEdit' => 'required'
-        ]);   
+        ];
+
+        $customError = [
+            'editedId.required' => 'We encountered an unexpected error, please reload the page.',
+            'groupName.required' => 'The group name is required.',
+            'partnersId.required' => 'You must select at least one partner for the group.'
+        ];
+
+        $this->validate($request, $rules, $customError);
+
 
         try {
             $group = Group::findOrFail($id);       
@@ -231,20 +237,20 @@ class GroupController extends Controller
                 $rel->save();
             }
             return json_encode(array(
-                "statusCode"=>200
+                "statusCode" => 200
             ));
         } catch(ModelNotFoundException $e) {                
             return json_encode(
                 array(
-                    "statusCode"=>400,
-                    "error"=>$e
+                    "statusCode" => 400,
+                    "error" => $e
                 )
             );        
         }
     }
 
     /**
-    * Remove the specified resource from storage.
+    * Delete the group from the database.
     *
     * @param  Request $request
     * @return \Illuminate\Http\Response
@@ -253,8 +259,8 @@ class GroupController extends Controller
     {
         $ret = Group::destroy($request->id);
         return json_encode(array(
-            "statusCode"=>200,
-            "destroyStatus"=>$ret
+            "statusCode" => 200,
+            "destroyStatus" => $ret
         ));
     }
 }

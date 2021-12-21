@@ -19,10 +19,10 @@
           </div>
           <br>
           <div class="form-group">
-            <select id="multiselect" name="partnersId[]" multiple="multiple"></select>
+            <select id="multiselect" name="partnersId[]" multiple="multiple" required="required"></select>
             <div class="btn-group" role="group" aria-label="Basic outlined example" style="width: 100%">
-              <a role="button" class="btn btn-outline-primary bi bi-chevron-double-left" onclick="$('#multiselect').multiSelect('deselect_all');"></a>
-              <a role="button" class="btn btn-outline-primary bi bi-chevron-double-right" onclick="$('#multiselect').multiSelect('select_all');"></a>              
+              <a role="button" class="btn bi bi-chevron-double-left" onclick="$('#multiselect').multiSelect('deselect_all');"></a>
+              <a role="button" class="btn bi bi-chevron-double-right" onclick="$('#multiselect').multiSelect('select_all');"></a>              
             </div>  
           </div>
         </div>
@@ -40,6 +40,22 @@
   formNewGroup.submit(function (e) {
     e.preventDefault(e);
     let fd = new FormData(this);
+    
+    let boolCheck = true;
+
+    if(fd.get("groupName") === "") {
+      toastr.warning("The group name is required.");
+      boolCheck = false;
+    }
+    
+    if(fd.get("partnersId[]") === null) {
+      toastr.warning("You must select at least one partner for the group.");
+      boolCheck = false;
+    } 
+      
+    if(!boolCheck)
+      return 1;
+      
     $.ajax({
       async: true,
       type: formNewGroup.attr("method"),
@@ -62,8 +78,10 @@
           toastr.success("The group has been created!")
         }
       },
-      error: function (request, status, error) {
-        console.log("error");
+      error: function (response) {
+        $.each(response.responseJSON.errors, function(key,value) {
+          toastr.warning(value);
+        }); 
       }
     });
   });

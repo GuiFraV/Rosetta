@@ -89,9 +89,9 @@
               $('#groupShowTable').append("<tr><td>"+row['partner']['company']+"</td><td>"+row['partner']['origin']+"</td><td>"+row['partner']['phone']+"</td><td>"+row['partner']['email']+"</td></tr>");
             }
           });
-        } else {
-          // Error case, status code === 400
-          // toastr.warning("The specified group has not been found. Try to reload the page.");
+        } else if(row['statusCode'] != undefined && row['statusCode'] === 400) {
+          toastr.warning("The specified group has not been found. Try to reload the page.");
+          console.log(row['error']);
         }
       },
       error: function (request, status, error) {

@@ -15,7 +15,7 @@
           </div>
           <br>
           <div class="form-group">            
-            <select id="multiselectEdit" name="partnersIdEdit[]" multiple="multiple"></select>            
+            <select id="multiselectEdit" name="partnersIdEdit[]" multiple="multiple" required="required"></select>            
           </div>
         </div>
         <div class="modal-footer">
@@ -43,6 +43,7 @@
         // console.log(data);        
         if(data['statusCode'] === 400) {
           toastr.warning("Error while loading the group. Try to reload the page.");
+          console.log(data['error']);
           return 1;
         } else if (data['statusCode'] === 200) {
           if(data['partnersOptions'] == []) {
@@ -107,6 +108,22 @@
   formEditGroup.submit(function (e) {
     e.preventDefault(e);
     let fd = new FormData(this);
+
+    let boolCheck = true;
+
+    if(fd.get("groupName") === "") {
+      toastr.warning("The group name is required.");
+      boolCheck = false;
+    }
+    
+    if(fd.get("partnersIdEdit[]") === null) {
+      toastr.warning("You must select at least one partner for the group.");
+      boolCheck = false;
+    } 
+
+    if(!boolCheck)
+      return 1;
+
     $.ajax({
       async: true,
       type: "POST",
@@ -124,7 +141,8 @@
           $('#editGroupModal').modal('hide');
           toastr.success("The group has been edited!");
         } else if(res['statusCode'] === 400) {
-          toastr.warning("There has been an error during the edition of the group. Try to reload the page.")
+          toastr.warning("There has been an error during the edition of the group. Try to reload the page.");
+          console.log(res['error']);
         }  
       },
       error: function (request, status, error) {

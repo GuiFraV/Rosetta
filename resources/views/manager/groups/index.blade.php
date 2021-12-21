@@ -100,10 +100,9 @@
           return 1;
         } else {
           $('#groupName').val('');
-          let options = JSON.parse(data);
-          // $('.selectpicker').empty();
           $('#multiselect').empty();
           // console.log(options);
+          let options = JSON.parse(data);          
           options.forEach(row => {            
             $('#multiselect').append("<option value='"+row['value']+"'>"+row['label']+"</option>");
           });
