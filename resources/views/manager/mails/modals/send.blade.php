@@ -5,7 +5,7 @@
         <h5 class="modal-title" id="sendModalLabel">Send Email</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <form name="appbundle_mailing" id="sendForm" method="POST" action="{{ route('testSendMail')}}">
+      <form id="formSendMail" method="POST" enctype="multipart/form-data">
         @csrf
         <div class="modal-body">
           <input type="text" name="mailId1" id="mailId1" hidden>
@@ -28,11 +28,9 @@
               <div class="form-group">
             <select class="form-select" id="group_id" name="group_id" aria-label="Default select example">
                     <option selected></option>
-                  {{-- COMMENTED BECAUSE THE ROUTE WASNT WORKING WITH GROUP VAR
                     @foreach($groups as $group)
                       <option value="{{$group->id}}">{{$group->groupName}}</option>
                     @endforeach
-                  --}}
             </select>
               </div> 
             </div>
@@ -62,10 +60,78 @@
           <a class="btn btn-secondary" href="/mails">Close</a>
           {{-- COMMENTED BECAUSE CRASH WITH IT --}}
           {{-- <button class="btn btn-primary" id="sendMailUpdate" data-bs-target="#updateModal" data-bs-toggle="modal" onclick="editLast({{$lastMail}})">Update</button> --}}
-          <button class="btn btn-success" type="submit" id="sendSubmit" data-bs-dismiss="modal" href="{{ url('testSendMail/1') }}">Send</button>
-
+          {{-- <button class="btn btn-success" type="submit" id="sendSubmit" data-bs-dismiss="modal" href="{{ url('testSendMail/1') }}">Send</button> --}}
+          <button type="submit" id="btn_update" class="btn btn-primary">Send</button>
         </div>
       </form>
     </div>
   </div>
 </div>
+<script>
+  function openSendModal(id) {
+    $('#mailId1').val(id);
+    $.ajax({
+      async: true,
+      type: "GET",
+      url: "mails/"+id,
+      dataType: "JSON",
+      data: {"id": id},
+      cache: false,
+      processData: false,
+      contentType: false,    
+      success: function(data) {
+        /// Debug on send
+        //console.log(data);
+        if(data['statusCode'] === 400) {
+          toastr.warning("Specified email has not been found. Try to reload the page.")
+        } else if (data['statusCode'] === 200){
+          
+          // $('#showModalLabel').html("Mail N°"+id);
+          // $('#emailShowSubject').val(data['object']);
+          // tinymce.get('emailShowContent').setContent(data['message']);
+          // // Commented because it doesn't works, but the idea is to hide the toolbar with Jquery / CSS
+          // //$('#emailShowContent').children(".tox-editor-header").css('display','none');
+          // tinymce.get('emailShowContent').setMode('readonly');
+          // $('#emailShowAutoSend').html(data['autoSend']);
+          // $('#emailShowAuthor').html(data['author']);
+          // $('#emailShowCreatedAt').html(data['created_at']);
+          // if(data['updated_at'] === "none") {
+          //   $('#hideShowUpdated').hide();
+          // } else {
+          //   $('#hideShowUpdated').show();
+          //   $('#emailShowUpdatedAt').html(data['updated_at']);
+          // }
+          $('#sendModal').modal('show');
+        }
+      },
+      error: function (request, status, error) {
+        console.log(error);
+      }
+    });
+  }
+  let formSendMail = $("#formSendMail");
+  formSendMail.submit(function (e) {
+    e.preventDefault(e);
+    tinyMCE.triggerSave();
+    let fd = new FormData(this);
+    fd['mailid'] = $('#mailId1').val();
+    $.ajax({
+      async: true,
+      type: "POST",
+      url: "mails/sendMail/",
+      data: fd,     
+      cache: false,
+      processData: false,
+      contentType: false,    
+      success: function(data) {
+        /// Debug on send
+        //console.log(data);
+        $('#editEmailModal').modal('hide');
+        toastr.success("The email has been edited!");
+      },
+      error: function (request, status, error) {
+        console.log("error");
+      }
+    });
+  });
+</script>

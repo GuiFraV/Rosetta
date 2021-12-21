@@ -19,7 +19,7 @@ class Group extends Model
 
     public function partners()
     {
-        return $this->belongsToMany(Partner::class, 'group_partner', 'group_id', 'partner_id')->where('status', 1);
+        return $this->belongsToMany(Partner::class, 'group_partners', 'group_id', 'partner_id')->where('status', 1);
     }
 
     public function getPartnersCount()

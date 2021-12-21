@@ -26,7 +26,8 @@ class MailController extends Controller
      */
     public function index()
     {
-        return view('manager.mails.index'); //->with('title',$title)->with('mails', $mails)->with('lastMail',$lastMail)->with('groups',$groups);
+        $groups = Group::where('creator','=',getManagerId())->get();
+        return view('manager.mails.index')->with("groups",$groups); //->with('title',$title)->with('mails', $mails)->with('lastMail',$lastMail)->with('groups',$groups);
     }
 
     /**
@@ -70,6 +71,11 @@ class MailController extends Controller
                    $updated_at = $row->updated_at->format('d-m-Y');
                    return $updated_at;
                 })                
+                ->addColumn('sendBtn', function($row)
+                {
+                    $sendBtn = '<a role="button" class="bi bi-envelope text-primary" style="font-size: 1.4rem;" onclick="openSendModal('.$row->id.');"></a>';
+                    return $sendBtn;
+                })
                 ->addColumn('showBtn', function($row)
                 {
                     $showBtn = '<a role="button" class="bi bi-eye text-primary" style="font-size: 1.4rem;" onclick="openShowModal('.$row->id.');"></a>';
@@ -85,7 +91,7 @@ class MailController extends Controller
                     $deleteBtn = '<a role="button" class="bi bi-trash text-danger" style="font-size: 1.4rem;" onclick="$(\'#destroyModal\').modal(\'show\'); $(\'#destroyedId\').val('.$row->id.');"></a>';
                     return $deleteBtn;
                 })                
-                ->rawColumns(['autoSend', 'showBtn', 'editBtn', 'deleteBtn'])
+                ->rawColumns(['autoSend', 'sendBtn' , 'showBtn', 'editBtn', 'deleteBtn'])
                 ->make(true);
         }  
     }
@@ -223,14 +229,15 @@ class MailController extends Controller
     }
 
     //Request $request
-    public function sendMail() {
+    public function sendMail(Request $request) {
         
-        /*      
+             
         $mailId = $request->input('mailId1');
         $groupId = $request->input('group_id');
         $sendDate = $request->input('sendDate');
         $newDate = date('D, d M Y H:i:s O', strtotime($sendDate));
 
+         
         $mail = Mail::find($mailId);
         $group = Group::find($groupId);
 
@@ -244,31 +251,33 @@ class MailController extends Controller
         foreach ($selectedPartners as $partner){
             $partnersGroup[] = $partner->email;
         }
+        /*
         */
-
-        $client = new Client();
-        // $res = $client->request('POST', 'https://api.mailgun.net/v3/sandboxd905481280454e0cb56438aba176aa59.mailgun.org/messages', 
-        $res = $client->request('POST', 'https://api.mailgun.net/v3/sandbox9523439c43cd469fab938c565c1f8b33.mailgun.org/messages', 
-        [
-            'form_params' => 
+        foreach ($partnersGroup as $partner){
+            $client = new Client();
+            // $res = $client->request('POST', 'https://api.mailgun.net/v3/sandboxd905481280454e0cb56438aba176aa59.mailgun.org/messages', 
+            $res = $client->request('POST', 'https://api.mailgun.net/v3/sandbox9523439c43cd469fab938c565c1f8b33.mailgun.org/messages', 
             [
-                "from" => "test@test.com",#manager_email
-                "to" => ["developpement@intergate-logistic.com","developpement2@intergate-logistic.com"],#manager_group
-                // "bcc" => $partnersGroup,
-                "subject" => "Test",
-                "text"=>"Testing Mailgun"
-                // "o:deliverytime" => Carbon::now()->hours(2)->toRfc2822String(),
-                // "o:deliverytime" => $newDate,
-                // "html" => view('mails\myTestMail',compact('details'))->render()
-            ],
-            'auth' => 
-            [
-                'api', 
-                'key-c02e140e0e1bcb64d3b94bc90876e02d'
-            ]
-        ]);
+                'form_params' => 
+                [
+                    "from" => getManagerEmail(),#manager_email
+                    "to" => $partner,
+                    "subject" => $mail->object,
+                    "text"=> $mail->message
+                    // "o:deliverytime" => Carbon::now()->hours(2)->toRfc2822String(),
+                    // "o:deliverytime" => $newDate,
+                    // "html" => view('mails\myTestMail',compact('details'))->render()
+                ],
+                'auth' => 
+                [
+                    'api', 
+                    'key-c02e140e0e1bcb64d3b94bc90876e02d'
+                ]
+            ]);
+            $results = json_decode($res->getBody(), true);
 
-        $results = json_decode($res->getBody(), true);
+        }
+        
         if($results) {
             return json_encode("Success! Your E-mail has been sent.");
         } else {

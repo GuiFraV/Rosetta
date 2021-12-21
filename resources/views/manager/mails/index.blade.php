@@ -54,6 +54,7 @@
         <th scope="col"></th>
         <th scope="col"></th>
         <th scope="col"></th>
+        <th scope="col"></th>
       </tr>
     </thead>
     <tbody class="align-middle"></tbody>
@@ -65,6 +66,7 @@
 @include('manager.mails.modals.show')
 @include('manager.mails.modals.edit')
 @include('manager.mails.modals.destroy')
+@include('manager.mails.modals.send')
 
 <script type="text/javascript">
 
@@ -92,6 +94,12 @@
         {data: 'author', name: 'author'},
         {data: 'created_at', name: 'created_at'},
         {data: 'updated_at', name: 'updated_at'},
+        {
+            data: 'sendBtn', 
+            name: 'sendBtn', 
+            orderable: false, 
+            searchable: true
+        },
         {
             data: 'showBtn', 
             name: 'showBtn', 

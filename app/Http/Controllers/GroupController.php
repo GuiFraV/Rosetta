@@ -31,7 +31,7 @@ class GroupController extends Controller
     public function getGroups(Request $request)
     {
         if ($request->ajax()) {      
-            $data = Group::all();
+            $data = Group::where('creator','=',getManagerId())->get();
             return DataTables::of($data)                
                 ->addIndexColumn()                
                 ->editColumn('created_at', function($row)
@@ -179,7 +179,7 @@ class GroupController extends Controller
           $partners = Partner::all()->where('manager_id', '=', getManagerId());        
           $selectOptionsArray = array();
           foreach($partners as $partner) {
-              array_push($selectOptionsArray, ["label" => $partner['company'] . " | " . $partner['type'] . " | " . $partner['origin'], "value" => $partner['id']]);
+              array_push($selectOptionsArray, ["label" => $partner['company'] . " | " . $partner['type'] . " | " . $partner['mail'], "value" => $partner['id']]);
           }
           return json_encode(
               array(

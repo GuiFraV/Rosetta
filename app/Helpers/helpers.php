@@ -554,6 +554,13 @@ if(!function_exists("getManagerType")) {
     }
 }
 
+if(!function_exists("getManagerEmail")) {
+    function getManagerEmail() {
+        $managerType = Auth::user()->email;
+        return $managerType;   
+    }
+}
+
 if(!function_exists("getStateToHuman")) {
     function getStateToHuman($state_id) {
         $state = State::findOrFail($state_id);
