@@ -221,7 +221,7 @@
       success: function(data) {
         /// Debug the response
         data = JSON.parse(data);
-        console.log(data);        
+        // console.log(data);        
         if(data['statusCode'] === 200) {
           $('#partnerDataTable').DataTable().ajax.reload();
           $('#editPartnerModal').modal('hide');

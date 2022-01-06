@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Manager;
 use App\Models\Partner;
 use Illuminate\Http\Request;
 use Auth;
@@ -29,7 +30,12 @@ class PartnerController extends Controller
     public function getPartners(Request $request)
     {
         if ($request->ajax()) {      
-            $data = Partner::all();
+            if (Auth::user()->role_id === 1) {
+                $data = Partner::all();
+            } elseif (Auth::user()->role_id === 3) {
+                $manager_id = Manager::with('user')->where("user_id","=",Auth::user()->id)->get()[0]["id"];
+                $data = Partner::all()->where("manager_id", "=", $manager_id);
+            }            
             return DataTables::of($data)                
                 ->addIndexColumn()
                 ->removeColumn('status')                                

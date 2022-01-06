@@ -8,8 +8,10 @@
   </div>
   <br>
    
-  <!-- Add admin restriction for creation after development -->
+  @if (Auth::user()->role_id === 1) 
   <a class="btn btn-primary" id="btnNewPartner" role="button">Create a new partner</a><br><br>  
+  @endif
+
   <table class="table table-striped table-hover yajra-datatable" id="partnerDataTable">
     <thead>
       <tr>
@@ -22,18 +24,24 @@
         <th scope="col">Manager</th>
         <th scope="col">Created At</th>
         <th scope="col"></th>
-        <th scope="col"></th>
-        <th scope="col"></th>
+        @if (Auth::user()->role_id === 1) 
+          <th scope="col"></th>
+          <th scope="col"></th>
+        @endif
       </tr>
     </thead>
     <tbody class="align-middle"></tbody>
   </table><br>
 </div>
 
-@include('manager.partners.modals.create')
 @include('manager.partners.modals.show')
-@include('manager.partners.modals.edit')
-@include('manager.partners.modals.destroy')
+
+@if (Auth::user()->role_id === 1) 
+    @include('manager.partners.modals.create')
+    @include('manager.partners.modals.edit')
+    @include('manager.partners.modals.destroy')    
+@endif
+
 
 <script>
   $(function () {
@@ -56,7 +64,9 @@
             name: 'showBtn', 
             orderable: false, 
             searchable: true
-        },        
+        }
+        @if (Auth::user()->role_id === 1) 
+        ,        
         {
             data: 'editBtn', 
             name: 'editBtn', 
@@ -68,17 +78,19 @@
             name: 'deleteBtn', 
             orderable: false, 
             searchable: true
-        }                
+        } 
+        @endif               
       ]
     });
   });
 </script>
 
-<!-- Si user !admin alors pas ce script -->
+@if (Auth::user()->role_id === 1) 
 <script>
   $('#btnNewPartner').on('click', function() {
     $('#createPartnerModal').modal('show');
   });
 </script>
+@endif
 
 @endsection
