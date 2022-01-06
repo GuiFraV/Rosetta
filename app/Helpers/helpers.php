@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\Agency;
+use App\Models\Country;
 use Illuminate\Support\Facades\DB;
 use App\Models\Prospect;
 use App\Models\Manager;
@@ -529,6 +531,11 @@ if(!function_exists("boolToHuman")) {
 
 if(!function_exists("getManagerName")) {
     function getManagerName($managerId, $param) {
+        if($param === "complete") {
+          $manager = Manager::findOrFail($managerId);
+          $agency = Agency::findOrFail($manager->agency_id);
+          return $manager->first_name ." ". $manager->last_name ." | ". $agency->agency_name;
+        }  
         $results = DB::select('select first_name, last_name from managers where id = :id', ['id' => $managerId]); 
         if (empty($results))
             return "N/A";
@@ -572,6 +579,22 @@ if(!function_exists("getManagerId")) {
     function getManagerId() {
         $manager_id = App\Models\Manager::with('user')->where("user_id","=",Auth::user()->id)->get()[0]["id"];
         return $manager_id;   
+    }
+}
+
+if(!function_exists("countryToHuman")) {
+    function countryToHuman($code) {
+      $country = Country::where("code", "=", $code)->firstOrFail();
+      $humanReadable = $country->emoji . " " . $country->shortname;
+      return $humanReadable;
+    }
+}
+
+if(!function_exists("getPhoneCode")) {
+    function getPhoneCode($countryCode) {
+        $country = Country::where("code", "=", $countryCode)->firstOrFail();
+        $phoneCode = $country->phone_code;
+        return $phoneCode;
     }
 }
 

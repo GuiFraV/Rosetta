@@ -12,8 +12,13 @@
 </style>
 
 <div class="container">
-    <h2>Prospect list</h2>
-    <a href="{{ route('manager.prospect.create') }}" role="button" class="float-end btn btn-primary">Add a prospect</a><br><br>
+  <br>
+  <div class="jumbotron text-center">
+    <h1 class="display-5" style="font-family: Segoe UI;">Prospect list</h1>
+  </div>
+  <br>
+
+    <a href="{{ route('manager.prospect.create') }}" role="button" class="btn btn-primary">Add a prospect</a><br><br>
 
     @if(!empty(Session::get('archived')))
         <script>toastr.warning('{{ Session::get('archived') }}');</script>

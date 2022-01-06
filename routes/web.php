@@ -74,8 +74,13 @@ Route::group(['as'=>'manager.','prefix' => 'manager','middleware'=>['auth','mana
 
     Route::get('partners', [PartnerController::class, 'index'])->name('partners.index');
     Route::get('partners/getPartners', [PartnerController::class, 'getPartners'])->name('partners.getPartners');
+    Route::get('partners/countryAuto', [PartnerController::class, 'countryAuto'])->name('partners.countryAuto');
+    Route::get('partners/managerAuto', [PartnerController::class, 'managerAuto'])->name('partners.managerAuto');
+    Route::delete('partners/destroyer/{id}', 'App\Http\Controllers\PartnerController@destroyer');
+    Route::get('partners/{id}', 'App\Http\Controllers\PartnerController@show');
+    Route::get('partners/edit/{id}', 'App\Http\Controllers\PartnerController@edit');
+    Route::post('partners/update/{id}', 'App\Http\Controllers\PartnerController@update');
 
-    
     /// Emails ///
     // Email routes
     Route::resource('mails', MailController::class, [

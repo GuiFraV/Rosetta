@@ -45,6 +45,9 @@
   .tox-notifications-container {
       display: none !important;
   }
+  .ui-autocomplete {
+    z-index: 1500;
+  }
   </style>
 </head>
 
