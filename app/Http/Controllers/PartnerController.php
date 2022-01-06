@@ -151,7 +151,7 @@ class PartnerController extends Controller
         $partner->name = $request->contact;
         $partner->company = $request->company;
         $partner->origin = $request->country;        
-        $partner->phone = $request->phone.$request->callingCodeForm;
+        $partner->phone = $request->callingCodeForm.$request->phone;
         $partner->email = $request->email;
         $partner->type = $request->type;
         $status = $partner->save();
@@ -279,7 +279,7 @@ class PartnerController extends Controller
             $partner->name = $request->partnerEditContact;
             $partner->company = $request->partnerEditCompany;
             $partner->origin = $request->partnerEditCountry;        
-            $partner->phone = $request->phone.$request->partnerEditCallingCodeForm;
+            $partner->phone = $request->partnerEditCallingCodeForm.$request->partnerEditPhone;
             $partner->email = $request->partnerEditEmail;
             $partner->type = $request->partnerEditType;
             $status = $partner->save();

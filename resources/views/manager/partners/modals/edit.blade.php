@@ -163,7 +163,7 @@
   formEditPartner.submit(function (e) {
     e.preventDefault(e);
     let fd = new FormData(this);
-
+    
     // Front validation
     let boolCheck = true;
 
