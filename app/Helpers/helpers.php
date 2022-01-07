@@ -528,6 +528,12 @@ if(!function_exists("boolToHuman")) {
         }
     }
 }
+if(!function_exists("getallmanagers")) {
+    function getallmanagers() {
+        $results = DB::select('select id , first_name, last_name , type from managers'); 
+        return $results;
+    }
+}
 
 if(!function_exists("getManagerName")) {
     function getManagerName($managerId, $param) {

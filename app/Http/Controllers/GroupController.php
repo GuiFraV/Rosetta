@@ -32,8 +32,14 @@ class GroupController extends Controller
     {
         if ($request->ajax()) {      
             $data = Group::where('creator','=',getManagerId())->get();
+
             return DataTables::of($data)                
-                ->addIndexColumn()                
+                ->addIndexColumn()
+                ->editColumn('nb', function($row)
+                {
+                   $nb = GroupPartner::all()->where('group_id', '=', $row->id);
+                   return count($nb);
+                })                
                 ->editColumn('created_at', function($row)
                 {
                    $created_at = $row->created_at->format('d-m-Y');
@@ -44,6 +50,7 @@ class GroupController extends Controller
                    $updated_at = $row->updated_at->format('d-m-Y');
                    return $updated_at;
                 })
+               
                 ->addColumn('showBtn', function($row)
                 {
                     $showBtn = '<a role="button" class="bi bi-eye text-primary" style="font-size: 1.4rem;" onclick="openShowModal('.$row->id.');"></a>';

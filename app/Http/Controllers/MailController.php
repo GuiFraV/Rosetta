@@ -39,7 +39,7 @@ class MailController extends Controller
     public function getMails(Request $request)
     {
         if ($request->ajax()) {      
-            $data = Mail::all();
+            $data = Mail::where('author','=',getManagerId())->get();
             return DataTables::of($data)                
                 ->addIndexColumn()
                 ->editColumn('autoSend', function($row)
@@ -256,17 +256,17 @@ class MailController extends Controller
         foreach ($partnersGroup as $partner){
             $client = new Client();
             // $res = $client->request('POST', 'https://api.mailgun.net/v3/sandboxd905481280454e0cb56438aba176aa59.mailgun.org/messages', 
-            $res = $client->request('POST', 'https://api.mailgun.net/v3/sandbox9523439c43cd469fab938c565c1f8b33.mailgun.org/messages', 
+            $res = $client->request('POST', 'https://api.eu.mailgun.net/v3/form.loaditeasy.com/messages', 
             [
                 'form_params' => 
                 [
                     "from" => getManagerEmail(),#manager_email
                     "to" => $partner,
                     "subject" => $mail->object,
-                    "text"=> $mail->message
+                    //"text"=> $mail->message
                     // "o:deliverytime" => Carbon::now()->hours(2)->toRfc2822String(),
                     // "o:deliverytime" => $newDate,
-                    // "html" => view('mails\myTestMail',compact('details'))->render()
+                    "html" => $mail->message
                 ],
                 'auth' => 
                 [
@@ -275,9 +275,8 @@ class MailController extends Controller
                 ]
             ]);
             $results = json_decode($res->getBody(), true);
-
         }
-        
+
         if($results) {
             return json_encode("Success! Your E-mail has been sent.");
         } else {

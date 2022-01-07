@@ -125,7 +125,7 @@
       contentType: false,    
       success: function(data) {
         /// Debug on send
-        //console.log(data);
+        console.log(data);
         $('#editEmailModal').modal('hide');
         toastr.success("The email has been edited!");
       },

@@ -13,6 +13,7 @@
       <tr>
         {{-- <th scope="col">Number</th> --}}
         <th scope="col">Name</th>
+        <th scope="col">Nb</th>
         <th scope="col">Created At</th>
         <th scope="col">Updated At</th>
         <th scope="col"></th>
@@ -41,12 +42,13 @@
       processing: true,
       serverSide: true,
       ajax: "{{ route('manager.groups.getGroups') }}",
-      order: [[2, 'desc']],
+      order: [[3, 'desc']],
       columns: [
         // {data: 'id', name: 'id'},
         {data: 'groupName', name: 'groupName'},
+        {data: 'nb', name: 'nb'},  
         {data: 'created_at', name: 'created_at'},
-        {data: 'updated_at', name: 'updated_at'},        
+        {data: 'updated_at', name: 'updated_at'},         
         {
             data: 'showBtn', 
             name: 'showBtn', 

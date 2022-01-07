@@ -1,6 +1,8 @@
 @extends('manager.navbar')
 
 @section('content')
+<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+
 <?php
     function secondsToTime($seconds_time)
     {
@@ -16,48 +18,80 @@
 ?>
 <div id="map">
 </div>
-<script type="text/javascript">
-    function myfunction(){
-        var map;
-        var start = new google.maps.LatLng(7.434876909631617,80.4424951234613);
-        var end = new google.maps.LatLng(7.3178281209262686,80.8735878891028);
-        var option ={
-            zoom : 10,
-            center : start 
-        };
-        map = new google.maps.Map(document.getElementById('map'),option);
-        var display = new google.maps.DirectionsRenderer();
-        var services = new google.maps.DirectionsService();
-        display.setMap(map);
-            var request ={
-                origin : start,
-                destination:end,
-                travelMode: 'DRIVING'
-            };
-            services.route(request,function(result,status){
-                if(status =='OK'){
-                    display.setDirections(result);
-                }
-            });
-    }
-</script>
-<div class="mt-5" style="margin-right: 80px;margin-left: 80px;">
+<style>
+    table {
+  /* Not required only for visualizing */
+  border-collapse: collapse;
+  width: 100%;
+}
+
+table thead tr th {
+  /* Important */
+  background-color: red;
+  position: sticky;
+  z-index: 100;
+  top: 0;
+}
+
+td {
+  /* Not required only for visualizing */
+  padding: 1em;
+}
+    .notification {
+        text-decoration: none;
+        position: relative;
+        display: inline-block;
+        }
+
+       
+
+        .notification .badge {
+        position: absolute;
+        top: -10px;
+        right: 50px;
+        padding: 5px 10px;
+        border-radius: 50%;
+        background: red;
+        color: white;
+        }
+</style>
+<br>
+  <div class="jumbotron text-center">
+    <h1 class="display-5" style="font-family: Segoe UI;">Routes List</h1>
+  </div>
+  <br>
+<div class="mt-5" style="margin-right: 110px;margin-left: 110px;">
     <div class="row" style="margin-top: 5rem;">
         <div class="col-lg-12 margin-tb">
-            <div class="pull-left">
-                <h2>Management of Routes</h2>
-            </div>
             <p>
-                <a class="btn btn-primary" data-bs-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
-                    Filter
+                <script type="text/javascript">
+                    function ffffffff() {
+                    /* Get the text field */
+                        var copyText = `<?php echo ($test); ?>`;
+                        navigator.clipboard.writeText(copyText);
+                        var myFile = new File([copyText], "Routes.txt", {type: "text/plain;charset=utf-8"});
+                        saveAs(myFile);
+                    }
+                </script>
+                <a class="notification btn btn-primary" data-bs-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample" >
+                    <span>Filter</span>
+                    @if ($type_search!="all")
+                        <span class="badge">1</span>
+                    @endif
                 </a>
+                
+                @if ($type_search!="all")
+                    <a class="btn btn-outline-primary" href="/manager/trajets">Reset</a>
+
+                @endif
                 <form action="{{ route('manager.trajets.create') }}" method="GET">
-                    <button class="btn btn-success" type="submit" href="{{ route('manager.trajets.create') }}" name="type" value="load" >
+                    <button class="btn btn-success" type="submit" href="{{ route('manager.trajets.create') }}" name="type" value="load" @if ($type_manager == "LM") disabled @endif >
                         Add Load
                     </button>
-                    <button class="btn btn-success" type="submit" href="{{ route('manager.trajets.create') }}" name="type" value="truck" >
+                    <button class="btn btn-success" type="submit" href="{{ route('manager.trajets.create') }}" name="type" value="truck" @if ($type_manager == "TM") disabled @endif>
                         Add Truck
                     </button>
+                    <button type="button" onclick="ffffffff();">Click to Save</button>
                 </form>
                 
               </p>
@@ -65,13 +99,20 @@
                 <div class="card card-body">
                     <form action="{{ route('manager.trajets.index') }}" method="GET">
                         <div class="container col-sm-4">
-                          <form class="d-flex" >
-                            <input type="date" name="searchbar" style="display: block;    width: 100%;    padding: .375rem .75rem;    font-size: 1rem;    font-weight: 400;    line-height: 1.5;    color: #212529;    background-color: #fff;    background-clip: padding-box;    border: 1px solid #ced4da;    -webkit-appearance: none;    -moz-appearance: none;    appearance: none;    border-radius: .25rem;    transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;" value="<?php echo date("Y-m-d");?>">
+                          <form class="d-flex"  >
+                            {{-- <input type="date" name="searchbar" style="display: block;    width: 100%;    padding: .375rem .75rem;    font-size: 1rem;    font-weight: 400;    line-height: 1.5;    color: #212529;    background-color: #fff;    background-clip: padding-box;    border: 1px solid #ced4da;    -webkit-appearance: none;    -moz-appearance: none;    appearance: none;    border-radius: .25rem;    transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;" value=""> --}}
+                            <select name="managerid" style="display: block;    width: 100%;    padding: .375rem .75rem;    font-size: 1rem;    font-weight: 400;    line-height: 1.5;    color: #212529;    background-color: #fff;    background-clip: padding-box;    border: 1px solid #ced4da;    -webkit-appearance: none;    -moz-appearance: none;    appearance: none;    border-radius: .25rem;    transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;">
+                                <option value="test">Select a manager</option>
+                                @foreach (getallmanagers() as $item)
+                                    <option value="{{$item->id}}">{{$item->first_name}} {{$item->last_name}}</option>
+                                @endforeach
+                            </select>
                             <br>
                             <button class="btn btn-outline-success" type="submit">Search</button>
-                            <a class="btn btn-outline-primary" href="/trajets">Reset</a>
+                                <a class="btn btn-outline-primary" href="/manager/trajets">Reset</a>
                           </form>
                         </div>
+                        
                     </form>
                 </div>
             </div>
@@ -85,54 +126,57 @@
                 <h2>404 Not Found</h2>
             </div>
         @else
-            <table class="table">
+            <table class="table" >
+                <tr>
+                    <th style="font-size: 85%">Action</th>
+                    <th style="font-size: 85%">Manager</th>
+                    <th style="font-size: 85%">Date of departure</th>
+                    <th style="font-size: 85%">From</th>
+                    <th style="font-size: 85%">To</th>
+                    <th style="font-size: 85%">Distance</th>
+                    <th style="font-size: 85%">Type</th>
+                    <th style="font-size: 85%">Key</th>
+                    <th style="font-size: 85%">Stars</th>
+                </tr>
                 @foreach ($zones as $item)
                     <tr class="table-light">
-                        <th colspan="8">{{$item->zone_name}}</th>
+                        <th colspan="9" style="text-align: center">{{$item->zone_name}}</th>
                         <?php  $i = 0 ;?>
                         @foreach ($data as $key)
                         <tr>
                             @if ($key->zone_name == $item->zone_name)
-                                @if ($i==0)
-                                <tr>
-                                    <th>Action</th>
-                                    <th>Date of departure</th>
-                                    <th>From</th>
-                                    <th>To</th>
-                                    <th>Distance</th>
-                                    <th>Type</th>
-                                    <th>Key</th>
-                                    <th>Stars</th>
-                                </tr>
+                                @if ($i===0)
+                                
                                 @endif
                                 
                                 <td> 
-                                    <a onclick="duplicate(<?php echo $key->id?>)" ><span style = "color: Dodgerblue;" title="Duplicate" class="fa fa-copy" ></span></a>
+                                    {{-- <a onclick="duplicate(<?php echo $key->id?>)" ><span style = "color: Dodgerblue;" title="Duplicate" class="fa fa-copy" ></span></a>
                                     @if ($key->type != $type_manager)
                                         <a onclick="duplicate(<?php echo $key->id?>)" ><span style = "color: Dodgerblue;" title="Matcher" class="fa fa-copy" ></span></a>
 
-                                    @endif
-                                    <a from_l = "<?php echo $key->from_others?>" to_l = "<?php echo $key->to_others?>" typebtn="openmapps"><span style = "color: Dodgerblue;" title="Open Maps" class="fa fa-map-marked-alt" ></span></a>
+                                    @endif --}}
+                                    <a href = "#" from_l = "<?php echo $key->from_others?>" to_l = "<?php echo $key->to_others?>" typebtn="openmapps"><span style = "color: Dodgerblue;" title="Open Maps" class="fa fa-map-marked-alt" ></span></a>
 
 
                                 </td>
-                                <td>
+                                <td style="font-size: 75%">{{ getManagerName($key->manager_id, "") }}</td>
+                                <td style="font-size: 75%">
                                     <?php  
                                         $orgDate = $key->date_depart;  
                                         $newDate = date("d/m/Y", strtotime($orgDate));  
                                         echo $newDate;  
                                     ?>  
                                 </td>
-                                <td>{{$key->from_others}}</td>
-                                <td>{{$key->to_others}}</td>
-                                <td>
+                                <td style="font-size: 75%">{{$key->from_others}}</td>
+                                <td style="font-size: 75%">{{$key->to_others}}</td>
+                                <td style="font-size: 75%">
                                     @if ($key->distance != 0)
                                         {{(int)(($key->distance)/1000)}} Km
                                     @else
                                         NaN
                                     @endif
                                 </td>
-                                <td>
+                                <td style="font-size: 75%">
                                 @if ($key->vans != 0)
                                     {{$key->vans}} <span class="fa fa-car"  style="align-self: center"></span>
                                 @endif
@@ -146,7 +190,7 @@
                                 @if ($key->key == 1)
                                     <td><span class="fa fa-key"  style="align-self: center"></span></td>
                                 @else
-                                    <td></td>
+                                    <td style="font-size: 75%"></td>
                                 @endif
                                 
                                 
@@ -163,8 +207,8 @@
                                 </td>
                                 
                             @endif
+                            <?php ++$i ?>
                         </tr>
-                        <?php ++$i ?>
                         @endforeach
 
                     </tr>
@@ -179,6 +223,7 @@
     
 </div>
 <script type="text/javascript">
+    
     function duplicate(el)
     {
         $(document).ready(function(){
@@ -201,5 +246,10 @@
     
     
    
+</script>
+<script>
+
+    
+    
 </script>
 @endsection

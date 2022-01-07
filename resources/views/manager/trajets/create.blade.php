@@ -4,7 +4,6 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
 
 <!-- Compiled and minified MultiSelect JS -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.14.0-beta2/js/bootstrap-select.min.js" integrity="sha512-FHZVRMUW9FsXobt+ONiix6Z0tIkxvQfxtCSirkKc5Sb4TKHmqq1dZa8DphF0XqKb3ldLu/wgMa8mT6uXiLlRlw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     
 <!-- Compiled and minified MultiSelect CSS -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.14.0-beta2/css/bootstrap-select.min.css" integrity="sha512-mR/b5Y7FRsKqrYZou7uysnOdCIJib/7r5QeJMFvLNHNhtye3xJp1TdJVPLtetkukFn227nKpXD9OjUc09lx97Q==" crossorigin="anonymous" referrerpolicy="no-referrer" />   
@@ -64,7 +63,7 @@
                                 <div class="form-group">
                                     <select id="from_country_select"  class="selectpicker form-control SelectWine" name="from_country_select1" data-live-search="true"  title="Select Country" >
                                         @foreach ($countries as $country)
-                                            <option value={{$country->country_code}} >{{$country->country_name}}</option>
+                                            <option value={{$country->code}} >{{$country->fullname}}</option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -74,7 +73,7 @@
                                         
                                     </select>
                                 </div> --}}
-                                <input id="from_city_gl" type="text" size="50" placeholder="Enter a city" autocomplete="off" runat="server" />  
+                                <input id="from_city_gl" type="text"  placeholder="Enter a city" autocomplete="off" runat="server" />  
 
                             </div>
                         </div>
@@ -90,17 +89,18 @@
                                 <div class="form-group">
                                     <select id="to_country_select"  class="selectpicker form-control SelectWine" name="to_country_select1" data-live-search="true"  title="Select Country" >
                                         @foreach ($countries as $country)
-                                            <option value={{$country->country_code}}>{{$country->country_name}}</option>
+                                            <option value={{$country->code}} >{{$country->fullname}}</option>
                                         @endforeach
                                     </select>
-                                    
                                 </div>
-                                <input id="to_country_hidden" name="from_country_hidden" type="hidden" value="">
-                                <div class="form-group">
-                                    <select id="to_city_select" class="form-control" name="to_city" data-live-search="true">
+                                <input id="to_country_hidden" name="to_country_hidden" type="hidden" value="">
+                                {{-- <div class="form-group">
+                                    <select id="from_city_select" class="form-control" name="from_city" data-live-search="true">
                                         
                                     </select>
-                                </div>
+                                </div> --}}
+                                <input id="to_city_gl" type="text"  placeholder="Enter a city" autocomplete="off" runat="server" />  
+
                             </div>
                         </div>
                     </div>
@@ -309,6 +309,7 @@
             
             
         });
+        
         $('#from_country_select').on('change',function() {
             var country_code = $(this).find('option:selected').val();
             console.log(country_code);
@@ -366,64 +367,61 @@
                 var place = autocomplete.getPlace();
                 var place_array = place.name.split(',');
                 input.value = place_array[0];
-                
-                
-            });
-            console.log("3");
-        }
-        $('#from_city_select').on('change',function() {
-            var city_name = $(this).find('option:selected').text();
-            var city_code = $(this).find('option:selected').val();
-            var from_cities = $("#trip_additionalCityFrom").val()
-            city_name = city_name + " ("+city_code+")";
-            if (from_cities == ""){
-                city_name = from_cities + city_name 
-            }else{
-                city_name = from_cities + " + " + city_name 
-            }
-            $("#trip_additionalCityFrom").val(city_name)
- 
-            
-        });
-        
-        
-    });
-    $(document).ready(function(){
-        $('#to_country_select').on('change',function() {
-            var query = $(this).val();
- 
-            $.ajax({
-                url:"/manager/searchcity",
-                type:"GET",
-                data:{'country_id':query},
-                success:function (data) {
-                    $("#to_city_select").html("");
-                    var texthtm = "";
-                    $.each(data, function (i, elem) {
-                        texthtm =texthtm + "<option value="+elem.country_code+">"+elem.city_name+"</option>";
-                    });
-                    $("#to_city_select").append(texthtm);
+                var from_cities = $("#trip_additionalCityFrom").val()
+                city_name = place_array[0] + " ("+country_code+")";
+                if (from_cities == ""){
+                    city_name = from_cities + city_name 
+                }else{
+                    city_name = from_cities + " + " + city_name 
                 }
+                $("#trip_additionalCityFrom").val(city_name);
+                $("#from_city_gl").val("");
+                
+                
             });
+        }
+        $('#to_country_select').on('change',function() {
+            var country_code = $(this).find('option:selected').val();
+            console.log(country_code);
+            console.log("1");
+            tocity(country_code);
+            console.log("4");
+            google.maps.event.addDomListener(window, 'load', fromcity);
+            console.log("5");
+           
         });
-        $('#to_city_select').on('change',function() {
-            var city_name = $(this).find('option:selected').text();
-            var city_code = $(this).find('option:selected').val();
-            city_name = city_name + " ("+city_code+")";
-            var to_cities = $("#trip_additionalCityTo").val()
-            if (to_cities == ""){
-                city_name = to_cities + city_name 
-            }else{
-                city_name = to_cities + " + " + city_name
-            }
-            
-            $("#trip_additionalCityTo").val(city_name)
- 
-            
-        });
+        function tocity(country_code){
+            console.log("2");
+            var input = document.getElementById('to_city_gl');
+            var id_place = "";
+            var from_options = {
+                componentRestrictions: { country: country_code },
+                strictBounds: true,
+                types: ["(cities)"],
+            };
+            var autocomplete = new google.maps.places.Autocomplete(input,from_options);
+            google.maps.event.addListener(autocomplete, 'place_changed', function () {
+                var place = autocomplete.getPlace();
+                var place_array = place.name.split(',');
+                input.value = place_array[0];
+                var from_cities = $("#trip_additionalCityTo").val()
+                city_name = place_array[0] + " ("+country_code+")";
+                if (from_cities == ""){
+                    city_name = from_cities + city_name 
+                }else{
+                    city_name = from_cities + " + " + city_name 
+                }
+                $("#trip_additionalCityTo").val(city_name);
+                $("#to_city_gl").val("");
+                
+                
+            });
+        }
+        
         
         
     });
+    
     
    
 </script>
