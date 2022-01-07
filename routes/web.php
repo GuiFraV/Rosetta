@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboard;
 use App\Http\Controllers\Admin\PartnerController as AdminPartnerController;
 use App\Http\Controllers\Admin\ManagerController as ManagerController;
-use App\Http\Controllers\PartnerController as PartnerController;
+use App\Http\Controllers\Manager\PartnerController as ManagerPartnerController;
 use App\Http\Controllers\TrajetController as TrajetController;
 use App\Http\Controllers\HoraireController as HoraireController;
 use App\Http\Controllers\GroupController as GroupController;
@@ -53,10 +53,12 @@ Auth::routes();
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 Route::get('/addmanagers', [App\Http\Controllers\Admin\ManagerController::class, 'savemanager'])->name('addmanagers');
 
+/// USER WITHOUT RIGHTS ROUTES ///
 Route::group(['as'=>'user.','prefix' => 'user','namespace'=>'User','middleware'=>['auth','user']], function () {
     Route::get('dashboard', [App\Http\Controllers\User\DashboardController::class, 'index'])->name('dashboard');
 });
 
+/// MANAGER ROUTES ///
 Route::group(['as'=>'manager.','prefix' => 'manager','middleware'=>['auth','manager']], function () {
     
     Route::get('dashboard', [App\Http\Controllers\Manager\DashboardController::class, 'index'])->name('dashboard');
@@ -67,19 +69,13 @@ Route::group(['as'=>'manager.','prefix' => 'manager','middleware'=>['auth','mana
 
     /// Partners ///
     // Partner routes
-    Route::resource('partners',PartnerController::class, [
+    Route::resource('partners',ManagerPartnerController::class, [
       'only' => ['index', 'store'],
       'except' => ['create', 'edit', 'destroy', 'show', 'update']
     ]);
-
-    Route::get('partners', [PartnerController::class, 'index'])->name('partners.index');
-    Route::get('partners/getPartners', [PartnerController::class, 'getPartners'])->name('partners.getPartners');
-    Route::get('partners/countryAuto', [PartnerController::class, 'countryAuto'])->name('partners.countryAuto');
-    Route::get('partners/managerAuto', [PartnerController::class, 'managerAuto'])->name('partners.managerAuto');
-    Route::delete('partners/destroyer/{id}', 'App\Http\Controllers\PartnerController@destroyer');
-    Route::get('partners/{id}', 'App\Http\Controllers\PartnerController@show');
-    Route::get('partners/edit/{id}', 'App\Http\Controllers\PartnerController@edit');
-    Route::post('partners/update/{id}', 'App\Http\Controllers\PartnerController@update');
+    Route::get('partners', [ManagerPartnerController::class, 'index'])->name('partners.index');
+    Route::get('partners/getPartners', [ManagerPartnerController::class, 'getPartners'])->name('partners.getPartners');
+    Route::get('partners/{id}', 'App\Http\Controllers\Manager\PartnerController@show');
 
     /// Emails ///
     // Email routes
@@ -171,6 +167,7 @@ Route::group(['as'=>'manager.','prefix' => 'manager','middleware'=>['auth','mana
 
 });
 
+/// ADMIN ROUTES ///
 Route::group(['as'=>'admin.','prefix' => 'admin','middleware'=>['auth','admin']], function () {
     Route::get('dashboard', [AdminDashboard::class, 'index'])->name('dashboard');
     // Route::get('managers', [App\Http\Controllers\Admin\ManagerController::class, 'index'])->name('managers');
@@ -179,7 +176,22 @@ Route::group(['as'=>'admin.','prefix' => 'admin','middleware'=>['auth','admin']]
     Route::get('searchhour', [HoraireController::class, 'searchhour'])->name('searchhour');
     Route::get('manager/activate',[ManagerController::class,'activatemanager']);
     Route::put('users/password',[ManagerController::class,'editpassword']);
-    Route::resource('partners',AdminPartnerController::class);
-    Route::post('partners/partnerStatus/{partnerStatus}', [AdminPartnerController::class, 'partnerStatus'])->name('partners.partnerStatus');    
+    
+    /// Partners ///
+    // Partner routes
+    Route::resource('partners',AdminPartnerController::class, [
+      'only' => ['index', 'store'],
+      'except' => ['create', 'edit', 'destroy', 'show', 'update']
+    ]);
+    Route::get('partners', [AdminPartnerController::class, 'index'])->name('partners.index');
+    Route::get('partners/getPartners', [AdminPartnerController::class, 'getPartners'])->name('partners.getPartners');
+    Route::get('partners/countryAuto', [AdminPartnerController::class, 'countryAuto'])->name('partners.countryAuto');
+    Route::get('partners/managerAuto', [AdminPartnerController::class, 'managerAuto'])->name('partners.managerAuto');
+    Route::delete('partners/destroyer/{id}', 'App\Http\Controllers\Admin\PartnerController@destroyer');
+    Route::get('partners/{id}', 'App\Http\Controllers\Admin\PartnerController@show');
+    Route::get('partners/edit/{id}', 'App\Http\Controllers\Admin\PartnerController@edit');
+    Route::post('partners/update/{id}', 'App\Http\Controllers\Admin\PartnerController@update');
+
+    // Route::post('partners/partnerStatus/{partnerStatus}', [AdminPartnerController::class, 'partnerStatus'])->name('partners.partnerStatus');    
 });
  

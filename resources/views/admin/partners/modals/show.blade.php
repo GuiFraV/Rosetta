@@ -46,7 +46,11 @@
           </div>          
         </div>
 
-        <div class="row text-center">          
+        <div class="row text-center">
+          <div class="col">
+            <h5 class="lbl-color">Manager :</h5>
+            <p id="partnerShowManager"></p>
+          </div>
           <div class="col">          
             <h5 class="lbl-color">Created at :</h5>
             <p id="partnerShowCreatedAt"></p>
@@ -86,7 +90,8 @@
           $('#partnerShowOrigin').html(data["origin"]);
           $('#partnerShowPhone').html(data["phone"]);
           $('#partnerShowEmail').html(data["email"]);
-          $('#partnerShowType').html(data["type"]);          
+          $('#partnerShowType').html(data["type"]);
+          $('#partnerShowManager').html(data["manager"]);
           $('#partnerShowCreatedAt').html(data["created_at"]);         
           if(data["updated_at"] === "none") {
             $('#hideShowUpdated').hide();

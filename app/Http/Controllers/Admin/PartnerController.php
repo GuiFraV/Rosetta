@@ -3,9 +3,12 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Models\Manager;
 use App\Models\Partner;
+use Illuminate\Http\Request;
+use Auth;
+use Illuminate\Support\Facades\DB;
+use Yajra\DataTables\DataTables;
 
 class PartnerController extends Controller
 {
@@ -14,33 +17,105 @@ class PartnerController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
+    public function index()
     {
-        //
-        $title = 'Partners Management';
-        // $partners = Partner::all();
-        // $partners = Partner::orderBy('created_at','desc')->paginate(10);
-        try {
-            $search = $request->get('searchbar');
-            // $cities = City::whereNotNull('city_name')->where('city_name','like','%'.$search.'%')->orderBy('city_name')->paginate(10);    
-            $partners = Partner::where('name','like','%'.$search.'%')
-                                ->orderBy('created_at','desc')->paginate(10);
-        } catch (\Throwable $th) {
-            // $cities = City::whereNotNull('city_name')->orderBy('city_name')->paginate(10);
-            $partners = Partner::orderBy('created_at','desc')->paginate(10);
-        }  
-        return view('admin.partners.index')->with('partners', $partners)->with('title',$title);
+        return view('admin.partners.index');
     }
 
     /**
-     * Show the form for creating a new resource.
+    * Generate a yajara data table of the groups.
+    *
+    * @param  \Illuminate\Http\Request  $request
+    * @return Yajra\DataTables\DataTables
+    */
+    public function getPartners(Request $request)
+    {
+        if ($request->ajax()) {      
+            if (Auth::user()->role_id === 1) {
+                $data = Partner::all();
+            } elseif (Auth::user()->role_id === 3) {
+                $manager_id = Manager::with('user')->where("user_id","=",Auth::user()->id)->get()[0]["id"];
+                $data = Partner::all()->where("manager_id", "=", $manager_id);
+            }            
+            return DataTables::of($data)                
+                ->addIndexColumn()
+                ->removeColumn('status')                                
+                ->editColumn('manager_id', function($row)
+                {
+                   $manager = getManagerName($row->manager_id, 'all');
+                   return $manager;
+                })
+                ->editColumn('created_at', function($row)
+                {
+                   $created_at = $row->created_at->format('d-m-Y');
+                   return $created_at;
+                })
+                ->addColumn('showBtn', function($row)
+                {
+                    $showBtn = '<a role="button" class="bi bi-eye text-primary" style="font-size: 1.4rem;" onclick="openShowModal('.$row->id.');"></a>';
+                    return $showBtn;
+                })                
+                ->addColumn('editBtn', function($row)
+                {
+                    $editBtn = '<a role="button" class="bi bi-pencil text-warning" style="font-size: 1.4rem;" onclick="openModalEdit('.$row->id.');"></a>';
+                    return $editBtn;
+                })                
+                ->addColumn('deleteBtn', function($row)
+                {
+                    $deleteBtn = '<a role="button" class="bi bi-trash text-danger" style="font-size: 1.4rem;" onclick="$(\'#destroyModal\').modal(\'show\'); $(\'#destroyedId\').val('.$row->id.');"></a>';
+                    return $deleteBtn;
+                })                                
+                ->rawColumns(['showBtn', 'editBtn', 'deleteBtn'])                
+                ->make(true);
+        }  
+    }
+
+    /**
+     * Take data related to a country and returns a set of label / values as proposition for the user.
      *
+     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function countryAuto(Request $request)
     {
-        $managers = Manager::all();
-        return view('admin.partners.create')->with('managers',$managers);
+      // Look for countries (full/short name, and country code) containing the search term
+      $term = strtolower($request->term);
+      $res = DB::table('countries')->whereRaw("LOWER(fullname) LIKE '%".$term."%' OR LOWER(shortname) LIKE '%".$term."%' OR LOWER(code) LIKE '%".$term."%'")->get();
+      
+      // Put the results in an array containing 3 keys : label (displayed in the completion), value (the country code), and phone_code
+      $retArr = array();
+      foreach($res as $country) {
+          array_push($retArr, ["label" => $country->emoji . " " . $country->shortname, "value" => $country->code, "phone_code" => $country->phone_code]);
+      }
+      
+      return json_encode($retArr);
+    }
+
+    /**
+    * Take data related to a manager and returns a set of label / values as proposition for the user.
+    *
+    * @param  \Illuminate\Http\Request  $request
+    * @return \Illuminate\Http\Response
+    */
+    public function managerAuto(Request $request)
+    {
+      // Select managers (name, and agency) containing the search term and type
+      $term = strtolower($request->term);
+      $type = ($request->type == "Client") ? "TM" : "LM";
+
+      /// Query en SQL : SELECT managers.id, first_name, last_name, agency_name FROM managers INNER JOIN agencies ON managers.agency_id = agencies.id WHERE (first_name LIKE '%TERM%' OR last_name LIKE '%TERM%') AND `type` = 'TYPE' 
+      $res = DB::table('managers')
+                ->join('agencies', 'managers.agency_id', '=', 'agencies.id')
+                ->select('managers.id', 'first_name', 'last_name', 'agency_name')
+                ->whereRaw("(LOWER(first_name) LIKE '%".$term."%' OR LOWER(last_name) LIKE '%".$term."%') AND `type` = '".$type."'")                  
+                ->get();
+   
+      // Put the results in an array containing 2 keys : label (displayed for the completion), and value (the manager id)
+      $retArr = array();
+      foreach($res as $manager) {
+          array_push($retArr, ["label" => $manager->first_name . " " . $manager->last_name . " | " . $manager->agency_name, "value" => $manager->id]);
+      }
+      return json_encode($retArr);
     }
 
     /**
@@ -51,145 +126,212 @@ class PartnerController extends Controller
      */
     public function store(Request $request)
     {
-        $this->validate($request, [
-            'manager_id' => 'required',
-            'name' => 'required',
+        /// Back validation
+        $rules = [
             'company' => 'required',
-            'origin' => 'required',
+            'contact' => 'required',
+            'country' => 'required',                       
+            'callingCodeForm' => 'required',          
             'phone' => 'required',
-            'email' => 'required',
-            // 'type' => 'required'
-        ]);
-
-        $partner = new Partner;
-
-            if($request->type_partner == 'client'){
-
-                $partner->type = 'Client';
-                // return('Client');
-            } 
-            else
-            {
-                $partner->type = 'Carrier';
-                // return('Carrier');
-            } 
-
-        // $partner->lastId = $request->input('lastId');
-        $partner->manager_id = $request->input('manager_id');
-        $partner->name = $request->input('name');
-        $partner->company = $request->input('company');
-        $partner->origin = $request->input('origin');
-        $partner->phone = $request->input('phone');
-        $partner->email  = $request->input('email');
-        // $partner->type = $request->input('type');
-
-        $partner->save();
-        // return redirect('partners')->with('success','Epartner created');
-        // return Redirect::back()->with('error_code', 5);
+            'email' => 'required',            
+            'type' => 'required',
+            'manager' => 'required'
+        ];
         
-        // $request->except('_token');
-        // $object=$request->get('object');
-        // $message=$request->get('message');
+        // Custom errors to display them as a toast in JS
+        $customError = [
+            'company.required' => "The partner's company name is required.",
+            'contact.required' => "The partner's contact name is required.",
+            'country.required' => "The partner's origin is required.",            
+            'callingCodeForm.required' => "The partner's phone is incorrect.",          
+            'phone.required' => "The partner's phone is required.",
+            'email.required' => "The partner's email is required.",            
+            'type.required' => "The partner's type is required.",
+            'manager.required' => "The partner's manager is required."
+        ];
 
-        // $insertData=partner::insert(
-        //     ['object' => $object , 'message' => $message]
-        // );
-        return redirect()->route('admin.partners.index')
-                         ->with('success','Partner created successfully.');
+        $this->validate($request, $rules, $customError);
+        
+        /// Creating the new partner with the freshly validated data
+        $partner = new Partner;
+        $partner->manager_id = $request->manager;
+        $partner->name = $request->contact;
+        $partner->company = $request->company;
+        $partner->origin = $request->country;        
+        $partner->phone = $request->callingCodeForm.$request->phone;
+        $partner->email = $request->email;
+        $partner->type = $request->type;
+        $status = $partner->save();
+        
+        /// Verifying the status of the save. The boolean '$status' tells it.
+        if ($status) {
+            echo json_encode(["statusCode" => 200]);
+        } else {
+            echo json_encode(["statusCode" => 400]);
+        }       
     }
 
     /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
+    * Display the specified resource.
+    *
+    * @param  $id
+    * @return \Illuminate\Http\Response
+    */
     public function show($id)
     {
-        //
+        try {
+            $partner = Partner::findOrFail($id);            
+            $updated_at = ($partner->created_at == $partner->updated_at) ? "none" : $partner->updated_at->format('d-m-Y H:i');
+            return json_encode(array(
+                "statusCode" => 200,
+                "manager" => getManagerName($partner->manager_id, 'all'), 
+                "contact" => $partner->name, 
+                "company" => $partner->company, 
+                "origin" => countryToHuman($partner->origin), 
+                "phone" => $partner->phone, 
+                "email" => $partner->email, 
+                "type" => $partner->type, 
+                "created_at" => $partner->created_at->format('d-m-Y H:i'), 
+                "updated_at" => $updated_at                
+            )); 
+        /// In the case where the partner is not found, the user is notified      
+        } catch(ModelNotFoundException $e) {
+            return json_encode(
+                array(
+                    "statusCode" => 400                    
+                )
+            );
+        }
     }
 
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int  $id
+     * @param  \App\Models\Partner  $partner
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit(Request $request)
     {
-        $title = 'Update Partner';
-        $managers = Manager::all();
-        $partner = Partner::find($id);
-        return view('admin.partners.edit')->with('partner',$partner)->with('title',$title)->with('managers',$managers);
+        $id = $request->id;
+        try {
+            $partner = Partner::findOrFail($id);                        
+            $phone_code = "+".getPhoneCode($partner->origin);
+            $real_phone = substr($partner->phone, strlen($phone_code));
+            return json_encode(
+                array(
+                    "statusCode" => 200,     
+                    "editedId" => $id,               
+                    "managerLabel" => getManagerName($partner->manager_id, "complete"), 
+                    "managerValue" => $partner->manager_id, 
+                    "contact" => $partner->name, 
+                    "company" => $partner->company, 
+                    "originLabel" => countryToHuman($partner->origin), 
+                    "originValue" => $partner->origin,
+                    "phone_code" => $phone_code,
+                    "phone" => $real_phone, 
+                    "email" => $partner->email, 
+                    "type" => $partner->type
+                )
+            );       
+        /// In the case where the partner is not found, the user is notified
+        } catch(ModelNotFoundException $e) {
+            return json_encode(
+                array(
+                    "statusCode" => 400                    
+                )
+            );
+        }
     }
 
     /**
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * @param  $id
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id)
-    {
-        $this->validate($request, [
-            'name' => 'required',
-            'company' => 'required',
-            'origin' => 'required',
-            'phone' => 'required',
-            'email' => 'required',
-            // 'type' => 'required'
-        ]);
+    {        
+        /// Back validation
+        $rules = [            
+            'partnerEditCompany' => 'required',
+            'partnerEditContact' => 'required',
+            'partnerEditCountry' => 'required',
+            'partnerEditPhone' => 'required',
+            'partnerEditCallingCodeForm' => 'required',
+            'partnerEditEmail' => 'required',
+            'partnerEditType' => 'required',
+            'partnerEditManager' => 'required'
+        ];
+      
+        // Custom errors to display them as a toast in JS
+        $customError = [
+            'partnerEditCompany.required' => "The partner's company name is required.",
+            'partnerEditContact.required' => "The partner's contact name is required.",
+            'partnerEditCountry.required' => "The partner's origin is required.",                        
+            'partnerEditPhone.required' => "The partner's phone is required.",
+            'partnerEditCallingCodeForm.required' => "The partner's phone is incorrect.",          
+            'partnerEditEmail.required' => "The partner's email is required.",
+            'partnerEditType.required' => "The partner's type is required.",
+            'partnerEditManager.required' => "The partner's manager is required."
+        ];
+
+        $this->validate($request, $rules, $customError);
         
-        $partner = Partner::find($id);
-        $partner->name = $request->input('name');
-        $partner->company = $request->input('company');
-        $partner->origin = $request->input('origin');
-        $partner->phone = $request->input('phone');
-        $partner->email  = $request->input('email');
-        // $partner->type = $request->input('type');
-
-        if($request->type_partner == 'client'){
-
-            $partner->type = 'Client';
-            // return('Client');
-        } 
-        else
-        {
-            $partner->type = 'Carrier';
-            // return('Carrier');
-        } 
-
-        $partner->update();
-        return redirect()->route('admin.partners.index')
-                         ->with('success','Partner updated successfully');
+        try {
+            /// Update the partner with the freshly validated data    
+            $partner = Partner::findOrFail($id);       
+            $partner->manager_id = $request->partnerEditManager;
+            $partner->name = $request->partnerEditContact;
+            $partner->company = $request->partnerEditCompany;
+            $partner->origin = $request->partnerEditCountry;        
+            $partner->phone = $request->partnerEditCallingCodeForm.$request->partnerEditPhone;
+            $partner->email = $request->partnerEditEmail;
+            $partner->type = $request->partnerEditType;
+            $status = $partner->save();
+            
+            /// Verifying the status of the save. The boolean '$status' tells it.
+            if ($status) {
+                echo json_encode(
+                    array(
+                        "statusCode" => 200
+                    )
+                );
+            } else {
+                /// In the case where the update failed, the user is notified
+                echo json_encode(
+                    array(
+                        "statusCode" => 400, 
+                        "error" => "updateError"
+                    )
+                );
+            }
+        /// In the case where the partner is not found, the user is notified
+        } catch(ModelNotFoundException $e) {                
+            return json_encode(
+                array(
+                    "statusCode" => 400,
+                    "error" => $e
+                )
+            );        
+        }  
     }
 
     /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
+    * Delete the partner from the database.
+    *
+    * @param  Request $request
+    * @return \Illuminate\Http\Response
+    */
+    public function destroyer(Request $request) 
     {
-        $partner = Partner::find($id);
-
-        $partner->delete();
-
-        return redirect()->route('admin.partners.index')->with('success','Partner deleted successfully');
-    }
-    public function partnerStatus($id)
-    {
-        $partner = Partner::find($id);
-        $state = $partner->status;
-        if ($state == 0) {
-            $partner->status = 1;
+        $ret = Partner::destroy($request->id);
+        /// Verifying the status of the deletion. The boolean '$ret' tells it.
+        if($ret) {
+            return json_encode(["statusCode" => 200]);  
         } else {
-            $partner->status = 0;
+            return json_encode(["statusCode" => 400]);  
         }
-        $partner->update();
-        return redirect()->route('admin.partners.index')
-                         ->with('success','Partner updated successfully');
+        
     }
 }
