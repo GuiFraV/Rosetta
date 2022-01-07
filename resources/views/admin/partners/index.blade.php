@@ -1,6 +1,15 @@
 @extends('admin.navbar')
 
 @section('content')
+
+<style>
+  .ui-autocomplete { 
+    position: absolute; 
+    cursor: default;
+    z-index:10000 !important;
+  }  
+</style>
+
 <div class="container">
   <br>
   <div class="jumbotron text-center">

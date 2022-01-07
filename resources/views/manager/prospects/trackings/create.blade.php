@@ -39,12 +39,14 @@
             <div id="resultOk" style="display: none;">    
                 <h5>Prospect validation done the {{ date('Y-m-d') }} by {{ getManagerName($prospect->actor, "all") }}</h5>
                 <div class="row">
-                    <div class="col">
-                        <div class="w-50">
-                            <label for="loadNumber" class="form-label">Load number</label>
-                            <input type="text" class="form-control" name="loadNumber" placeholder="1234567890" minlength="1" maxlength="50">
-                        </div>
+                    <div class="col">                        
+                      <label for="loadNumber" class="form-label">Load number</label>
+                      <input type="text" class="form-control" name="loadNumber" placeholder="1234567890" minlength="1" maxlength="50">                        
                     </div>
+                    <div class="col">                      
+                      <label for="contact" class="form-label">Contact name</label>
+                      <input type="text" class="form-control" name="contact" placeholder="John Doe" minlength="1" maxlength="50">                      
+                  </div>
                 </div><br>
                 <button type="submit" class="btn btn-success float-end">Validate</button>
             </div>

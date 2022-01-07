@@ -164,7 +164,6 @@ Route::group(['as'=>'manager.','prefix' => 'manager','middleware'=>['auth','mana
         return view('manager.prospects.faq');
     });
 
-
 });
 
 /// ADMIN ROUTES ///

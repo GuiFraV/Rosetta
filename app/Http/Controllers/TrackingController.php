@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Partner;
 use Illuminate\Http\Request;
 use App\Models\Tracking;
 use App\Models\Prospect;
@@ -55,7 +56,8 @@ class TrackingController extends Controller
             $data = $request->validate([
                 'id' => 'required',
                 'result' => 'required',
-                'loadNumber' => 'required|max:255'
+                'loadNumber' => 'required|max:255',
+                'contact' => 'required|max:191'
             ]);            
             $prospect->deadline = null;
             if(!isset($prospect->actor))
@@ -64,6 +66,20 @@ class TrackingController extends Controller
             $prospect->state = 4;
             $prospect->loadNumber = $request->loadNumber;
             $prospect->save();
+            // ATM not deleting the old prospect, but we will see in the future
+
+            // Transforming the prospect into a new partner 
+            $partner = new Partner();
+            $partner->manager_id = $prospect->actor;
+            $partner->name = $request->contact; 
+            $partner->company = $prospect->name;
+            $partner->origin = $prospect->country;
+            $partner->phone = $prospect->phone;
+            $partner->email = $prospect->email;
+            $partner->type = $prospect->type;
+            $partner->save();
+            // 
+
             return redirect('manager/prospects')->with('validated', "The prospect has been validated, good work!"); 
         } 
     }
