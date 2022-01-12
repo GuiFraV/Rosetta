@@ -66,10 +66,11 @@ Route::group(['as'=>'manager.','prefix' => 'manager','middleware'=>['auth','mana
     
     /// Trajets (routes) ///
     Route::resource('trajets',TrajetController::class);
+    Route::delete('trajets/destroyer/{id}', 'App\Http\Controllers\TrajetController@destroyer');
     Route::get('searchcity', [TrajetController::class, 'searchcity'])->name('searchcity');
     Route::get('duplicate', [TrajetController::class, 'duplicate'])->name('duplicate');
     Route::get('matching', [TrajetController::class, 'matching'])->name('matching');
-    Route::delete('trajets/destroyer/{id}', 'App\Http\Controllers\TrajetController@destroyer');
+    Route::post('trajets/getRouteList', [TrajetController::class, 'getRouteList'])->name('getRouteList');
 
     /// Partners ///
     // Partner routes

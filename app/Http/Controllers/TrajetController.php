@@ -11,6 +11,7 @@ use App\Models\Country;
 use GuzzleHttp\Client;
 use Carbon\Carbon;
 use Auth;
+use Illuminate\Support\Facades\DB;
 
 class TrajetController extends Controller
 {
@@ -19,36 +20,34 @@ class TrajetController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
-    {
+    public function index(Request $request) {
         $type_manager = Manager::with('user')->where("user_id","=",Auth::user()->id)->get()[0]["type"];
         $zones = Zone::get(['zones.zone_name']);
-        if( !empty( $request->except('_token') ) ){
-            //code...
+        
+        if(!empty($request->except('_token'))) {
+            //code... || <- what did he mean by that ?
         
             $managerid = $request->get('managerid');
-            if ($managerid == 'test'){
+            if($managerid == 'test') {
                 $type_search = "all";
                 $data = Trajet::join('zones', 'zones.id', '=', 'trajets.zone_id')
-                        ->orderBy('trajets.date_depart', 'DESC')
-                        ->get(['trajets.id','trajets.date_depart','zones.zone_name','trajets.from_others','trajets.to_others','trajets.key','trajets.distance','trajets.duration','trajets.stars','trajets.comment','trajets.vans','trajets.full_load','trajets.used_cars','trajets.manager_id']);
-            }else if ($managerid != 'test'){
+                                ->orderBy('trajets.date_depart', 'DESC')
+                                ->get(['trajets.id','trajets.date_depart','zones.zone_name','trajets.from_others','trajets.to_others','trajets.key','trajets.distance','trajets.duration','trajets.stars','trajets.comment','trajets.vans','trajets.full_load','trajets.used_cars','trajets.manager_id']);
+            } else if($managerid != 'test') {
                 $type_search = "bymanager";
                 $data = Trajet::join('zones', 'zones.id', '=', 'trajets.zone_id')
-                        ->where('trajets.manager_id','=',$managerid)
-                        ->orderBy('trajets.date_depart', 'DESC')
-                        ->get(['trajets.id','trajets.date_depart','zones.zone_name','trajets.from_others','trajets.to_others','trajets.key','trajets.distance','trajets.duration','trajets.stars','trajets.comment','trajets.vans','trajets.full_load','trajets.used_cars','trajets.manager_id']);
+                                ->where('trajets.manager_id','=',$managerid)
+                                ->orderBy('trajets.date_depart', 'DESC')
+                                ->get(['trajets.id','trajets.date_depart','zones.zone_name','trajets.from_others','trajets.to_others','trajets.key','trajets.distance','trajets.duration','trajets.stars','trajets.comment','trajets.vans','trajets.full_load','trajets.used_cars','trajets.manager_id']);
             }
         } else {
             //throw $th;
             $type_search = "all";
             $data = Trajet::join('zones', 'zones.id', '=', 'trajets.zone_id')
-                    ->orderBy('trajets.date_depart', 'DESC')
-                    ->get(['trajets.id','trajets.date_depart','zones.zone_name','trajets.from_others','trajets.to_others','trajets.key','trajets.distance','trajets.duration','trajets.stars','trajets.comment','trajets.vans','trajets.full_load','trajets.used_cars','trajets.manager_id']);        
+                            ->orderBy('trajets.date_depart', 'DESC')
+                            ->get(['trajets.id','trajets.date_depart','zones.zone_name','trajets.from_others','trajets.to_others','trajets.key','trajets.distance','trajets.duration','trajets.stars','trajets.comment','trajets.vans','trajets.full_load','trajets.used_cars','trajets.manager_id']);        
         }
-        return  view('manager.trajets.index', compact('zones') , compact('data') )->with('type_manager',$type_manager)->with('type_search',$type_search)->with('test',self::test());
-
-        
+        return  view('manager.trajets.index', compact('zones') , compact('data') )->with('type_manager',$type_manager)->with('type_search',$type_search)->with('test',self::test()); 
     }
 
     /**
@@ -56,130 +55,118 @@ class TrajetController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create(Request $request)
-    {
+    public function create(Request $request) {
         $zones = Zone::get();
         $countries  = Country::orderBy('fullname')->get();
-        return view('manager.trajets.create')
-        ->with(compact('zones'))
-        ->with(compact('request'))
-        ->with(compact('countries'));
+        return view('manager.trajets.create')->with(compact('zones'))
+                                            ->with(compact('request'))
+                                            ->with(compact('countries'));
     }
 
-    public function searchcity(Request $request)
-    {
-
-        if($request->ajax()) {
-          
+    public function searchcity(Request $request) {
+        if($request->ajax()) {          
             $data =City::join('countries', 'countries.id', '=', 'cities.coutry_id')
                         ->where('coutry_id', '=',$request->country_id)
                         ->orderBy('city_name')
-                        ->get(['countries.country_code','cities.city_name']);
-
-                        
-            return $data;
-           
-            
+                        ->get(['countries.country_code','cities.city_name']);                        
+            return $data;                       
         }
     }
-    public function test()
-    {
+    
+    public function test() {
         $type_manager = Manager::with('user')->where("user_id","=",Auth::user()->id)->get()[0]["type"];
         $data = Trajet::join('zones', 'zones.id', '=', 'trajets.zone_id')
-                    ->orderBy('trajets.date_depart', 'DESC')
-                    ->get(['trajets.id','trajets.zone_id','trajets.date_depart','zones.zone_name','trajets.from_others','trajets.to_others','trajets.key','trajets.distance','trajets.duration','trajets.stars','trajets.comment','trajets.vans','trajets.full_load','trajets.used_cars','trajets.manager_id']);
+                        ->orderBy('trajets.date_depart', 'DESC')
+                        ->get(['trajets.id','trajets.zone_id','trajets.date_depart','zones.zone_name','trajets.from_others','trajets.to_others','trajets.key','trajets.distance','trajets.duration','trajets.stars','trajets.comment','trajets.vans','trajets.full_load','trajets.used_cars','trajets.manager_id']);
         
         $text = "";
         $countries = ["CH", "ES", "FR", "UK", "PT","CY","AT", "BE", "DE", "DK", "FI", "IS", "IT", "LU", "NL", "NO", "SE","BG", "CZ", "EE", "HR", "HU", "LT", "LV", "PL", "RO", "RS", "SI", "SK"];
+        
         foreach ($data as $key) {
             if($type_manager=="LM"){
-                if( in_array($key->zone_id, array(1,2,3,4))){
+                if(in_array($key->zone_id, array(1,2,3,4))) {
+                    $from_others = $key->from_others;
+                    $to_others = $key->to_others;
+                    $conc = $from_others. " - " .$to_others ."\n" ;
+                    $text = $text  . $conc; 
+                }
+            } else if($type_manager=="TM"){
+                if(in_array($key->zone_id, array(5,6,7))) {
                     $from_others = $key->from_others;
                     $to_others = $key->to_others;
                     $conc = $from_others. " - " .$to_others ."\n" ;
                     $text = $text  . $conc; 
                 }
             }
-            if($type_manager=="TM"){
-                if( in_array($key->zone_id, array(5,6,7))){
-                    $from_others = $key->from_others;
-                    $to_others = $key->to_others;
-                    $conc = $from_others. " - " .$to_others ."\n" ;
-                    $text = $text  . $conc; 
-                }
-            }
-
         }
+
         $text2 = "";
         foreach ($countries as $code) {
             $country_code = "";
             $ch_cd = "";
             $loads = array();
             foreach ($data as $key) {
-                if($type_manager=="LM"){
-                    if( in_array($key->zone_id, array(1,2,3,4))){
+                if($type_manager == "LM") {
+                    if(in_array($key->zone_id, array(1,2,3,4))) {
                         $country = $key->from_others;
                         $country = explode('(', explode(')', $country)[0])[1];
-                        if($code == $country ){
-                            if ($country_code == ""){
+                        if($code == $country) {
+                            if($country_code == "") {
                                 $ch_cd = "1";
                                 $country_code = $country;
                                 $text2 = $text2 . "\n". $country_code. "\n";
                                 $textload = "";
-                                if ($key->vans != 0){
+                                if($key->vans != 0) {
                                     $textload = $textload . $key->vans . " Vans ";
                                 }
-                                if (strval($key->full_load) == "1"){
+                                if(strval($key->full_load) == "1") {
                                     $textload = $textload . "FL ";
                                 }
                                 if ($key->used_cars == 1){
                                     $textload = $textload . ": UC ";
-                                }
-                                
+                                }                                
                                 $text2 = $text2 . $key->from_others . " - " .$key->to_others. " | " .$textload. "\n" ;
-                            }else{
+                            } else {
                                 $textload = "";
-                                if ($key->vans != 0){
+                                if($key->vans != 0) {
                                     $textload = $textload . $key->vans. " Vans ";;
                                 }
-                                if (strval($key->full_load) == "1"){
+                                if(strval($key->full_load) == "1") {
                                     $textload = $textload . "FL";
                                 }
-                                if ($key->used_cars == 1){
+                                if($key->used_cars == 1) {
                                     $textload = $textload . ":UC";
                                 }
                                 $text2 = $text2 . $key->from_others . " - " .$key->to_others. " | " .$textload. "\n" ;
                                 $textload = "";
-                            }
-                            
+                            }                            
                         }
                         if($ch_cd != "1" ){
                             
                         }
                     }
                 }
-                if($type_manager=="TM"){
-                    if( in_array($key->zone_id, array(5,6,7))){
+                if($type_manager=="TM") {
+                    if(in_array($key->zone_id, array(5,6,7))) {
                         $country = $key->from_others;
                         $country = explode('(', explode(')', $country)[0])[1];
-                        if($code == $country ){
-                            if ($country_code == ""){
+                        if($code == $country) {
+                            if($country_code == "") {
                                 $ch_cd = "1";
                                 $country_code = $country;
                                 $text2 = $text2 . "\n". $country_code. "\n";
                                 $textload = "";
-                                if ($key->vans != 0){
+                                if($key->vans != 0) {
                                     $textload = $textload . $key->vans . " Vans ";
                                 }
-                                if (strval($key->full_load) == "1"){
+                                if(strval($key->full_load) == "1") {
                                     $textload = $textload . "FL ";
                                 }
-                                if ($key->used_cars == 1){
+                                if($key->used_cars == 1) {
                                     $textload = $textload . ": UC ";
-                                }
-                                
+                                }                                
                                 $text2 = $text2 . $key->from_others . " - " .$key->to_others. " | " .$textload. "\n" ;
-                            }else{
+                            } else {
                                 $textload = "";
                                 if ($key->vans != 0){
                                     $textload = $textload . $key->vans. " Vans ";;
@@ -383,4 +370,69 @@ class TrajetController extends Controller
             ));
         }        
     }
+    
+    /**
+    * Generate all the routes as text for the user.
+    *
+    * @return JSON Object
+    */
+    public function getRouteList() {
+        
+        $typeManager = getManagerType();        
+        
+        if($typeManager === "LM") {
+            $data = Trajet::where("date_depart", ">=", date('Y-m-d'))
+                            ->whereIn("zone_id", [1, 2, 3, 4])
+                            ->get();
+        } else if($typeManager === "TM") {
+            $data = Trajet::where("date_depart", ">=", date('Y-m-d'))
+                            ->whereIn("zone_id", [5, 6, 7])
+                            ->get();
+        } else if($typeManager === "Admin") {
+           $data = Trajet::where("date_depart", ">=", date('Y-m-d'))->get();
+        }
+
+        $retArr = array();        
+        foreach($data as $route) {            
+            $firstSub = $route->from_others;
+            
+            // If it's a load with multiple loading places, substr the first loading place (before '+')
+            if(str_contains($firstSub, "+")) {
+                $tmp = explode("+", $firstSub);
+                $firstSub = $tmp[0];
+            } 
+
+            // Find the position of '(' and substr the right part, 
+            $tmp = explode("(", $firstSub);   	
+            $secondSub = $tmp[1];
+
+            // Then Find the position of ')' and substr the left part
+            $tmp = explode(")", $secondSub);
+
+            $countryDeparture = $tmp[0];
+            
+            // Formating the text for the mail as a list
+            $displayText = $route->from_others . " -> " . $route->to_others;
+
+            // Insert in an array the country code and the display text used for the email
+            array_push($retArr, ["countryCode" => $countryDeparture, "label" => $displayText]);
+        }
+        
+        // Ordering our return array in a ascendant way
+        array_multisort($retArr, SORT_ASC);        
+        // dd($retArr);
+
+        $finalStr = "";
+        $tmp = "";
+        foreach($retArr as $elem) {
+          if($tmp != $elem['countryCode']) {
+            $tmp = $elem['countryCode'];
+            $finalStr .= PHP_EOL.PHP_EOL.$tmp.PHP_EOL.PHP_EOL;
+          }
+          $finalStr .= $elem['label'].PHP_EOL.PHP_EOL;
+        }
+
+        echo json_encode($finalStr);      
+  }
+
 }

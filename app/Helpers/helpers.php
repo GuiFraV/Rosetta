@@ -7,6 +7,12 @@ use App\Models\Prospect;
 use App\Models\Manager;
 use App\Models\State;
 
+if (!function_exists('str_contains')) {
+    function str_contains (string $haystack, string $needle) {
+        return empty($needle) || strpos($haystack, $needle) !== false;
+    }
+}
+
 if (!function_exists("countryCodeToEmojiName")) {
     function countryCodeToEmojiName($countryCode) {
         switch ($countryCode) {
