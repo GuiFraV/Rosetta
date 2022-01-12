@@ -1,12 +1,6 @@
 @extends('manager.navbar')
 
 @section('content')
-<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
-
-<!-- Compiled and minified MultiSelect JS -->
-    
-<!-- Compiled and minified MultiSelect CSS -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.14.0-beta2/css/bootstrap-select.min.css" integrity="sha512-mR/b5Y7FRsKqrYZou7uysnOdCIJib/7r5QeJMFvLNHNhtye3xJp1TdJVPLtetkukFn227nKpXD9OjUc09lx97Q==" crossorigin="anonymous" referrerpolicy="no-referrer" />   
 <div class="mt-5" style="margin-right: 140px;margin-left: 140px;">
     <div class="card-header text-center">
         <h2>Creation form</h2>

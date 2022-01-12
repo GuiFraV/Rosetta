@@ -330,16 +330,6 @@ class TrajetController extends Controller
         //
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Manager\Trajet  $trajet
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Trajet $trajet)
-    {
-        //
-    }
     public function duplicate(Request $request){
         $old_trajet_id = $request->trajet_id;
         $data = Trajet::where('id','=',$old_trajet_id)->get();
@@ -372,5 +362,25 @@ class TrajetController extends Controller
     }
     public function matching(){
         return Manager::with('user')->where("user_id","=",Auth::user()->id)->get()[0];
+    }
+
+    /**
+    * Delete the route from the database.
+    *
+    * @param  Request $request
+    * @return \Illuminate\Http\Response
+    */
+    public function destroyer(Request $request) 
+    {
+        $ret = Trajet::destroy($request->id);        
+        if($ret) {
+            return json_encode(array(
+                "statusCode" => 200
+            ));
+        } else {
+            return json_encode(array(
+                "statusCode" => 400                
+            ));
+        }        
     }
 }

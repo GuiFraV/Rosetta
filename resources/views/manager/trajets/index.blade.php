@@ -137,13 +137,14 @@ td {
                     <th style="font-size: 85%">Type</th>
                     <th style="font-size: 85%">Key</th>
                     <th style="font-size: 85%">Stars</th>
+                    <th style="font-size: 85%">Delete</th>
                 </tr>
                 @foreach ($zones as $item)
                     <tr class="table-light">
                         <th colspan="9" style="text-align: center">{{$item->zone_name}}</th>
                         <?php  $i = 0 ;?>
                         @foreach ($data as $key)
-                        <tr>
+                        <tr id="ln{{ $key->id }}">
                             @if ($key->zone_name == $item->zone_name)
                                 @if ($i===0)
                                 
@@ -205,6 +206,11 @@ td {
                                         <span class="fas fa-star"  style="align-self: center" title="***"></span>
                                     @endif
                                 </td>
+
+                                {{-- New delete button --}}
+                                <td>
+                                  <a role="button" class="bi bi-trash text-danger" style="font-size: 1.4rem;" onclick="$('#destroyModal').modal('show'); $('#destroyedId').val({{ $key->id }});"></a>
+                                </td>
                                 
                             @endif
                             <?php ++$i ?>
@@ -222,6 +228,9 @@ td {
     </div>
     
 </div>
+
+@include('manager.trajets.modals.destroy')
+
 <script type="text/javascript">
     
     function duplicate(el)

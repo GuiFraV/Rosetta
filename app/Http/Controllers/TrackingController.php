@@ -67,6 +67,7 @@ class TrackingController extends Controller
             $prospect->loadNumber = $request->loadNumber;
             $prospect->save();
             // ATM not deleting the old prospect, but we will see in the future
+            // Need to send email to manager with the load number to verify it, and not lose the information
 
             // Transforming the prospect into a new partner 
             $partner = new Partner();

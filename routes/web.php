@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\admin\CountryController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboard;
 use App\Http\Controllers\Admin\PartnerController as AdminPartnerController;
@@ -62,10 +63,13 @@ Route::group(['as'=>'user.','prefix' => 'user','namespace'=>'User','middleware'=
 Route::group(['as'=>'manager.','prefix' => 'manager','middleware'=>['auth','manager']], function () {
     
     Route::get('dashboard', [App\Http\Controllers\Manager\DashboardController::class, 'index'])->name('dashboard');
+    
+    /// Trajets (routes) ///
     Route::resource('trajets',TrajetController::class);
     Route::get('searchcity', [TrajetController::class, 'searchcity'])->name('searchcity');
     Route::get('duplicate', [TrajetController::class, 'duplicate'])->name('duplicate');
     Route::get('matching', [TrajetController::class, 'matching'])->name('matching');
+    Route::delete('trajets/destroyer/{id}', 'App\Http\Controllers\TrajetController@destroyer');
 
     /// Partners ///
     // Partner routes
@@ -189,8 +193,11 @@ Route::group(['as'=>'admin.','prefix' => 'admin','middleware'=>['auth','admin']]
     Route::delete('partners/destroyer/{id}', 'App\Http\Controllers\Admin\PartnerController@destroyer');
     Route::get('partners/{id}', 'App\Http\Controllers\Admin\PartnerController@show');
     Route::get('partners/edit/{id}', 'App\Http\Controllers\Admin\PartnerController@edit');
-    Route::post('partners/update/{id}', 'App\Http\Controllers\Admin\PartnerController@update');
-
+    Route::post('partners/update/{id}', 'App\Http\Controllers\Admin\PartnerController@update');    
     // Route::post('partners/partnerStatus/{partnerStatus}', [AdminPartnerController::class, 'partnerStatus'])->name('partners.partnerStatus');    
+
+    /// Countries ///
+    Route::get('country', [CountryController::class, 'index'])->name('index');
+    Route::get('country/getCountries', [CountryController::class, 'getCountries'])->name('country.getCountries');
 });
  
