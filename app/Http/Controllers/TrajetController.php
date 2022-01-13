@@ -381,15 +381,11 @@ class TrajetController extends Controller
         $typeManager = getManagerType();        
         
         if($typeManager === "LM") {
-            $data = Trajet::where("date_depart", ">=", date('Y-m-d'))
-                            ->whereIn("zone_id", [1, 2, 3, 4])
-                            ->get();
+            $data = Trajet::whereIn("zone_id", [1, 2, 3, 4])->get();
         } else if($typeManager === "TM") {
-            $data = Trajet::where("date_depart", ">=", date('Y-m-d'))
-                            ->whereIn("zone_id", [5, 6, 7])
-                            ->get();
+            $data = Trajet::whereIn("zone_id", [5, 6, 7])->get();
         } else if($typeManager === "Admin") {
-           $data = Trajet::where("date_depart", ">=", date('Y-m-d'))->get();
+           $data = Trajet::all();
         }
 
         $retArr = array();        
