@@ -385,7 +385,11 @@ class TrajetController extends Controller
         } else if($typeManager === "TM") {
             $data = Trajet::whereIn("zone_id", [5, 6, 7])->get();
         } else if($typeManager === "Admin") {
-           $data = Trajet::all();
+            $data = Trajet::all();
+        }
+
+        if ($data->isEmpty()) { 
+            echo json_encode("There are currently no loads or trucks available.");  
         }
 
         $retArr = array();        
