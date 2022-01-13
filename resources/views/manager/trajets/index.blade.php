@@ -209,12 +209,14 @@
 
 <script type="text/javascript">    
   // Get all routes as text
+  /*
   function ffffffff() {              
     var copyText = `<?php echo ($test); ?>`;
     navigator.clipboard.writeText(copyText);
     var myFile = new File([copyText], "Routes.txt", {type: "text/plain;charset=utf-8"});
     saveAs(myFile);
   }
+  */
   
   // Duplicate a route
   function getRoutes() {      
