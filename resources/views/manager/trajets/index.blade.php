@@ -17,6 +17,12 @@
     }
 ?>
 
+@if(!empty(Session::get('validationError')))
+    <script>toastr.warning('{{ Session::get('validationError') }}');</script>
+@elseif(!empty(Session::get('created')))
+    <script>toastr.success('{{ Session::get('created') }}');</script>
+@endif
+
 <div id="map"></div>
 
 <style>
@@ -75,12 +81,11 @@
         <a class="btn btn-outline-primary" href="/manager/trajets">Reset</a>
       @endif
       <form action="{{ route('manager.trajets.create') }}" method="GET">
-        <button class="btn btn-success" type="submit" href="{{ route('manager.trajets.create') }}" name="type" value="load" @if ($type_manager == "LM") disabled @endif>Add Load</button>
-        <button class="btn btn-success" type="submit" href="{{ route('manager.trajets.create') }}" name="type" value="truck" @if ($type_manager == "TM") disabled @endif>Add Truck</button>
-        {{-- <button type="button" onclick="ffffffff();">Click to Save</button> --}}
         @if(getManagerType() == "LM")
+          <button class="btn btn-success" type="submit" href="{{ route('manager.trajets.create') }}" name="type" value="load">Add Load</button>
           <button class="btn btn-secondary" type="button" onclick="getRoutes();">Copy the Loads</button>
         @elseif(getManagerType() == "TM")
+          <button class="btn btn-success" type="submit" href="{{ route('manager.trajets.create') }}" name="type" value="truck">Add Truck</button>
           <button class="btn btn-secondary" type="button" onclick="getRoutes();">Copy the Trucks</button>
         @endif
       </form>
@@ -113,7 +118,7 @@
       <h2>404 Not Found</h2>
     </div>
   @else
-    <table class="table" >
+    <table class="table" >      
       <tr>
         <th style="font-size: 85%">Action</th>
         <th style="font-size: 85%">Manager</th>
@@ -125,43 +130,26 @@
         <th style="font-size: 85%">Key</th>
         <th style="font-size: 85%">Stars</th>
         <th style="font-size: 85%">Delete</th>
-      </tr>
+      </tr>      
       @foreach ($zones as $item)
         <tr class="table-light">
-          <th colspan="9" style="text-align: center">{{$item->zone_name}}</th>
-            <?php  $i = 0 ;?>
+          <th colspan="9" style="text-align: center">{{ $item->zone_name }}</th>            
             @foreach ($data as $key)
-              <tr id="ln{{ $key->id }}">
-                @if ($key->zone_name == $item->zone_name)
-                  
-                  {{-- What is this ???? --}}
-                  @if ($i===0)                        
-                  @endif
-                        
-                  <td> 
-                    {{-- <a onclick="duplicate({{ $key->id }})"><span style="color: Dodgerblue;" title="Duplicate" class="fa fa-copy"></span></a>
+              @if ($key->zone_name == $item->zone_name)
+                <tr id="ln{{ $key->id }}">
+                  <td>                     
+                    {{--
                     @if ($key->type != $type_manager)
-                        <a onclick="duplicate({{ $key->id }})"><span style="color: Dodgerblue;" title="Matcher" class="fa fa-copy"></span></a>
-                    @endif --}}
-                    <a href = "#" from_l = "<?php echo $key->from_others?>" to_l = "<?php echo $key->to_others?>" typebtn="openmapps"><span style = "color: Dodgerblue;" title="Open Maps" class="fa fa-map-marked-alt" ></span></a>
+                      <a onclick="duplicate({{ $key->id }})"><span style="color: Dodgerblue;" title="Matcher" class="fa fa-copy"></span></a>
+                    @endif 
+                    --}}
+                    <a href="#" from_l="{{ $key->from_others }}" to_l="{{ $key->to_others }}" typebtn="openmapps"><span style = "color: Dodgerblue;" title="Open Maps" class="fa fa-map-marked-alt" ></span></a>
                   </td>
                   <td style="font-size: 75%">{{ getManagerName($key->manager_id, "") }}</td>
-                  <td style="font-size: 75%">
-                    <?php  
-                      $orgDate = $key->date_depart;  
-                      $newDate = date("d/m/Y", strtotime($orgDate));  
-                      echo $newDate;  
-                    ?>  
-                  </td>
-                  <td style="font-size: 75%">{{$key->from_others}}</td>
-                  <td style="font-size: 75%">{{$key->to_others}}</td>
-                  <td style="font-size: 75%">
-                    @if($key->distance != 0)
-                      {{ (int)(($key->distance)/1000) }} Km
-                    @else
-                      NaN
-                    @endif
-                  </td>
+                  <td style="font-size: 75%">{{ date('d-m-Y', strtotime($key->date_depart)) }}</td>
+                  <td style="font-size: 75%">{{ $key->from_others }}</td>
+                  <td style="font-size: 75%">{{ $key->to_others }}</td>
+                  <td style="font-size: 75%">{{ ($key->distance != 0) ? (int)(($key->distance)/1000)." Km" : "NaN" }}</td>
                   <td style="font-size: 75%">
                     @if($key->vans != 0)
                       {{ $key->vans }} <span class="fa fa-car"  style="align-self: center"></span>
@@ -172,7 +160,7 @@
                     @if($key->used_cars == 1)
                       :UC 
                     @endif
-                  </td>
+                  </td>                  
                   @if ($key->key == 1)
                     <td><span class="fa fa-key" style="align-self: center"></span></td>
                   @else
@@ -180,22 +168,18 @@
                   @endif                                                          
                   <td>
                     @if ($key->stars == 1)
-                      <span class="far fa-star" style="align-self: center" title="*"></span>
-                    @endif
-                    @if ($key->stars == 2)
-                      <span class="fas fa-star-half-alt" style="align-self: center" title="**"></span>
-                    @endif
-                    @if ($key->stars == 3)
+                      <span class="far fa-star" style="align-self: center" title="*"></span>                    
+                    @elseif ($key->stars == 2)
+                      <span class="fas fa-star-half-alt" style="align-self: center" title="**"></span>                    
+                    @elseif ($key->stars == 3)
                       <span class="fas fa-star" style="align-self: center" title="***"></span>
                     @endif
-                  </td>
-                  {{-- New delete button --}}
+                  </td>                  
                   <td>
                     <a role="button" class="bi bi-trash text-danger" style="font-size: 1.4rem;" onclick="$('#destroyModal').modal('show'); $('#destroyedId').val({{ $key->id }});"></a>
                   </td>  
-                @endif
-                <?php ++$i ?>
-              </tr>
+                </tr>
+              @endif                
             @endforeach
         </tr>
       @endforeach  
@@ -207,18 +191,8 @@
 
 @include('manager.trajets.modals.destroy')
 
-<script type="text/javascript">    
+<script type="text/javascript">      
   // Get all routes as text
-  /*
-  function ffffffff() {              
-    var copyText = `<?php echo ($test); ?>`;
-    navigator.clipboard.writeText(copyText);
-    var myFile = new File([copyText], "Routes.txt", {type: "text/plain;charset=utf-8"});
-    saveAs(myFile);
-  }
-  */
-  
-  // Duplicate a route
   function getRoutes() {      
     $.ajax({
       async: true,
@@ -236,6 +210,9 @@
         document.execCommand('copy'); 
         ref.style.display = 'none'; 
         ref.value ='';
+        // navigator.clipboard.writeText(copyText);
+        // var myFile = new File([copyText], "Routes.txt", {type: "text/plain;charset=utf-8"});
+        // saveAs(myFile);        
       },
       error: function (request, status, error) {
         console.log(error);

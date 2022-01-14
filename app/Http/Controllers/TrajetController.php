@@ -21,7 +21,7 @@ class TrajetController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function index(Request $request) {
-        $type_manager = Manager::with('user')->where("user_id","=",Auth::user()->id)->get()[0]["type"];
+        $type_manager = getManagerType();        
         $zones = Zone::get(['zones.zone_name']);
         
         if(!empty($request->except('_token'))) {
@@ -81,20 +81,14 @@ class TrajetController extends Controller
      */
     public function store(Request $request)
     {
-        $date_depart=$request->get('date_depart');
-        $zone_select=$request->get('zone_select');
-        $key=$request->key_radios;
-        if ($key == 'key'){
-            $key = 1;
-        }else{
-            $key = 0;
-        }
+        // Var attribution for validation and insert
+        $date_depart = $request->date_depart;
+        $zone_select = $request->zone_select;        
+        $key = ($request->key_radios === "key") ? 1 : 0;        
+        $stars = $request->stars_select;
+        $from_others = $request->from_cities;
+        $to_others = $request->to_cities;
         
-        $stars=$request->get('stars_select');
-        $from_others=$request->get('from_cities');
-        $to_others=$request->get('to_cities');
-        $comment=$request->get('comment_trajet');
-
         $results =  self::distancebtw(str_replace('+', '|', $from_others),str_replace('+', '|', $to_others));
         try {
             $distance = $results["rows"][0]["elements"][0]["distance"]["value"];
@@ -106,44 +100,53 @@ class TrajetController extends Controller
         
         $vans = 0;
         $full_load = 0;
-        $used_cars = $request->get('usedcars');
-        if ($used_cars == "checked"){
-            $used_cars = 1;
-        }else{
-            $used_cars = 0;
-        }
-        if ($zone_select == 1 || $zone_select == 2 || $zone_select == 3){
+        
+        switch($zone_select) {
+          case 1:
+          case 2:
+          case 3:
             $vans = $request->get('btnradio');
             $full_load = 1;
-            
-            
-        }
-        if ($zone_select == 4){
+          case 4:
             $vans = $request->get('btnradio');
             $full_load = 0;
-        }
-        if ($zone_select == 5){
+          case 5:
             $vans = 11;
             $full_load = 1;
-        }
-        if ($zone_select == 6){
+          case 6:
             $vans = $request->get('btnradio');
             $full_load = 0;
-        }
-        if ($zone_select == 7){
+          case 7:
             $vans = $request->get('btnradio');
             $full_load = 1;
+          default:
+            break;
         }
 
-        
+        $used_cars = ($request->get('usedcars') === "checked") ? 1 : 0;
+        $comment = $request->comment_trajet;
 
-        $insertData=Trajet::insert(
+        // Validation
+        if(
+          $date_depart === null || $date_depart < date('Y-m-d') || 
+          $zone_select === null || ($zone_select < 1 || $zone_select > 7) ||
+          $key != 1 && $key != 2 ||
+          $stars === null || ($stars != 1 && $stars != 2 && $stars != 3) ||
+          $from_others === null || strlen($from_others) > 191 ||
+          $to_others === null || strlen($to_others) > 191 ||
+          $vans < 1 || $vans > 11 || $vans === "on"
+        ) {
+          return redirect()->route('manager.trajets.index')->with('validationError','There has been an error during the creation, please retry.');
+        }
+        
+        // Insert
+        $insertData = Trajet::insert(
             [
                 'date_depart' => $date_depart,
                 'zone_id' => $zone_select,
                 'distance' => $distance,
                 'duration' => $duration,
-                'manager_id' => Manager::with('user')->where("user_id","=",Auth::user()->id)->get("id")[0]["id"],
+                'manager_id' => getManagerId(),
                 'key' => $key,
                 'stars' => $stars,
                 'from_others' => $from_others ,
@@ -154,9 +157,7 @@ class TrajetController extends Controller
                 'used_cars' => $used_cars
             ]
         );
-        return redirect()->route('manager.trajets.index')
-                        ->with('success','Trajet created successfully.');
-        
+        return redirect()->route('manager.trajets.index')->with('created','The road has been created successfully.');        
     }
 
     /**
@@ -272,13 +273,17 @@ class TrajetController extends Controller
         foreach($data as $route) {            
             $firstSub = $route->from_others;
             
+            // Check if the FROM is defined, else continue
+            if($firstSub === null)
+              continue;
+
             // If it's a load with multiple loading places, substr the first loading place (before '+')
             if(str_contains($firstSub, "+")) {
                 $tmp = explode("+", $firstSub);
                 $firstSub = $tmp[0];
             } 
 
-            // Find the position of '(' and substr the right part, 
+            // Find the position of '(' and substr the right part
             $tmp = explode("(", $firstSub);   	
             $secondSub = $tmp[1];
 
