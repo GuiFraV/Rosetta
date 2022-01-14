@@ -81,13 +81,14 @@
         <a class="btn btn-outline-primary" href="/manager/trajets">Reset</a>
       @endif
       <form action="{{ route('manager.trajets.create') }}" method="GET">
-        @if(getManagerType() == "LM")
+        @if(getManagerType() == "TM")
           <button class="btn btn-success" type="submit" href="{{ route('manager.trajets.create') }}" name="type" value="load">Add Load</button>
           <button class="btn btn-secondary" type="button" onclick="getRoutes();">Copy the Loads</button>
-        @elseif(getManagerType() == "TM")
+        @elseif(getManagerType() == "LM")
           <button class="btn btn-success" type="submit" href="{{ route('manager.trajets.create') }}" name="type" value="truck">Add Truck</button>
           <button class="btn btn-secondary" type="button" onclick="getRoutes();">Copy the Trucks</button>
         @endif
+          <button class="btn btn-danger float-end" type="button" onclick="location.reload();">Refresh</button>
       </form>
     </p>
     <div class="collapse" id="collapseExample">

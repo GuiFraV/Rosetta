@@ -166,15 +166,35 @@
       $('#flexRadioDefault1').click(function() {
         $('#collapseOne').show();
       });
+
       $('#flexRadioDefault2').click(function() {
         $('#collapseOne').hide();
       });
-      $('#from_cities_button_empty').click(function() {
-        $('#trip_additionalCityFrom').val('');
+
+      $('#from_cities_button_empty').click(function() {        
+        let tmp = $('#trip_additionalCityFrom').val();
+        let tmpArr = tmp.split("+");                      
+        tmpArr.pop();              
+        let final = "";              
+        tmpArr.forEach(elem => {
+          final += elem + "+";
+        });        
+        final = final.slice(0, -1);        
+        $('#trip_additionalCityFrom').val(final);        
       });
-      $('#to_cities_button_empty').click(function() {
-        $('#trip_additionalCityTo').val('');
+
+      $('#to_cities_button_empty').click(function() {        
+        let tmp = $('#trip_additionalCityTo').val();
+        let tmpArr = tmp.split("+");                      
+        tmpArr.pop();              
+        let final = "";              
+        tmpArr.forEach(elem => {
+          final += elem + "+";
+        });        
+        final = final.slice(0, -1);        
+        $('#trip_additionalCityTo').val(final);        
       });
+
       $('#zone_select').on('change',function() {
         var zone_id = $(this).find('option:selected').val();
         
