@@ -47,7 +47,7 @@
         </div>  
         <div class="col">          
           <label class="control-label required">Date of departure</label>            
-          <input type="datetime-local" name="date_depart" min="{{ date('Y-m-d\TH:i:s') }}" style="display: block; width: 100%; padding: .375rem .75rem; font-size: 1rem; font-weight: 400; line-height: 1.5; color: #212529; background-color: #fff;    background-clip: padding-box;    border: 1px solid #ced4da;    -webkit-appearance: none;    -moz-appearance: none;    appearance: none;    border-radius: .25rem;    transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;" value="{{ date('Y-m-d\TH:i:s') }}">                        
+          <input type="date" name="date_depart" min="{{ date('Y-m-d') }}" style="display: block; width: 100%; padding: .375rem .75rem; font-size: 1rem; font-weight: 400; line-height: 1.5; color: #212529; background-color: #fff;    background-clip: padding-box;    border: 1px solid #ced4da;    -webkit-appearance: none;    -moz-appearance: none;    appearance: none;    border-radius: .25rem;    transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;" value="{{ date('Y-m-d') }}">                        
           <div class="row">
             <div class="col" style="margin-top: 10px;">
               <input class="form-check-input" type="radio" name="key_radios" id="key_id" value="key" checked>

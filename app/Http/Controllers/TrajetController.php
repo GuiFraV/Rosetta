@@ -149,13 +149,9 @@ class TrajetController extends Controller
             }
         }        
 
-        // Not currently able to compare dates with this format
-        // $tmp = new DateTime('yesterday');
-        // $dateYesterdayCompare = $tmp->format('Y-m-d\TH:i:s');
-        
         // Validation        
         if(
-          $date_depart === null || 
+          $date_depart === null || $date_depart < date('Y-m-d') || 
           // $date_depart < $dateYesterdayCompare || 
           $zone_id === 0 || $zone_id === null || ($zone_id < 1 || $zone_id > 7) ||
           $key != 1 && $key != 2 ||

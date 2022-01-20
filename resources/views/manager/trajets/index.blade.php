@@ -144,7 +144,7 @@
                   <a href="#" from_l="{{ $key->from_others }}" to_l="{{ $key->to_others }}" typebtn="openmapps"><span style="color: Dodgerblue;" title="Open Maps" class="fa fa-map-marked-alt" ></span></a>
                 </td>
                 <td style="font-size: 75%">{{ getManagerName($key->manager_id, "") }}</td>
-                <td style="font-size: 75%">{{ date('d-m-Y H:i', strtotime($key->date_depart)) }}</td>
+                <td style="font-size: 75%">{{ date('d-m-Y', strtotime($key->date_depart)) }}</td>
                 <td style="font-size: 75%">{{ $key->from_others }}</td>
                 <td style="font-size: 75%">{{ $key->to_others }}</td>
                 <td style="font-size: 75%">{{ ($key->distance != 0) ? (int)(($key->distance)/1000)." Km" : "NaN" }}</td>
