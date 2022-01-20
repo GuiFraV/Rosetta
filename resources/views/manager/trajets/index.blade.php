@@ -83,12 +83,13 @@
       <form action="{{ route('manager.trajets.create') }}" method="GET">
         @if(getManagerType() == "TM")
           <button class="btn btn-success" type="submit" href="{{ route('manager.trajets.create') }}" name="type" value="load">Add Load</button>
-          <button class="btn btn-secondary" type="button" onclick="getRoutes();">Copy the Loads</button>
+          <button class="btn btn-secondary" type="button" onclick="getRoutes();">Copy the Trucks</button>
         @elseif(getManagerType() == "LM")
           <button class="btn btn-success" type="submit" href="{{ route('manager.trajets.create') }}" name="type" value="truck">Add Truck</button>
-          <button class="btn btn-secondary" type="button" onclick="getRoutes();">Copy the Trucks</button>
-        @endif
-          <button class="btn btn-danger float-end" type="button" onclick="location.reload();">Refresh</button>
+          <button class="btn btn-secondary" type="button" onclick="getRoutes();">Copy the Loads</button>
+        @endif          
+        <button class="btn btn-danger float-end" type="button" onclick="location.reload();">Refresh</button>  
+        <!-- <button class="btn btn-primary float-end" type="button" style="margin-right: 4px;" onclick="duplicateAll()">Duplicate All</button>         -->
       </form>
     </p>
     <div class="collapse" id="collapseExample">
@@ -119,9 +120,9 @@
       <h2>404 Not Found</h2>
     </div>
   @else
-    <table class="table" >      
+    <table class="table align-middle" >      
       <tr>
-        <th style="font-size: 85%">Action</th>
+        <th style="font-size: 85%"></th>
         <th style="font-size: 85%">Manager</th>
         <th style="font-size: 85%">Date of departure</th>
         <th style="font-size: 85%">From</th>
@@ -130,58 +131,63 @@
         <th style="font-size: 85%">Type</th>
         <th style="font-size: 85%">Key</th>
         <th style="font-size: 85%">Stars</th>
-        <th style="font-size: 85%">Delete</th>
+        <th style="font-size: 85%"></th>
+        <th style="font-size: 85%"></th>
       </tr>      
       @foreach ($zones as $item)
         <tr class="table-light">
-          <th colspan="9" style="text-align: center">{{ $item->zone_name }}</th>            
-            @foreach ($data as $key)
-              @if ($key->zone_name == $item->zone_name)
-                <tr id="ln{{ $key->id }}">
-                  <td>                     
-                    {{--
-                    @if ($key->type != $type_manager)
-                      <a onclick="duplicate({{ $key->id }})"><span style="color: Dodgerblue;" title="Matcher" class="fa fa-copy"></span></a>
-                    @endif 
-                    --}}
-                    <a href="#" from_l="{{ $key->from_others }}" to_l="{{ $key->to_others }}" typebtn="openmapps"><span style = "color: Dodgerblue;" title="Open Maps" class="fa fa-map-marked-alt" ></span></a>
-                  </td>
-                  <td style="font-size: 75%">{{ getManagerName($key->manager_id, "") }}</td>
-                  <td style="font-size: 75%">{{ date('d-m-Y', strtotime($key->date_depart)) }}</td>
-                  <td style="font-size: 75%">{{ $key->from_others }}</td>
-                  <td style="font-size: 75%">{{ $key->to_others }}</td>
-                  <td style="font-size: 75%">{{ ($key->distance != 0) ? (int)(($key->distance)/1000)." Km" : "NaN" }}</td>
-                  <td style="font-size: 75%">
-                    @if($key->vans != 0)
-                      {{ $key->vans }} <span class="fa fa-car"  style="align-self: center"></span>
-                    @endif
-                    @if(strval($key->full_load) == "1")
-                      FL
-                    @endif
-                    @if($key->used_cars == 1)
-                      :UC 
-                    @endif
-                  </td>                  
-                  @if ($key->key == 1)
-                    <td><span class="fa fa-key" style="align-self: center"></span></td>
-                  @else
-                    <td style="font-size: 75%"></td>
-                  @endif                                                          
-                  <td>
-                    @if ($key->stars == 1)
-                      <span class="far fa-star" style="align-self: center" title="*"></span>                    
-                    @elseif ($key->stars == 2)
-                      <span class="fas fa-star-half-alt" style="align-self: center" title="**"></span>                    
-                    @elseif ($key->stars == 3)
-                      <span class="fas fa-star" style="align-self: center" title="***"></span>
-                    @endif
-                  </td>                  
-                  <td>
-                    <a role="button" class="bi bi-trash text-danger" style="font-size: 1.4rem;" onclick="$('#destroyModal').modal('show'); $('#destroyedId').val({{ $key->id }});"></a>
-                  </td>  
-                </tr>
-              @endif                
-            @endforeach
+          <th colspan="11" style="text-align: center">{{ $item->zone_name }}</th>            
+          @foreach ($data as $key)
+            @if ($key->zone_name == $item->zone_name)
+              <tr id="ln{{ $key->id }}">
+                <td>                                         
+                  <a href="#" from_l="{{ $key->from_others }}" to_l="{{ $key->to_others }}" typebtn="openmapps"><span style="color: Dodgerblue;" title="Open Maps" class="fa fa-map-marked-alt" ></span></a>
+                </td>
+                <td style="font-size: 75%">{{ getManagerName($key->manager_id, "") }}</td>
+                <td style="font-size: 75%">{{ date('d-m-Y H:i', strtotime($key->date_depart)) }}</td>
+                <td style="font-size: 75%">{{ $key->from_others }}</td>
+                <td style="font-size: 75%">{{ $key->to_others }}</td>
+                <td style="font-size: 75%">{{ ($key->distance != 0) ? (int)(($key->distance)/1000)." Km" : "NaN" }}</td>
+                <td style="font-size: 75%">
+                  @if($key->vans != 0)
+                    {{ $key->vans }} <span class="fa fa-car"  style="align-self: center"></span>
+                  @endif
+                  @if(strval($key->full_load) == "1")
+                    FL
+                  @endif
+                  @if($key->used_cars == 1)
+                    :UC 
+                  @endif
+                </td>                  
+                @if ($key->key == 1)
+                  <td><span class="fa fa-key" style="align-self: center"></span></td>
+                @else
+                  <td style="font-size: 75%"></td>
+                @endif                                                          
+                <td>
+                  @if ($key->stars == 1)
+                    <span class="far fa-star" style="align-self: center" title="*"></span>                    
+                  @elseif ($key->stars == 2)
+                    <span class="fas fa-star-half-alt" style="align-self: center" title="**"></span>                    
+                  @elseif ($key->stars == 3)
+                    <span class="fas fa-star" style="align-self: center" title="***"></span>
+                  @endif
+                </td>                  
+                <td>
+                  @if ($key->visible === 0 && $key->manager_id === getManagerId())                    
+                    <a role="button" class="bi bi-node-plus text-primary" style="font-size: 1.4rem;" id="buttonDuplicate" title="Duplicate" onclick="duplicate(this, {{ $key->id }})"></a>
+                  @elseif ($key->visible > 0 && $key->manager_id === getManagerId())
+                    <a role="button" class="bi bi-node-minus text-danger" style="font-size: 1.4rem;" id="buttonUnduplicate" title="Cancel Duplication" onclick="unduplicate(this, {{ $key->id }})"></a>
+                  @endif
+                </td>  
+                <td>                  
+                  @if ($key->manager_id === getManagerId())
+                    <a role="button" class="bi bi-trash text-danger" style="font-size: 1.4rem;" title="Delete" onclick="$('#destroyModal').modal('show'); $('#destroyedId').val({{ $key->id }});"></a>                  
+                  @endif
+                </td>  
+              </tr>
+            @endif                
+          @endforeach
         </tr>
       @endforeach  
     </table>
@@ -221,18 +227,80 @@
     });       
   }
 
-  // Duplicate a route
-  function duplicate(el) {      
+  function duplicateAll() {
     $.ajax({
-      url:"/manager/duplicate",
-      type:"GET",
-      data:{'trajet_id':el},
-      success:function (data) {
-        location.reload();
-      }      
+      async: true,
+      url:"trajets/duplicateAll",
+      type:"POST",
+      cache: false,
+      processData: false,
+      contentType: false,    
+      success:function (data) {                        
+        console.log(data);
+        location.reload();      
+      },
+      error: function (request, status, error) {
+        console.log(error);
+      }
     });       
   }
-  
+
+  function unduplicate(e, id) {
+    $.ajax({
+      async: true,
+      url:"trajets/unduplicate/"+id,
+      type:"POST",
+      data: {"id":id},
+      cache: false,
+      processData: false,
+      contentType: false,    
+      success:function(data) {                             
+        let ret = JSON.parse(data);
+        if(ret.error === 0) {          
+          toastr.success("This " + ret.retType + " won't be shown again tomorrow.");      
+          e.classList.remove("bi-node-minus");
+          e.classList.remove("text-danger");        
+          e.classList.add("bi-node-plus");
+          e.classList.add("text-primary");
+          let tmpOnClick = e.getAttribute('onclick');
+          let tempTab = tmpOnClick.split('unduplicate');        
+          e.setAttribute('onclick', "duplicate" + tempTab[1]);
+        }
+      },
+      error: function (request, status, error) {
+        console.log(error);
+      }
+    });       
+  }
+
+  function duplicate(e, id) {
+    $.ajax({
+      async: true,
+      url:"trajets/duplicate/"+id,
+      type:"POST",
+      data: {"id":id},
+      cache: false,
+      processData: false,
+      contentType: false,    
+      success:function(data) {  
+        let ret = JSON.parse(data);                            
+        if(ret.error === 0) {
+          toastr.success("This " + ret.retType + " will be shown again tomorrow.");      
+          e.classList.remove("bi-node-plus");
+          e.classList.remove("text-primary");
+          e.classList.add("bi-node-minus");
+          e.classList.add("text-danger");                
+          let tmpOnClick = e.getAttribute('onclick');
+          let tempTab = tmpOnClick.split('duplicate');        
+          e.setAttribute('onclick', "unduplicate" + tempTab[1]);
+        }
+      },
+      error: function (request, status, error) {
+        console.log(error);
+      }
+    });       
+  }
+
   $('a[typebtn="openmapps"]').click(function() {
     window.open('https://www.google.com/maps/dir/' + $(this).attr("from_l") +'/' + $(this).attr("to_l"));        
   });

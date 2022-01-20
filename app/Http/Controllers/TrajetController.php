@@ -11,6 +11,7 @@ use App\Models\Country;
 use GuzzleHttp\Client;
 use Carbon\Carbon;
 use Auth;
+use DateTime;
 use Illuminate\Support\Facades\DB;
 
 class TrajetController extends Controller
@@ -31,21 +32,27 @@ class TrajetController extends Controller
             if($managerid == 'test') {
                 $type_search = "all";
                 $data = Trajet::join('zones', 'zones.id', '=', 'trajets.zone_id')
+                                ->where('trajets.visible', ">=", '0')
                                 ->orderBy('trajets.date_depart', 'DESC')
-                                ->get(['trajets.id','trajets.date_depart','zones.zone_name','trajets.from_others','trajets.to_others','trajets.key','trajets.distance','trajets.duration','trajets.stars','trajets.comment','trajets.vans','trajets.full_load','trajets.used_cars','trajets.manager_id']);
+                                // ->get(['trajets.id','trajets.date_depart','zones.zone_name','trajets.from_others','trajets.to_others','trajets.key','trajets.distance','trajets.duration','trajets.stars','trajets.comment','trajets.vans','trajets.full_load','trajets.used_cars','trajets.manager_id']);
+                                ->get(['trajets.id','trajets.date_depart','zones.zone_name', 'trajets.manager_id', 'trajets.from_others','trajets.to_others','trajets.distance','trajets.duration','trajets.key','trajets.stars','trajets.comment','trajets.vans','trajets.full_load','trajets.used_cars', 'trajets.visible']);
             } else if($managerid != 'test') {
                 $type_search = "bymanager";
                 $data = Trajet::join('zones', 'zones.id', '=', 'trajets.zone_id')
                                 ->where('trajets.manager_id','=',$managerid)
+                                ->where('trajets.visible', ">=", '0')
                                 ->orderBy('trajets.date_depart', 'DESC')
-                                ->get(['trajets.id','trajets.date_depart','zones.zone_name','trajets.from_others','trajets.to_others','trajets.key','trajets.distance','trajets.duration','trajets.stars','trajets.comment','trajets.vans','trajets.full_load','trajets.used_cars','trajets.manager_id']);
+                                // ->get(['trajets.id','trajets.date_depart','zones.zone_name','trajets.from_others','trajets.to_others','trajets.key','trajets.distance','trajets.duration','trajets.stars','trajets.comment','trajets.vans','trajets.full_load','trajets.used_cars','trajets.manager_id']);
+                                ->get(['trajets.id','trajets.date_depart','zones.zone_name', 'trajets.manager_id', 'trajets.from_others','trajets.to_others','trajets.distance','trajets.duration','trajets.key','trajets.stars','trajets.comment','trajets.vans','trajets.full_load','trajets.used_cars', 'trajets.visible']);
             }
         } else {
             //throw $th;
             $type_search = "all";
             $data = Trajet::join('zones', 'zones.id', '=', 'trajets.zone_id')
+                            ->where('trajets.visible', ">=", '0')
                             ->orderBy('trajets.date_depart', 'DESC')
-                            ->get(['trajets.id','trajets.date_depart','zones.zone_name','trajets.from_others','trajets.to_others','trajets.key','trajets.distance','trajets.duration','trajets.stars','trajets.comment','trajets.vans','trajets.full_load','trajets.used_cars','trajets.manager_id']);        
+                            // ->get(['trajets.id','trajets.date_depart','zones.zone_name','trajets.from_others','trajets.to_others','trajets.key','trajets.distance','trajets.duration','trajets.stars','trajets.comment','trajets.vans','trajets.full_load','trajets.used_cars','trajets.manager_id']);        
+                            ->get(['trajets.id','trajets.date_depart','zones.zone_name', 'trajets.manager_id', 'trajets.from_others','trajets.to_others','trajets.distance','trajets.duration','trajets.key','trajets.stars','trajets.comment','trajets.vans','trajets.full_load','trajets.used_cars', 'trajets.visible']);
         }
         return  view('manager.trajets.index', compact('zones') , compact('data') )->with('type_manager',$type_manager)->with('type_search',$type_search); 
     }
@@ -81,15 +88,14 @@ class TrajetController extends Controller
      */
     public function store(Request $request)
     {
+        // dd($request->all());
+        
         // Var attribution for validation and insert
         $date_depart = $request->date_depart;
-        $zone_select = $request->zone_select;        
-        $key = ($request->key_radios === "key") ? 1 : 0;        
-        $stars = $request->stars_select;
         $from_others = $request->from_cities;
         $to_others = $request->to_cities;
         
-        $results =  self::distancebtw(str_replace('+', '|', $from_others),str_replace('+', '|', $to_others));
+        $results = self::distancebtw(str_replace('+', '|', $from_others),str_replace('+', '|', $to_others));
         try {
             $distance = $results["rows"][0]["elements"][0]["distance"]["value"];
             $duration = $results["rows"][0]["elements"][0]["duration"]["value"];
@@ -97,66 +103,89 @@ class TrajetController extends Controller
             $distance = "0";
             $duration = "0";
         }
+
+        $key = ($request->key_radios === "key") ? 1 : 0;        
+        $stars = $request->stars_select;
+        $comment = $request->comment_trajet;
         
-        $vans = 0;
+        $vehicles = $request->btnradio;
         $full_load = 0;
         
-        switch($zone_select) {
-          case 1:
-          case 2:
-          case 3:
-            $vans = $request->get('btnradio');
-            $full_load = 1;
-          case 4:
-            $vans = $request->get('btnradio');
-            $full_load = 0;
-          case 5:
-            $vans = 11;
-            $full_load = 1;
-          case 6:
-            $vans = $request->get('btnradio');
-            $full_load = 0;
-          case 7:
-            $vans = $request->get('btnradio');
-            $full_load = 1;
-          default:
-            break;
+        if($vehicles === "on") {
+          $vehicles = 0;
+          $full_load = 1;
         }
 
-        $used_cars = ($request->get('usedcars') === "checked") ? 1 : 0;
-        $comment = $request->comment_trajet;
+        $used_cars = ($request->has('used_cars') && $request->used_cars === "checked") ? 1 : 0;        
+        $intergateTruck = ($request->has('intergateTruck')) ? 1 : 0;        
 
-        // Validation
+        
+
+        $tmpType = getManagerType();        
+        $zone_id = 0;
+        $arrZoneOne = array("EE", "LV", "LT", "CZ", "SK");
+        $arrZoneTwo = array("DE", "AT", "IT", "BE", "NL", "LU", "DK", "SE", "NO");
+        $arrZoneThree = array("FR", "ES", "PT", "GB", "CH");
+        $countryCodeDeparture = $request->from_country_select1;
+        if($tmpType === "TM") {
+            if($full_load) {
+                if(in_array($countryCodeDeparture, $arrZoneOne)) {
+                    $zone_id = 1;
+                } elseif(in_array($countryCodeDeparture, $arrZoneTwo)) {
+                    $zone_id = 2;
+                } elseif(in_array($countryCodeDeparture, $arrZoneThree)) {
+                    $zone_id = 3;  
+                }
+            } else {
+                $zone_id = 4;
+            }
+        } elseif($tmpType === "LM") {
+            if($intergateTruck) {
+                $zone_id = 7;
+            } elseif($full_load) {
+                $zone_id = 5;
+            } else {
+                $zone_id = 6;
+            }
+        }        
+
+        // Not currently able to compare dates with this format
+        // $tmp = new DateTime('yesterday');
+        // $dateYesterdayCompare = $tmp->format('Y-m-d\TH:i:s');
+        
+        // Validation        
         if(
-          $date_depart === null || $date_depart < date('Y-m-d') || 
-          $zone_select === null || ($zone_select < 1 || $zone_select > 7) ||
+          $date_depart === null || 
+          // $date_depart < $dateYesterdayCompare || 
+          $zone_id === 0 || $zone_id === null || ($zone_id < 1 || $zone_id > 7) ||
           $key != 1 && $key != 2 ||
           $stars === null || ($stars != 1 && $stars != 2 && $stars != 3) ||
           $from_others === null || strlen($from_others) > 191 ||
           $to_others === null || strlen($to_others) > 191 ||
-          $vans < 1 || $vans > 11 || $vans === "on"
+          $vehicles < 0 || $vehicles > 11
         ) {
           return redirect()->route('manager.trajets.index')->with('validationError','There has been an error during the creation, please retry.');
         }
         
-        // Insert
-        $insertData = Trajet::insert(
-            [
-                'date_depart' => $date_depart,
-                'zone_id' => $zone_select,
-                'distance' => $distance,
-                'duration' => $duration,
-                'manager_id' => getManagerId(),
-                'key' => $key,
-                'stars' => $stars,
-                'from_others' => $from_others ,
-                'to_others' => $to_others ,
-                'comment' => $comment ,
-                'vans' => $vans,
-                'full_load' => $full_load,
-                'used_cars' => $used_cars
-            ]
-        );
+        // dd($request);
+
+        // Insertion
+        $insertData = Trajet::insert([
+            'date_depart' => $date_depart,
+            'zone_id' => $zone_id,
+            'manager_id' => getManagerId(),
+            'from_others' => $from_others ,
+            'to_others' => $to_others ,
+            'distance' => $distance,
+            'duration' => $duration,                
+            'key' => $key,
+            'stars' => $stars,                
+            'comment' => $comment ,
+            'vans' => $vehicles,
+            'full_load' => $full_load,
+            'used_cars' => $used_cars
+        ]);
+        // dd($insertData);
         return redirect()->route('manager.trajets.index')->with('created','The road has been created successfully.');        
     }
 
@@ -194,20 +223,81 @@ class TrajetController extends Controller
         //
     }
 
-    public function duplicate(Request $request){
-        $old_trajet_id = $request->trajet_id;
-        $data = Trajet::where('id','=',$old_trajet_id)->get();
-        
-        $new_date = Carbon::createFromFormat('Y-m-d', $data[0]->date_depart);
-        $daysToAdd = 1;
-        $new_date = $new_date->addDays($daysToAdd)->format('Y-m-d');
-
-        $newTask = $data[0]->replicate();
-        $newTask->date_depart = $new_date; // the new project_id
-        $newTask->save();
-
-        return $new_date;
+    /**
+    * Update every Load / Truck that are visible for today (visible = 0), to visible for tommorrow (visible = 1).
+    *
+    * @return $countAffected, the number of rows that will be affected by this operation
+    */
+    public function duplicateAll() 
+    {
+        $countAffected = Trajet::where('visible', 0)->update(['visible' => 1]);
+        echo json_encode($countAffected);
     }
+
+    /**
+    * Set visible at 0, so the Load / Truck won't be showed tommorrow.
+    *
+    * @param  \Illuminate\Http\Request  $request
+    * @return JSON
+    */
+    public function unduplicate(Request $request) 
+    {        
+        $trajet = Trajet::find($request->id);
+        $trajet->visible = 0;        
+        $trajet->save();
+        
+        $retType = "";
+        switch($trajet->zone_id) {
+            case 1:
+            case 2:
+            case 3:
+            case 4:
+                $retType = "load";
+                break;
+            case 5:
+            case 6:
+            case 7:
+                $retType = "truck";
+                break;
+            default:
+                $retType = "element";                
+        }
+
+        echo json_encode(array("error" => 0, "retType" => $retType));
+    }
+
+    /**
+    * Set visible at 1, so the Load / Truck will be showed tommorrow.
+    *
+    * @param  \Illuminate\Http\Request  $request
+    * @return JSON
+    */
+    public function duplicate(Request $request) 
+    {        
+        $trajet = Trajet::find($request->id);
+        $trajet->visible = 1;                
+        $trajet->save();
+        
+        $retType = "";
+        switch($trajet->zone_id) {
+            case 1:
+            case 2:
+            case 3:
+            case 4:
+                $retType = "load";
+                break;
+            case 5:
+            case 6:
+            case 7:
+                $retType = "truck";
+                break;
+            default:
+                $retType = "element";                
+        }
+
+        echo json_encode(array("error" => 0, "retType" => $retType));
+    }
+
     public function distancebtw($from , $to)
     {
         try {
@@ -221,10 +311,11 @@ class TrajetController extends Controller
             return $results ;
         } catch (\Throwable $th) {
             return null;
-        }
-        
+        }        
     }
-    public function matching(){
+    
+    public function matching()
+    {
         return Manager::with('user')->where("user_id","=",Auth::user()->id)->get()[0];
     }
 

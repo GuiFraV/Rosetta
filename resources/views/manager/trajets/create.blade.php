@@ -1,7 +1,7 @@
 @extends('manager.navbar')
 
 @section('content')
-<div class="mt-5" style="margin-right: 140px;margin-left: 140px;">
+<div class="mt-5" style="margin-right: 140px; margin-left: 140px;">
   <div class="jumbotron text-center">
     <h1 class="display-6" style="font-family: Segoe UI;">New {{ ucfirst($request->type) }}</h1>
   </div>
@@ -9,42 +9,10 @@
     <form id="formNewRoad" action="{{ route('manager.trajets.store') }}" method="POST" autocomplete="off">
       @csrf
       <div class="row">
-        <div class="col-md-6">
-          <div class="form-group">
-            <label class="control-label required">Date of departure</label>
-            <br>
-            <input type="date" name="date_depart" style="display: block;    width: 100%;    padding: .375rem .75rem;    font-size: 1rem;    font-weight: 400;    line-height: 1.5;    color: #212529;    background-color: #fff;    background-clip: padding-box;    border: 1px solid #ced4da;    -webkit-appearance: none;    -moz-appearance: none;    appearance: none;    border-radius: .25rem;    transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;" value="<?php echo date("Y-m-d");?>">
-          </div>
-        </div>
-        <div class="col-md-6">
-          <div class="form-group">
-            <label class="control-label required" for="trip_zone">Zone</label>            
-            <select id="zone_select" name="zone_select" class="form-control">
-              @if ($request->type == "load")
-                @foreach ($zones as $zone)
-                  @if ($zone->id == 1 || $zone->id == 2 || $zone->id == 3 || $zone->id == 4 )
-                    <option value={{$zone->id}}>{{$zone->zone_name}}</option>
-                  @endif
-                @endforeach
-              @else
-                @foreach ($zones as $zone)
-                  @if ($zone->id == 5 || $zone->id == 6 || $zone->id == 7 )
-                    <option value={{$zone->id}}>{{$zone->zone_name}}</option>
-                  @endif
-                @endforeach
-              @endif                
-            </select>                              
-          </div>
-        </div>
-      </div>
-      <br>
-      <div class="row">
         <div class="col">
-          <div class="col">
-            <label class="control-label required" for="trip_cityFrom">From</label>
-          </div>
-          <div class="col" id="from_div">
-            <div class="col-md-8 card">
+          <label class="control-label required" for="trip_cityFrom">From</label>          
+          <div id="from_div">
+            <div class="card">
               <div class="card-body from_card">
                 <div class="form-group">
                   <select id="from_country_select"  class="selectpicker form-control SelectWine" name="from_country_select1" data-live-search="true"  title="Select Country" >
@@ -60,11 +28,9 @@
           </div>
         </div>
         <div class="col">
-          <div class="col">
-            <label class="control-label required" for="trip_cityFrom">To</label>
-          </div>
-          <div class="col" id="to_div">
-            <div class="col-md-8 card">
+          <label class="control-label required" for="trip_cityFrom">To</label>          
+          <div id="to_div">
+            <div class="card">
               <div class="card-body to_card">
                 <div class="form-group">
                   <select id="to_country_select"  class="selectpicker form-control SelectWine" name="to_country_select1" data-live-search="true"  title="Select Country" >
@@ -78,42 +44,47 @@
               </div>
             </div>
           </div>
-        </div>        
-        <div class="col-md-2 mt-filter">
-          <input class="form-check-input" type="radio" name="key_radios" id="key_id" value="key" checked>
-          <label class="form-check-label" for="key_id">Key</label>
-          <input class="form-check-input" type="radio" name="key_radios" id="conc_id" value="concurant">
-          <label class="form-check-label" for="conc_id">Concurant</label>            
+        </div>  
+        <div class="col">          
+          <label class="control-label required">Date of departure</label>            
+          <input type="datetime-local" name="date_depart" min="{{ date('Y-m-d\TH:i:s') }}" style="display: block; width: 100%; padding: .375rem .75rem; font-size: 1rem; font-weight: 400; line-height: 1.5; color: #212529; background-color: #fff;    background-clip: padding-box;    border: 1px solid #ced4da;    -webkit-appearance: none;    -moz-appearance: none;    appearance: none;    border-radius: .25rem;    transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;" value="{{ date('Y-m-d\TH:i:s') }}">                        
+          <div class="row">
+            <div class="col" style="margin-top: 10px;">
+              <input class="form-check-input" type="radio" name="key_radios" id="key_id" value="key" checked>
+              <label class="form-check-label" for="key_id">Key</label>
+              <br>
+              <input class="form-check-input" type="radio" name="key_radios" id="conc_id" value="concurant">
+              <label class="form-check-label" for="conc_id">Concurant</label>            
+            </div>
+            <div class="col">              
+              <label class="control-label required">Star(s)</label>
+              <select id="trip_cityTo" name="stars_select" class="form-control">
+                <option value="1">*</option>
+                <option value="2" selected>**</option>
+                <option value="3">***</option>                
+              </select>                   
+            </div>
+          </div>                      
         </div>
-        <div class="col-md-2">
-          <div class="form-group">
-            <label class="control-label required">Star(s)</label>
-            <select id="trip_cityTo" name="stars_select" class="form-control">
-              <option value="1">*</option>
-              <option value="2" selected>**</option>
-              <option value="3">***</option>                
-            </select>
-          </div>            
-        </div>
-      </div>
+      </div>      
       <br>
       <div class="form-group">
-        <label class="control-label" for="trip_additionalCityFrom">(From) cities separated by +</label>         
+        <label class="control-label" for="trip_additionalCityFrom">From (cities separated by +)</label>         
         <div class="input-group mb-3">
           <input type="text" id="trip_additionalCityFrom" name="from_cities" class="form-control" readonly />
-          <button class="btn btn-outline-secondary" type="button" id="from_cities_button_empty">X</button>
+          <button class="btn btn-outline-secondary" type="button" title="Clear the last added city" id="from_cities_button_empty">X</button>
         </div>
       </div>
       <div class="form-group">
-        <label class="control-label" for="trip_additionalCityTo">(To) cities separated by +</label> 
+        <label class="control-label" for="trip_additionalCityTo">To (cities separated by +)</label> 
         <div class="input-group mb-3">
           <input type="text" id="trip_additionalCityTo" name="to_cities" class="form-control" readonly />
-          <button class="btn btn-outline-secondary" type="button" id="to_cities_button_empty">X</button>
+          <button class="btn btn-outline-secondary" type="button" title="Clear the last added city" id="to_cities_button_empty">X</button>
         </div>
       </div>
       <div class="form-group">
         <div id="collapseOne">
-          <label class="form-check-label" for="flexRadioDefault1">Number of vans :</label>
+          <label class="form-check-label" for="flexRadioDefault1">Number of vehicles :</label>
           <br>
           <div class="btn-group" role="group" >
               <input type="radio" class="btn-check" name="btnradio" id="btnradio1" autocomplete="off" value="1"  >
@@ -140,17 +111,27 @@
               <label class="btn btn-outline-primary" for="btnradio11">11</label>
               &nbsp &nbsp
               <div class="fullload">
-                <input type="checkbox" class="btn-check" name="btnradio" id="btnradio12" autocomplete="off" checked disabled>
+                <input type="checkbox" class="btn-check" name="btnradio" id="btnradio12" autocomplete="off">
                 <label class="btn btn-outline-primary" for="btnradio12">Full Load</label>
               </div>
               &nbsp &nbsp
-              <div class="usedcars">
+              <div class="usedcars my-auto">
                 <input class="form-check-input" type="checkbox"  name="usedcars" id="usedcars" value="checked">
-                <label class="form-check-label" for="usedcars">Used Cars</label>
-              </div>              
+                <label class="form-check-label" for="usedcars">Used Vehicles</label>
+              </div>     
+              @if(getManagerType() == "LM")         
+                &nbsp &nbsp
+                <div class="my-auto">
+                  <input class="form-check-input" type="checkbox"  name="intergateTruck" id="intergateTruck" value="1">
+                  <label class="form-check-label" for="usedcars">Intergate Truck</label>
+                </div>
+              @endif              
           </div>
         </div>
       </div>   
+      <div class="row">      
+        
+      </div>
       <br>   
       <div class="form-group"><label class="control-label" for="trip_comment">Comment</label> <input type="text" id="trip_comment" name="comment_trajet" class="form-control" /></div>
       <div class="text-center p-3">
@@ -163,6 +144,17 @@
 <script type="text/javascript">
   
   $(document).ready(function() {       
+      
+      /// Event handler of the click on the full load button unchecking / disabling the others radios. 
+      $("#btnradio12").click(function() {
+        if($("#btnradio12").prop("checked")) {
+          $("#btnradio1, #btnradio2, #btnradio3, #btnradio4, #btnradio5, #btnradio6, #btnradio7, #btnradio8, #btnradio9, #btnradio10, #btnradio11").prop("checked", false);        
+          $("#btnradio1, #btnradio2, #btnradio3, #btnradio4, #btnradio5, #btnradio6, #btnradio7, #btnradio8, #btnradio9, #btnradio10, #btnradio11").attr("disabled", true);       
+        } else {
+          $("#btnradio1, #btnradio2, #btnradio3, #btnradio4, #btnradio5, #btnradio6, #btnradio7, #btnradio8, #btnradio9, #btnradio10, #btnradio11").attr("disabled", false);
+        }
+      });
+    
       $('#flexRadioDefault1').click(function() {
         $('#collapseOne').show();
       });
@@ -195,6 +187,7 @@
         $('#trip_additionalCityTo').val(final);        
       });
 
+      /*
       $('#zone_select').on('change',function() {
         var zone_id = $(this).find('option:selected').val();
         
@@ -236,7 +229,8 @@
           $('.fullload').show();
         }
       });
-      
+      */
+
       $('#from_country_select').on('change',function() {
         var country_code = $(this).find('option:selected').val();
         console.log(country_code);        
@@ -302,11 +296,10 @@
       }
   });
 
-
   $("#btnSubmitRoad").click(function() {
 
     let date_depart = $("[name='date_depart']").val();
-    let zone_select = $("#zone_select").val();
+    // let zone_select = $("#zone_select").val();
     let key = $("input[name='key_radios']:checked").val();    
     let stars = $('#trip_cityTo').val();
     let from_cities = $('#trip_additionalCityFrom').val();
@@ -326,15 +319,15 @@
       boolCheck = true;
     }
 
-    if(zone_select === null) {
-      toastr.warning("Form error! Please select a zone.");
-      boolCheck = true;
-    }
+    // if(zone_select === null) {
+    //   toastr.warning("Form error! Please select a zone.");
+    //   boolCheck = true;
+    // }
 
-    if(zone_select < 1 || zone_select > 7) {
-      toastr.warning("Form error! The selected zone is incorrect, please try to reload the page.");
-      boolCheck = true;
-    }
+    // if(zone_select < 1 || zone_select > 7) {
+    //   toastr.warning("Form error! The selected zone is incorrect, please try to reload the page.");
+    //   boolCheck = true;
+    // }
 
     if(key != "key" && key != "concurant") {
       toastr.warning("Form error! Please select a key.");
@@ -366,7 +359,7 @@
       boolCheck = true;
     }
 
-    if((vanNumber < 1 || vanNumber > 11) || vanNumber === "on") {
+    if((vanNumber < 1 || vanNumber > 11) || vanNumber === undefined) {
       toastr.warning("Form error! The number of van is incorrect.");
       boolCheck = true;
     }
@@ -376,8 +369,6 @@
     
     $("#formNewRoad").submit();
   });
-
-    
 
 </script>
 

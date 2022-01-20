@@ -27,6 +27,7 @@ class Trajet extends Migration
             $table->boolean("key");
             $table->boolean("concurants");
             $table->integer("stars");
+            $table->integer("visible")->default(0);
             $table->timestamps();
         });
     }

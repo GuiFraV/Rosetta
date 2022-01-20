@@ -610,6 +610,32 @@ if(!function_exists("getPhoneCode")) {
     }
 }
 
+if (!function_exists("countryCodeExtractor")) 
+{
+    function countryCodeExtractor($placeStr)
+    {
+        // Check if the FROM is defined, else continue
+        if($placeStr === null)
+          return;
+
+        // If it's a load with multiple loading places, substr the first loading place (before '+')
+        if(str_contains($placeStr, "+")) {
+            $tmp = explode("+", $placeStr);
+            $placeStr = $tmp[0];
+        } 
+
+        // Find the position of '(' and substr the right part
+        $tmp = explode("(", $placeStr);   	
+        $secondSub = $tmp[1];
+
+        // Then Find the position of ')' and substr the left part
+        $tmp = explode(")", $secondSub);
+
+        $result = $tmp[0];
+        return $result;
+    }
+}
+
 if(!function_exists("countryCodeToCallingCode")) {
     function countryCodeToCallingCode($countryCode) {
         switch ($countryCode) {

@@ -68,7 +68,9 @@ Route::group(['as'=>'manager.','prefix' => 'manager','middleware'=>['auth','mana
     Route::resource('trajets',TrajetController::class);
     Route::delete('trajets/destroyer/{id}', 'App\Http\Controllers\TrajetController@destroyer');
     Route::get('searchcity', [TrajetController::class, 'searchcity'])->name('searchcity');
-    Route::get('duplicate', [TrajetController::class, 'duplicate'])->name('duplicate');
+    Route::post('trajets/duplicateAll', [TrajetController::class, 'duplicateAll'])->name('duplicateAll');
+    Route::post('trajets/duplicate/{id}', [TrajetController::class, 'duplicate'])->name('duplicate');
+    Route::post('trajets/unduplicate/{id}', [TrajetController::class, 'unduplicate'])->name('unduplicate');
     Route::get('matching', [TrajetController::class, 'matching'])->name('matching');
     Route::post('trajets/getRouteList', [TrajetController::class, 'getRouteList'])->name('getRouteList');
 
@@ -201,4 +203,6 @@ Route::group(['as'=>'admin.','prefix' => 'admin','middleware'=>['auth','admin']]
     Route::get('country', [CountryController::class, 'index'])->name('index');
     Route::get('country/getCountries', [CountryController::class, 'getCountries'])->name('country.getCountries');
 });
- 
+
+/// CRON ROUTES ///
+Route::get('cron/decreaseRoadCounter/', 'App\Http\Controllers\CronController@decreaseRoadCounter');

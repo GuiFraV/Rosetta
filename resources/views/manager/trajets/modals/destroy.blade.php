@@ -35,26 +35,20 @@
       processData: false,
       contentType: false,    
       success: function(data) {
-          console.log(data);
-          if(data['statusCode'] === 200) {
-            $('#destroyedId').val("");
-            $('#ln'+id).remove();
-            $('#destroyModal').modal('hide');
-            toastr.warning("This route has been deleted.");
-          } else if(data['statusCode'] === 400) {
-            $('#destroyedId').val("");
-            $('#destroyModal').modal('hide');
-            toastr.error("There has been an error during the deletion. Please reload the page and retry.");
-          }
-          /*
+        console.log(data);
+        if(data['statusCode'] === 200) {
           $('#destroyedId').val("");
           $('#ln'+id).remove();
           $('#destroyModal').modal('hide');
-          toastr.warning("This route has been deleted");
-          */
+          toastr.warning("This route has been deleted.");
+        } else if(data['statusCode'] === 400) {
+          $('#destroyedId').val("");
+          $('#destroyModal').modal('hide');
+          toastr.error("There has been an error during the deletion. Please reload the page and retry.");
+        }          
       },
       error: function (request, status, error) {
-          console.log(error);
+        console.log(error);
       }
     });
   });

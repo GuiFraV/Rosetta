@@ -49,7 +49,7 @@
     </table><br>
     <div class="float-end">
         {{-- <a href="prospect/marketingsearch" role="button" class="bi bi-search">My marketing search</a> --}}
-        <a href="prospects/faq" role="button" class="bi bi-question">F.A.Q</a>
+        {{-- <a href="prospects/faq" role="button" class="bi bi-question">F.A.Q</a> --}}
     </div>
     <input type="text" id="mailCopy" style="display: none;">
 </div>

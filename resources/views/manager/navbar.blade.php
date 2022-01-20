@@ -125,7 +125,7 @@
               <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">Prospects</a>
               <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
                   <li><a class="dropdown-item" href="{{ route('manager.prospect.index') }}">Prospect List</a></li>
-                  <li><a class="dropdown-item disabled" href="#">F.A.Q</a></li>
+                  <li><a class="dropdown-item disabled" href="prospects/faq">F.A.Q</a></li>
               </ul>
           </li>
           <li class="nav-item dropdown">
