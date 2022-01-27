@@ -360,7 +360,7 @@
     }
 
     if((vanNumber < 1 || vanNumber > 11) || vanNumber === undefined) {
-      toastr.warning("Form error! The number of van is incorrect.");
+      toastr.warning("Form error! The number of vehicles is incorrect.");
       boolCheck = true;
     }
 

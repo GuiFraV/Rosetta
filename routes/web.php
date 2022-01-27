@@ -71,7 +71,9 @@ Route::group(['as'=>'manager.','prefix' => 'manager','middleware'=>['auth','mana
     Route::post('trajets/duplicateAll', [TrajetController::class, 'duplicateAll'])->name('duplicateAll');
     Route::post('trajets/duplicate/{id}', [TrajetController::class, 'duplicate'])->name('duplicate');
     Route::post('trajets/unduplicate/{id}', [TrajetController::class, 'unduplicate'])->name('unduplicate');
-    Route::get('matching', [TrajetController::class, 'matching'])->name('matching');
+    Route::post('trajets/getMatchingList/{id}', [TrajetController::class, 'getMatchingList'])->name('getMatchingList');
+    Route::post('trajets/refreshMatchingList/{id}', [TrajetController::class, 'refreshMatchingList'])->name('refreshMatchingList');
+    Route::post('trajets/matchElements', [TrajetController::class, 'matchElements'])->name('matchElements');
     Route::post('trajets/getRouteList', [TrajetController::class, 'getRouteList'])->name('getRouteList');
 
     /// Partners ///

@@ -131,6 +131,8 @@
         <th style="font-size: 85%">Type</th>
         <th style="font-size: 85%">Key</th>
         <th style="font-size: 85%">Stars</th>
+        <th style="font-size: 85%">Created at</th>
+        <th style="font-size: 85%"></th>
         <th style="font-size: 85%"></th>
         <th style="font-size: 85%"></th>
       </tr>      
@@ -139,7 +141,9 @@
           <th colspan="11" style="text-align: center">{{ $item->zone_name }}</th>            
           @foreach ($data as $key)
             @if ($key->zone_name == $item->zone_name)
-              <tr id="ln{{ $key->id }}">
+              <tr id="ln{{ $key->id }}" class="{{ isset($key->matched_to) ? 'text-decoration-line-through' : '' }}">
+                
+
                 <td>                                         
                   <a href="#" from_l="{{ $key->from_others }}" to_l="{{ $key->to_others }}" typebtn="openmapps"><span style="color: Dodgerblue;" title="Open Maps" class="fa fa-map-marked-alt" ></span></a>
                 </td>
@@ -173,13 +177,24 @@
                     <span class="fas fa-star" style="align-self: center" title="***"></span>
                   @endif
                 </td>                  
+                <td style="font-size: 75%">{{ date('H:i', strtotime($key->created_at)) }}</td>                  
+                <td>
+                  @if (isset($key->comment))
+                    <a role="button" class="bi bi-chat-square-text text-warning" style="font-size: 1.4rem;" id="buttonComment" onclick="" data-bs-toggle="tooltip" title="" data-bs-original-title="{{ $key->comment }}"></a>
+                  @endif
+                </td>
+                <td>                  
+                  @if (!isset($key->matched_to) && $key->manager_id === getManagerId())
+                    <a role="button" class="bi bi-arrows-collapse text-success" style="font-size: 1.4rem;" id="buttonDuplicate" title="Match" onclick="openMatchModal({{ $key->id }}); $('#idInitialElementMatch').val({{ $key->id }}); $('#maxKilometersMatch').val(150); $('#actualRangeVal').html('150Km');"></a>               
+                  @endif                  
+                </td>                
                 <td>
                   @if ($key->visible === 0 && $key->manager_id === getManagerId())                    
                     <a role="button" class="bi bi-node-plus text-primary" style="font-size: 1.4rem;" id="buttonDuplicate" title="Duplicate" onclick="duplicate(this, {{ $key->id }})"></a>
                   @elseif ($key->visible > 0 && $key->manager_id === getManagerId())
                     <a role="button" class="bi bi-node-minus text-danger" style="font-size: 1.4rem;" id="buttonUnduplicate" title="Cancel Duplication" onclick="unduplicate(this, {{ $key->id }})"></a>
                   @endif
-                </td>  
+                </td>                    
                 <td>                  
                   @if ($key->manager_id === getManagerId())
                     <a role="button" class="bi bi-trash text-danger" style="font-size: 1.4rem;" title="Delete" onclick="$('#destroyModal').modal('show'); $('#destroyedId').val({{ $key->id }});"></a>                  
@@ -197,8 +212,16 @@
 </div>
 
 @include('manager.trajets.modals.destroy')
+@include('manager.trajets.modals.matching')
 
 <script type="text/javascript">      
+
+  var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+  var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+    return new bootstrap.Tooltip(tooltipTriggerEl)
+  })
+
+
   // Get all routes as text
   function getRoutes() {      
     $.ajax({
