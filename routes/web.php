@@ -66,6 +66,9 @@ Route::group(['as'=>'manager.','prefix' => 'manager','middleware'=>['auth','mana
     
     /// Trajets (routes) ///
     Route::resource('trajets',TrajetController::class);
+    Route::post('trajets/edit/{id}', 'App\Http\Controllers\TrajetController@edit');
+    // Route::post('trajets/update/{id}', 'App\Http\Controllers\TrajetController@update');
+    Route::post('trajets/update/{id}', [TrajetController::class, 'update'])->name('update');
     Route::delete('trajets/destroyer/{id}', 'App\Http\Controllers\TrajetController@destroyer');
     Route::get('searchcity', [TrajetController::class, 'searchcity'])->name('searchcity');
     Route::post('trajets/duplicateAll', [TrajetController::class, 'duplicateAll'])->name('duplicateAll');

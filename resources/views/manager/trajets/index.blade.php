@@ -65,7 +65,7 @@
 <div class="container">
   <br>
   <div class="jumbotron text-center">
-    <h1 class="display-5" style="font-family: Segoe UI;">Routes List</h1>
+    <h1 class="display-5" style="font-family: Segoe UI;">Routes Planning</h1>
   </div>
   <br>
 
@@ -117,7 +117,7 @@
   @if (json_decode($data) == [])
     <div class="container text-center">
       <h1>Oops!</h1>
-      <h2>404 Not Found</h2>
+      <h2>There are no routes with this filter.</h2>
     </div>
   @else
     <table class="table align-middle" >      
@@ -137,7 +137,7 @@
         <th style="font-size: 85%"></th>
       </tr>      
       @foreach ($zones as $item)
-        <tr class="table-light">
+        <tr class="table-light" id="zone{{ $item->id }}">
           <th colspan="11" style="text-align: center">{{ $item->zone_name }}</th>            
           @foreach ($data as $key)
             @if ($key->zone_name == $item->zone_name)
@@ -185,7 +185,7 @@
                 </td>
                 <td>                  
                   @if (!isset($key->matched_to) && $key->manager_id === getManagerId())
-                    <a role="button" class="bi bi-arrows-collapse text-success" style="font-size: 1.4rem;" id="buttonDuplicate" title="Match" onclick="openMatchModal({{ $key->id }}); $('#idInitialElementMatch').val({{ $key->id }}); $('#maxKilometersMatch').val(150); $('#actualRangeVal').html('150Km');"></a>               
+                    <a role="button" class="bi bi-arrows-collapse text-success" style="font-size: 1.4rem;" title="Match" onclick="openMatchModal({{ $key->id }}); $('#idInitialElementMatch').val({{ $key->id }}); $('#maxKilometersMatch').val(150); $('#actualRangeVal').html('150Km');"></a>               
                   @endif                  
                 </td>                
                 <td>
@@ -195,6 +195,11 @@
                     <a role="button" class="bi bi-node-minus text-danger" style="font-size: 1.4rem;" id="buttonUnduplicate" title="Cancel Duplication" onclick="unduplicate(this, {{ $key->id }})"></a>
                   @endif
                 </td>                    
+                <td>                  
+                  @if ($key->manager_id === getManagerId())
+                    <a role="button" class="bi bi-pencil text-warning" style="font-size: 1.4rem;" title="Update" onclick="openModalEdit({{ $key->id }}); $('#updatedId').val({{ $key->id }});"></a>                  
+                  @endif
+                </td>  
                 <td>                  
                   @if ($key->manager_id === getManagerId())
                     <a role="button" class="bi bi-trash text-danger" style="font-size: 1.4rem;" title="Delete" onclick="$('#destroyModal').modal('show'); $('#destroyedId').val({{ $key->id }});"></a>                  
@@ -211,6 +216,7 @@
   <textarea id="routesTextCopy" style="display: none;"></textarea>
 </div>
 
+@include('manager.trajets.modals.edit')
 @include('manager.trajets.modals.destroy')
 @include('manager.trajets.modals.matching')
 
