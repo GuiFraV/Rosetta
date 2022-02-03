@@ -17,41 +17,52 @@ use Illuminate\Support\Facades\DB;
 class TrajetController extends Controller
 {
     /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+    * Display a listing of the resource.
+    *
+    * @return \Illuminate\Http\Response
+    */
     public function index(Request $request) {
+
         $type_manager = getManagerType();        
+        $countries  = Country::where("isActive", 1)->orderBy('fullname')->get();
         $zones = Zone::get(['zones.id', 'zones.zone_name']);
+
+        $results = Trajet::query();
+        $results->join('zones', 'zones.id', '=', 'trajets.zone_id');
+        $results->where('trajets.visible', ">=", '0');
         
-        if(!empty($request->except('_token'))) {
-            //code... || <- what did he mean by that ?
-        
-            $managerid = $request->get('managerid');
-            if($managerid == 'test') {
-                $type_search = "all";
-                $data = Trajet::join('zones', 'zones.id', '=', 'trajets.zone_id')
-                                ->where('trajets.visible', ">=", '0')
-                                ->orderBy('trajets.id', 'DESC')                                
-                                ->get(['trajets.id','trajets.date_depart','zones.zone_name', 'trajets.manager_id', 'trajets.from_others','trajets.to_others','trajets.distance','trajets.duration','trajets.key','trajets.stars','trajets.comment','trajets.vans','trajets.full_load','trajets.used_cars', 'trajets.visible', 'trajets.created_at', 'trajets.matched_to']);
-            } else if($managerid != 'test') {
-                $type_search = "bymanager";
-                $data = Trajet::join('zones', 'zones.id', '=', 'trajets.zone_id')
-                                ->where('trajets.manager_id','=',$managerid)
-                                ->where('trajets.visible', ">=", '0')
-                                ->orderBy('trajets.id', 'DESC')                                
-                                ->get(['trajets.id','trajets.date_depart','zones.zone_name', 'trajets.manager_id', 'trajets.from_others','trajets.to_others','trajets.distance','trajets.duration','trajets.key','trajets.stars','trajets.comment','trajets.vans','trajets.full_load','trajets.used_cars', 'trajets.visible', 'trajets.created_at', 'trajets.matched_to']);
-            }
-        } else {
-            //throw $th;
-            $type_search = "all";
-            $data = Trajet::join('zones', 'zones.id', '=', 'trajets.zone_id')
-                            ->where('trajets.visible', ">=", '0')
-                            ->orderBy('trajets.id', 'DESC')                            
-                            ->get(['trajets.id','trajets.date_depart','zones.zone_name', 'trajets.manager_id', 'trajets.from_others','trajets.to_others','trajets.distance','trajets.duration','trajets.key','trajets.stars','trajets.comment','trajets.vans','trajets.full_load','trajets.used_cars', 'trajets.visible', 'trajets.created_at', 'trajets.matched_to']);
+        $srcCount = 0;
+
+        if ($request->srcDepartureCity != null) {
+            $results = $results->where('from_others', 'like', '%' . $request->srcDepartureCity . '%');
+            $srcCount += 2;
+        } else if($request->srcDepartureCountry != null) {
+            $results = $results->where('from_others', 'like', '%(' . $request->srcDepartureCountry . ')%');
+            $srcCount++;
         }
-        return  view('manager.trajets.index', compact('zones') , compact('data') )->with('type_manager',$type_manager)->with('type_search',$type_search); 
+        
+        if ($request->srcArrivalCity != null) {
+            $results = $results->where('to_others', 'like', '%' . $request->srcArrivalCity . '%');
+            $srcCount += 2;
+        } else if($request->srcArrivalCountry != null) {
+            $results = $results->where('to_others', 'like', '%(' . $request->srcArrivalCountry . ')%');
+            $srcCount++;
+        }
+        
+        if ($request->srcManager != null) {
+            $results = $results->where('trajets.manager_id', '=', $request->srcManager);
+            $srcCount++;
+        }
+        
+        if ($request->srcZone != null) {
+            $results = $results->where('trajets.zone_id', '=', $request->srcZone);
+            $srcCount++;
+        }
+        
+        $results->orderBy('trajets.id', 'DESC');
+        $data = $results->get(['trajets.id','trajets.date_depart','zones.zone_name', 'trajets.manager_id', 'trajets.from_others','trajets.to_others','trajets.distance','trajets.duration','trajets.key','trajets.stars','trajets.comment','trajets.vans','trajets.full_load','trajets.used_cars', 'trajets.visible', 'trajets.created_at', 'trajets.matched_to']);
+        
+        return view('manager.trajets.index', compact('zones') , compact('data'))->with('type_manager', $type_manager)->with('countries', $countries)->with('srcCount', $srcCount); 
     }
 
     /**

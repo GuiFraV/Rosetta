@@ -13,7 +13,7 @@ class Kernel extends ConsoleKernel
      * @var array
      */
     protected $commands = [
-        //
+        Commands\duplication::class,
     ];
 
     /**
@@ -24,13 +24,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        /*
-        $schedule->call(function () {
-            DB::update('UPDATE trajets SET visible = visible+1 WHERE visible >= 0');
-        })
-        ->command('duplicateTrajets')
-        ->everyMinute();
-        */
+        $schedule->command('duplication:start')->days([1, 2, 3, 4, 5])->at('22:00');
     }
 
     /**
@@ -41,7 +35,6 @@ class Kernel extends ConsoleKernel
     protected function commands()
     {
         $this->load(__DIR__.'/Commands');
-
         require base_path('routes/console.php');
     }
 }

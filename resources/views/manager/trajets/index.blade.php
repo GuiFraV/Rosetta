@@ -70,49 +70,87 @@
   <br>
 
   <div class="col-lg-12 margin-tb">
-    <p>        
-      <a class="notification btn btn-primary" data-bs-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample" >
-        <span>Filter</span>
-        @if ($type_search!="all")
-          <span class="badge">1</span>
-        @endif
-      </a>          
-      @if ($type_search!="all")
-        <a class="btn btn-outline-primary" href="/manager/trajets">Reset</a>
-      @endif
-      <form action="{{ route('manager.trajets.create') }}" method="GET">
-        @if(getManagerType() == "TM")
-          <button class="btn btn-success" type="submit" href="{{ route('manager.trajets.create') }}" name="type" value="load">Add Load</button>
-          <button class="btn btn-secondary" type="button" onclick="getRoutes();">Copy the Trucks</button>
-        @elseif(getManagerType() == "LM")
-          <button class="btn btn-success" type="submit" href="{{ route('manager.trajets.create') }}" name="type" value="truck">Add Truck</button>
-          <button class="btn btn-secondary" type="button" onclick="getRoutes();">Copy the Loads</button>
-        @endif          
-        <button class="btn btn-danger float-end" type="button" onclick="location.reload();">Refresh</button>  
-        <!-- <button class="btn btn-primary float-end" type="button" style="margin-right: 4px;" onclick="duplicateAll()">Duplicate All</button>         -->
-      </form>
-    </p>
-    <div class="collapse" id="collapseExample">
+    <a role="button" class="notification btn btn-primary" data-bs-toggle="collapse" href="#searchFiltersCollapse" role="button" aria-expanded="false" aria-controls="searchFiltersCollapse">
+      Filter @if ($srcCount > 0) <div class="badge">{{ $srcCount }}</div> @endif
+    </a>          
+    @if ($srcCount > 0) <a class="btn btn-warning" href="/manager/trajets">Reset</a> @endif
+    <form action="{{ route('manager.trajets.create') }}" method="GET" style="display: inline;">
+      @if(getManagerType() == "TM")
+        <button class="btn btn-success" type="submit" href="{{ route('manager.trajets.create') }}" name="type" value="load">Add Load</button>
+        <button class="btn btn-secondary" type="button" onclick="getRoutes();">Copy the Trucks</button>
+      @elseif(getManagerType() == "LM")
+        <button class="btn btn-success" type="submit" href="{{ route('manager.trajets.create') }}" name="type" value="truck">Add Truck</button>
+        <button class="btn btn-secondary" type="button" onclick="getRoutes();">Copy the Loads</button>
+      @endif          
+      <button class="btn btn-danger float-end" type="button" onclick="location.reload();">Refresh</button>  
+      {{-- <button class="btn btn-primary float-end" type="button" style="margin-right: 4px;" onclick="duplicateAll()">Duplicate All</button> --}}
+    </form>  
+    <br>
+
+    <div class="collapse" id="searchFiltersCollapse">
       <div class="card card-body">
-        <form action="{{ route('manager.trajets.index') }}" method="GET">
-          <div class="container col-sm-4">
-            <form class="d-flex"  >
-              {{-- <input type="date" name="searchbar" style="display: block;    width: 100%;    padding: .375rem .75rem;    font-size: 1rem;    font-weight: 400;    line-height: 1.5;    color: #212529;    background-color: #fff;    background-clip: padding-box;    border: 1px solid #ced4da;    -webkit-appearance: none;    -moz-appearance: none;    appearance: none;    border-radius: .25rem;    transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;" value=""> --}}
-              <select name="managerid" style="display: block;    width: 100%;    padding: .375rem .75rem;    font-size: 1rem;    font-weight: 400;    line-height: 1.5;    color: #212529;    background-color: #fff;    background-clip: padding-box;    border: 1px solid #ced4da;    -webkit-appearance: none;    -moz-appearance: none;    appearance: none;    border-radius: .25rem;    transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;">
-                <option value="test">Select a manager</option>
-                @foreach (getallmanagers() as $item)
-                  <option value="{{$item->id}}">{{$item->first_name}} {{$item->last_name}}</option>
-                @endforeach
-              </select>
-              <br>
-              <button class="btn btn-outline-success" type="submit">Search</button>
-              <a class="btn btn-outline-primary" href="/manager/trajets">Reset</a>
-            </form>
+        <form action="{{ route('manager.trajets.index') }}" method="GET" style="display: inline;">
+          <div class="container">
+            <div class="row">
+              <div class="col">
+                <label class="control-label" for="srcDepartureCity">From</label>                    
+                <div class="card">
+                  <div class="card-body from_card">
+                    <div class="form-group">
+                      <select id="srcDepartureCountry"  class="selectpicker form-control form-select" name="srcDepartureCountry" data-live-search="true" title="Select Country" >
+                        @foreach ($countries as $country)
+                          <option value={{$country->code}} >{{$country->fullname}}</option>
+                        @endforeach
+                      </select>
+                    </div>
+                    <input id="srcDepartureCity" type="text"  placeholder="Enter a city" name="srcDepartureCity" autocomplete="off" runat="server"/>  
+                  </div>
+                </div>          
+              </div>
+              <div class="col">
+                <label class="control-label" for="srcArrivalCity">To</label>                    
+                <div class="card">
+                  <div class="card-body to_card">
+                    <div class="form-group">
+                      <select id="srcArrivalCountry"  class="selectpicker form-control form-select" name="srcArrivalCountry" data-live-search="true"  title="Select Country" >
+                        @foreach ($countries as $country)
+                          <option value={{$country->code}} >{{$country->fullname}}</option>
+                        @endforeach
+                      </select>
+                    </div>
+                    <input id="srcArrivalCity" type="text"  placeholder="Enter a city" name="srcArrivalCity" autocomplete="off" runat="server"/>  
+                  </div>
+                </div>          
+              </div>
+              <div class="col">
+                <div class="row" style="padding-bottom: 2%;">
+                  <label for="srcManager" class="form-label">Manager</label>
+                  <select class="form-select" name="srcManager" id="srcManager" style="display: block; width: 100%; padding: .375rem .75rem; font-size: 1rem; font-weight: 400; line-height: 1.5; color: #212529; background-color: #fff; background-clip: padding-box; border: 1px solid #ced4da; -webkit-appearance: none;    -moz-appearance: none;    appearance: none;    border-radius: .25rem;    transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;">
+                    <option value="" selected>Select a manager</option>
+                    @foreach (getallmanagers() as $item)
+                      <option value="{{$item->id}}">{{$item->first_name}} {{$item->last_name}}</option>
+                    @endforeach
+                  </select>    
+                </div>                
+                <div class="row" style="padding-top: 2%;">
+                  <label for="srcZone" class="form-label">Zone</label>
+                  <select class="form-select" name="srcZone" id="srcZone" style="display: block; width: 100%; padding: .375rem .75rem; font-size: 1rem; font-weight: 400; line-height: 1.5; color: #212529; background-color: #fff; background-clip: padding-box; border: 1px solid #ced4da; -webkit-appearance: none;    -moz-appearance: none;    appearance: none;    border-radius: .25rem;    transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;">
+                    <option value="" selected>Select a zone</option>
+                    @foreach ($zones as $zone)
+                      <option value="{{$zone->id}}">{{$zone->zone_name}}</option>
+                    @endforeach
+                  </select>
+                </div>
+              </div>
+              <div class="col-sm" style="display: flex; align-items: center;">
+                  <a class="btn btn-warning my-auto" href="/manager/trajets" style="margin-left: 25%; margin-right: 6%;">Reset</a>                
+                  <button class="btn btn-primary my-auto" type="submit" style="margin-right: 25%; margin-left: 6%;">Search</button>                
+              </div>
+            </div>   
           </div>                      
         </form>
       </div>
     </div>
-    <br>
   </div>
   @if (json_decode($data) == [])
     <div class="container text-center">
@@ -222,10 +260,102 @@
 
 <script type="text/javascript">      
 
+  /// Tooltip init 
   var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
   var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
     return new bootstrap.Tooltip(tooltipTriggerEl)
   })
+
+  /// Search parameters initialization  
+  $(function() {
+    // Echo the current URL
+    // console.log(window.location.href);
+    
+    // Create a new URLSearchParams from the URL
+    var searchParams = new URLSearchParams(window.location.search);
+    // Echo each URL parameter
+    for(var pair of searchParams.entries()) {
+       console.log(pair[0]+ ', '+ pair[1]);
+    }
+
+    if(searchParams.get("srcDepartureCountry") != "") {
+      $('select[name=srcDepartureCountry]').val(searchParams.get("srcDepartureCountry"));
+      $('.selectpicker').selectpicker('refresh');
+    }
+
+    if(searchParams.get("srcDepartureCity") != "") {
+      $("#srcDepartureCity").val(searchParams.get("srcDepartureCity"));
+    }
+
+    if(searchParams.get("srcArrivalCountry") != "") {      
+      $('select[name=srcArrivalCountry]').val(searchParams.get("srcArrivalCountry"));
+      $('.selectpicker').selectpicker('refresh');
+    }
+
+    if(searchParams.get("srcArrivalCity") != "") {
+      $("#srcArrivalCity").val(searchParams.get("srcArrivalCity"));
+    }
+
+    if(searchParams.get("srcManager") != "") {
+      $('#srcManager option[value="'+searchParams.get("srcManager")+'"]').prop('selected', true);
+    }
+
+    if(searchParams.get("srcZone") != "") {
+      $('#srcZone option[value="'+searchParams.get("srcZone")+'"]').prop('selected', true);
+    }
+  });
+
+  // Init of the Google Maps API for city autocomplete
+  /// On change of country selection
+  $('#srcDepartureCountry').on('change',function() {
+    var country_code = $(this).find('option:selected').val();    
+    srcAutoCityFrom(country_code);
+    google.maps.event.addDomListener(window, 'load', srcAutoCityFrom);
+  });
+
+  /// CityFrom autocomplete
+  function srcAutoCityFrom(country_code) {        
+    var input = document.getElementById('srcDepartureCity');
+    var id_place = "";
+    var from_options = {
+      componentRestrictions: { country: country_code },
+      strictBounds: true,
+      types: ["(cities)"]
+    };
+    var autocomplete = new google.maps.places.Autocomplete(input, from_options);
+    google.maps.event.addListener(autocomplete, 'place_changed', function() {
+      var place = autocomplete.getPlace();
+      var place_array = place.name.split(',');
+      input.value = place_array[0];
+      let city_name = place_array[0] + " ("+country_code+")";
+      $("#srcDepartureCity").val(city_name);      
+    });
+  }
+
+  $('#srcArrivalCountry').on('change',function() {
+    var country_code = $(this).find('option:selected').val();    
+    srcAutoCityTo(country_code);        
+    google.maps.event.addDomListener(window, 'load', srcAutoCityTo);
+  });
+
+  function srcAutoCityTo(country_code) {         
+    var input = document.getElementById('srcArrivalCity');
+    var id_place = "";
+    var from_options = {
+      componentRestrictions: { country: country_code },
+      strictBounds: true,
+      types: ["(cities)"]
+    };
+    var autocomplete = new google.maps.places.Autocomplete(input, from_options);
+    google.maps.event.addListener(autocomplete, 'place_changed', function() {
+      var place = autocomplete.getPlace();
+      var place_array = place.name.split(',');
+      input.value = place_array[0];      
+      city_name = place_array[0] + " ("+country_code+")";      
+      $("#srcArrivalCity").val(city_name);      
+    });
+  }
+
 
 
   // Get all routes as text
@@ -246,9 +376,6 @@
         document.execCommand('copy'); 
         ref.style.display = 'none'; 
         ref.value ='';
-        // navigator.clipboard.writeText(copyText);
-        // var myFile = new File([copyText], "Routes.txt", {type: "text/plain;charset=utf-8"});
-        // saveAs(myFile);        
       },
       error: function (request, status, error) {
         console.log(error);
