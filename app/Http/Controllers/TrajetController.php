@@ -73,6 +73,39 @@ class TrajetController extends Controller
     public function create(Request $request) {
         $zones = Zone::get();
         $countries  = Country::where("isActive", 1)->orderBy('fullname')->get();
+
+        
+        // Motivation quotes
+        $type = (getManagerType() === "LM") ? "truck" : "load" ;
+        
+        $monday = "Give me some " . $type . "s!";
+        $tuesday = "Do you have a " . $type . " for me?";
+        $wednesday = "We need more " . $type . "s!";
+        $thursday = "More " . $type . " guys!";
+        $friday = "Be sure you don't forget a " . $type . "!";
+        
+        $tmpTime = time();
+        // if today = monday count all type today with the created_at
+        if(date('D', $tmpTime) === 'Mon') {
+            echo "It is Monday today\n";
+            
+            /* query like 
+                $routesThisWeek = Trajet::where('id', '<=', $correctedComparisons)->get();
+            */
+
+        // else count all type since last monday 
+        } else {
+            echo "It is not Monday today\n";
+        }
+        
+        
+        
+        
+        $number = 10;
+        $statistic = "There has been N " . $type . "s since monday!";
+
+
+
         return view('manager.trajets.create')->with(compact('zones'))
                                             ->with(compact('request'))
                                             ->with(compact('countries'));

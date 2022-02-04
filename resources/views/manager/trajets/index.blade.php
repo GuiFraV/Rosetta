@@ -250,8 +250,37 @@
       @endforeach  
     </table>
   @endif
-  
   <textarea id="routesTextCopy" style="display: none;"></textarea>
+</div>
+
+  
+<div class="position-sticky float-end text-center" style="bottom: 7%; margin-right: 3.25%;  margin-bottom: -30%;">
+  <div class="col">
+    <div class="row">
+      <a role="button" class="btn btn-outline-primary" style="width: 70%; height: 75%; font-size: 50%;" onclick="$('html,body').animate({scrollTop: $('#zone1').offset().top},'fast');">Z1</a>
+    </div>
+    <div class="row">
+      <a role="button" class="btn btn-outline-primary" style="width: 70%; height: 75%; font-size: 50%;" onclick="$('html,body').animate({scrollTop: $('#zone2').offset().top},'fast');">Z2</a>
+    </div>
+    <div class="row">
+      <a role="button" class="btn btn-outline-primary" style="width: 70%; height: 75%; font-size: 50%;" onclick="$('html,body').animate({scrollTop: $('#zone3').offset().top},'fast');">Z3</a>
+    </div>
+    <div class="row">
+      <a role="button" class="btn btn-outline-primary" style="width: 70%; height: 75%; font-size: 50%;" onclick="$('html,body').animate({scrollTop: $('#zone4').offset().top},'fast');">PL</a>
+    </div>
+    <div class="row">
+      <a role="button" class="btn btn-outline-primary" style="width: 70%; height: 75%; font-size: 50%;" onclick="$('html,body').animate({scrollTop: $('#zone5').offset().top},'fast');">FT</a>
+    </div>
+    <div class="row">
+      <a role="button" class="btn btn-outline-primary" style="width: 70%; height: 75%; font-size: 50%;" onclick="$('html,body').animate({scrollTop: $('#zone6').offset().top},'fast');">PT</a>
+    </div>
+    <div class="row" style="padding-bottom: 750%;">
+      <a role="button" class="btn btn-outline-primary" style="width: 70%; height: 75%; font-size: 50%;" onclick="$('html,body').animate({scrollTop: $('#zone7').offset().top},'fast');">IT</a>
+    </div>
+    <div class="row">
+      <a role="button" class="bi bi-arrow-up-circle text-primary float-end" style="font-size: 1.5rem;" onclick="$('html,body').animate({scrollTop: $('html').offset().top},'fast');"></a>
+    </div>
+  </div>
 </div>
 
 @include('manager.trajets.modals.edit')
