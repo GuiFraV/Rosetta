@@ -17,28 +17,25 @@ class CountryController extends Controller
     /// Takes all the countries of the database and returns two arrays : one with the actived and another with the disabled countries.
     public function getCountries() 
     { 
-        $activated = DB::table("countries")->where("isActive", "=", "1")->get();
-        $disabled = DB::table("countries")->where("isActive", "=", "0")->get();
+        $activated = Country::where("isActive", "=", "1")->orderBy('id', 'asc')->get();        
+        $disabled = Country::where("isActive", "=", "0")->orderBy('id', 'asc')->get();
 
         if(empty($activated) && empty($disabled))
           echo json_encode([
             "statusCode" => 400  
           ]);
-
-        $arrOn = array();
-        $arrOff = array();
+      
+        $arrOptions = array();
 
         foreach($activated as $act) 
-          array_push($arrOn, $act);
-        
+          array_push($arrOptions, "<option value='".$act['id']."' selected>".$act['emoji']." ".$act['shortname']." (".$act['code'].")"."</option>");
 
         foreach($disabled as $dis)
-          array_push($arrOff, $dis);
+          array_push($arrOptions, "<option value='".$dis['id']."'>".$dis['emoji']." ".$dis['shortname']." (".$dis['code'].")"."</option>");
 
         echo json_encode([
           "statusCode" => 200,
-          "activated" => $arrOn,
-          "disabled" => $arrOff
+          "options" => $arrOptions
         ]);
     }
 }

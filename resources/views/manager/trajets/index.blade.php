@@ -1,26 +1,10 @@
 @extends('manager.navbar')
-
 @section('content')
-<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
-
-<?php
-    function secondsToTime($seconds_time)
-    {
-        if ($seconds_time < 24 * 60 * 60) {
-            return gmdate('H:i:s', $seconds_time);
-        } else {
-            $hours = floor($seconds_time / 3600);
-            $minutes = floor(($seconds_time - $hours * 3600) / 60);
-            $seconds = floor($seconds_time - ($hours * 3600) - ($minutes * 60));
-            return "$hours:$minutes:$seconds";
-        }
-    }
-?>
 
 @if(!empty(Session::get('validationError')))
-    <script>toastr.warning('{{ Session::get('validationError') }}');</script>
+    <script>toastr.warning("{{ Session::get('validationError') }}");</script>
 @elseif(!empty(Session::get('created')))
-    <script>toastr.success('{{ Session::get('created') }}');</script>
+    <script>toastr.success("{{ Session::get('created') }}");</script>
 @endif
 
 <div id="map"></div>

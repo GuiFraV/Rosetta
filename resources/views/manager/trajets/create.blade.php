@@ -1,6 +1,11 @@
 @extends('manager.navbar')
 
 @section('content')
+
+@if(!empty($quote))
+  <script>toastr.info('{{ $quote }}');</script>    
+@endif
+
 <div class="mt-5" style="margin-right: 140px; margin-left: 140px;">
   <div class="jumbotron text-center">
     <h1 class="display-6" style="font-family: Segoe UI;">New {{ ucfirst($request->type) }}</h1>

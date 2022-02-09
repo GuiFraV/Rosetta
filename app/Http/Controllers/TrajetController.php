@@ -71,10 +71,8 @@ class TrajetController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function create(Request $request) {
-        $zones = Zone::get();
         $countries  = Country::where("isActive", 1)->orderBy('fullname')->get();
 
-        
         // Motivation quotes
         $type = (getManagerType() === "LM") ? "truck" : "load" ;
         
@@ -83,30 +81,24 @@ class TrajetController extends Controller
         $wednesday = "We need more " . $type . "s!";
         $thursday = "More " . $type . " guys!";
         $friday = "Be sure you don't forget a " . $type . "!";
+        $arrayWeek = array($monday, $tuesday, $wednesday, $thursday, $friday);
+        $selected = date('N', strtotime('Today'));
         
-        $tmpTime = time();
-        // if today = monday count all type today with the created_at
-        if(date('D', $tmpTime) === 'Mon') {
-            echo "It is Monday today\n";
-            
-            /* query like 
-                $routesThisWeek = Trajet::where('id', '<=', $correctedComparisons)->get();
-            */
-
-        // else count all type since last monday 
-        } else {
-            echo "It is not Monday today\n";
+        // This week Route statistic
+        $arrSelectZone = ($type === "truck") ? [5, 6, 7] : [1, 2, 3, 4];
+        $lastMonday = date('Y-m-d H:i:s',strtotime('Monday this week'));
+        $routesThisWeek = Trajet::where('created_at', '>=', $lastMonday)->whereIn("zone_id", $arrSelectZone)->get();
+        $res = count($routesThisWeek);
+        
+        $arrayHeadsOrTails = array();        
+        $statistic = ($res <= 1) ? "There has been ".$res." " . $type . " since monday!" : "There has been ".$res." " . $type . "s since monday!";
+        array_push($arrayHeadsOrTails, $statistic);
+        if ($selected >= 1 && $selected <= 5) {
+            array_push($arrayHeadsOrTails, $arrayWeek[$selected-1]);
         }
-        
-        
-        
-        
-        $number = 10;
-        $statistic = "There has been N " . $type . "s since monday!";
+        $quote = $arrayHeadsOrTails[array_rand($arrayHeadsOrTails, 1)];
 
-
-
-        return view('manager.trajets.create')->with(compact('zones'))
+        return view('manager.trajets.create')->with('quote', $quote)                                            
                                             ->with(compact('request'))
                                             ->with(compact('countries'));
     }
@@ -114,7 +106,7 @@ class TrajetController extends Controller
     public function searchcity(Request $request) {
         if($request->ajax()) {          
             $data = City::join('countries', 'countries.id', '=', 'cities.coutry_id')
-                        ->where('coutry_id', '=',$request->country_id)
+                        ->where('coutry_id', '=', $request->country_id)
                         ->orderBy('city_name')
                         ->get(['countries.country_code','cities.city_name']);                        
             return $data;                       
@@ -136,16 +128,25 @@ class TrajetController extends Controller
         
         $termFrom = str_replace('+', '|', $from_others);
         $termTo = str_replace('+', '|', $to_others);
+                
+        $unified = $termFrom . " | " . $termTo;	
+        $unified = str_replace('+', '|', $unified);
         
-        $results = self::distancebtw($termFrom, $termTo);
-        try {
-            $distance = $results["rows"][0]["elements"][0]["distance"]["value"];
-            $duration = $results["rows"][0]["elements"][0]["duration"]["value"];
-        } catch (\Throwable $th) {
-            $distance = "0";
-            $duration = "0";
+        $distance = 0;
+        $duration = 0;
+        
+        $arrExp = explode(" | ", $unified);
+        
+        for($i=1; $i<count($arrExp); $i++) {
+            $results = self::distancebtw($arrExp[$i-1], $arrExp[$i]);            
+            try {
+                $distance += $results["rows"][0]["elements"][0]["distance"]["value"];
+                $duration += $results["rows"][0]["elements"][0]["duration"]["value"];
+            } catch (\Throwable $th) {
+                continue;
+            }
         }
-      
+
         $arrExp = explode(" | ", $termFrom);
         $from_coordinates = "";
         $multipleIteration = 0;
@@ -179,9 +180,9 @@ class TrajetController extends Controller
 
         $tmpType = getManagerType();        
         $zone_id = 0;
-        $arrZoneOne = array("EE", "LV", "LT", "CZ", "SK", "PL");
-        $arrZoneTwo = array("DE", "AT", "IT", "BE", "NL", "LU", "DK", "SE", "NO");
-        $arrZoneThree = array("FR", "ES", "PT", "GB", "CH");
+        $arrZoneOne = array("EE", "LV", "LT", "CZ", "SK", "PL", "HU", "BG", "HR", "GR", "MT", "RO", "SI");
+        $arrZoneTwo = array("DE", "AT", "IT", "BE", "NL", "LU", "DK", "SE", "NO", "FI");
+        $arrZoneThree = array("FR", "ES", "PT", "GB", "CH", "IE");
         $countryCodeDeparture = $request->from_country_select1;
         if($tmpType === "TM") {
             if($full_load) {
@@ -207,19 +208,19 @@ class TrajetController extends Controller
 
         // Validation        
         if($date_depart === null || $date_depart < date('Y-m-d', strtotime("yesterday"))) {
-            return redirect()->route('manager.trajets.index')->with('validationError','Form error! Please check the departure date.');
+            return redirect()->route('manager.trajets.index')->with('validationError', 'Form error! Please check the departure date.');
         } elseif($zone_id === 0 || $zone_id === null || ($zone_id < 1 || $zone_id > 7)) {
-            return redirect()->route('manager.trajets.index')->with('validationError','There has been an error during the creation, please retry.');
+            return redirect()->route('manager.trajets.index')->with('validationError', 'There has been an error during the creation, please retry.');
         } elseif($key != 0 && $key != 1) {
-            return redirect()->route('manager.trajets.index')->with('validationError','Form error! Please select a key.');
+            return redirect()->route('manager.trajets.index')->with('validationError', 'Form error! Please select a key.');
         } elseif($stars === null || ($stars != 1 && $stars != 2 && $stars != 3)) {
-            return redirect()->route('manager.trajets.index')->with('validationError','Form error! Please select a number of stars.');
+            return redirect()->route('manager.trajets.index')->with('validationError', 'Form error! Please select a number of stars.');
         } elseif($from_others === null || strlen($from_others) > 191) {
-            return redirect()->route('manager.trajets.index')->with('validationError','Form error! The loading city is missing or incorrect.');
+            return redirect()->route('manager.trajets.index')->with('validationError', 'Form error! The loading city is missing or incorrect.');
         } elseif($to_others === null || strlen($to_others) > 191) {
-            return redirect()->route('manager.trajets.index')->with('validationError','Form error! The unloading city is missing or incorrect.');
+            return redirect()->route('manager.trajets.index')->with('validationError', 'Form error! The unloading city is missing or incorrect.');
         } elseif($vehicles < 0 || $vehicles > 11) {
-            return redirect()->route('manager.trajets.index')->with('validationError','Form error! The number of vehicles is incorrect.');
+            return redirect()->route('manager.trajets.index')->with('validationError', 'Form error! The number of vehicles is incorrect.');
         }
         
         // dd($request);
@@ -599,7 +600,6 @@ class TrajetController extends Controller
             return null;
         }
     }
-
     
     /**
     * Get the list of matching trucks / loads for the matching modal
