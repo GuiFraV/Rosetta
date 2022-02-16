@@ -168,6 +168,7 @@ class ManagerController extends Controller
     */
     public function editpassword(Request $request)
     {
+
         // Set entry as variable for easier back-end validation
         $password = $request->password_edit_manager;
         
@@ -179,7 +180,7 @@ class ManagerController extends Controller
         }      
 
         $manager = Manager::with('user')->find($request->pass_id_manager);
-        $manager->user->password = bcrypt($request->$password);
+        $manager->user->password = bcrypt($password);
         $manager->push();
         
         $objects = Manager::with('user')->get();

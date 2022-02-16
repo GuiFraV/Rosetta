@@ -36,8 +36,9 @@
       </div>
     </div>    
   </div>
-  <br>
   
+  <br>
+
   <div class="row">
     <div class="col">    
       <div class="card">
@@ -59,6 +60,22 @@
         </div>
       </div>
     </div>
+  </div>
+
+  <br>
+
+  <div class="row">
+    <div class="col">    
+      <div class="card">
+        <i class="card-img-top bi bi-clock text-primary" style="font-size: 3rem; text-align:center; margin-bottom: -5px;"></i>
+        <div class="card-body">
+          <h5 class="card-title">Agencies</h5>
+          <p class="card-text">Manage the informations (name, address, phone number) for each Intergate agency.</p>
+          <a href="/admin/agencies" role="button" class="bi bi-arrow-down-left-circle float-end" style="font-size: 1.8rem;"></a>
+        </div>
+      </div>
+    </div>
+    <div class="col"></div>
   </div>
     
 </div>

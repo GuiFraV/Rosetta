@@ -98,6 +98,9 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('admin.horaires.index') }}">Schedule of sends</a>
                     </li>
+                    <li class="nav-item">
+                      <a class="nav-link" href="{{ route('admin.agencies.index') }}">Agencies</a>
+                    </li>                    
                     {{-- <li class="nav-item">
                         <a class="nav-link" href="{{ url('customers') }}">Carriers</a>
                     </li>
