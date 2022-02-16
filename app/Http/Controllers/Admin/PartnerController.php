@@ -23,7 +23,7 @@ class PartnerController extends Controller
     }
 
     /**
-    * Generate a yajara data table of the groups.
+    * Generate a Yajra data table of the groups.
     *
     * @param  \Illuminate\Http\Request  $request
     * @return Yajra\DataTables\DataTables
@@ -332,6 +332,5 @@ class PartnerController extends Controller
         } else {
             return json_encode(["statusCode" => 400]);  
         }
-        
     }
 }

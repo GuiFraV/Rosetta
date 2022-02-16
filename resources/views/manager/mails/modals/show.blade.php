@@ -4,21 +4,19 @@
   }
 </style>
 
-<div class="modal fade" id="showModal" tabindex="-1" aria-labelledby="showModalLabel" aria-hidden="true">
+<div class="modal fade" id="showEmailTemplateModal" tabindex="-1" aria-labelledby="showEmailTemplateModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="showModalLabel"></h5>
+        <h5 class="modal-title" id="showEmailTemplateModalLabel"></h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
         <div class="col">
-          <h5 class="lbl-color">Email subject :</h5>
-          {{-- <p id="emailShowSubject"></p> --}}
+          <h5 class="lbl-color">Email subject :</h5>          
           <input id="emailShowSubject" class="form-control" type="text" disabled readonly>
         </div><br>
         <h5 class="lbl-color">Email content :</h5>
-        {{-- <p id="emailShowContent"></p><br> --}}
         <textarea class="form-control mce-editor" id="emailShowContent"></textarea><br>
         <div class="row text-center">
           <div class="col">
@@ -43,14 +41,13 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        {{-- s<button type="button" class="btn btn-primary">Save changes</button> --}}
       </div>
     </div>
   </div>
 </div>
 
 <script>
-  function openShowModal(id) {
+  function openShowEmailTemplateModal(id) {
     $.ajax({
       async: true,
       type: "GET",
@@ -81,7 +78,7 @@
             $('#hideShowUpdated').show();
             $('#emailShowUpdatedAt').html(data['updated_at']);
           }
-          $('#showModal').modal('show');
+          $('#showEmailTemplateModal').modal('show');
         }
       },
       error: function (request, status, error) {

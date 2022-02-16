@@ -6,46 +6,14 @@
   <div class="jumbotron text-center">
     <h1 class="display-5" style="font-family: Segoe UI;">Email Management</h1>
   </div>
-  <br>
+  <br> 
   
-  {{-- @include('message.opMessage') --}}
-  {{-- @include('mails.modals.send') --}}
-  {{-- @include('message.modals.message') --}}
+  <a class="btn btn-primary" id="btnNewMail" role="button">Create a new email template</a>
+  <a class="btn btn-primary" id="btnOpenModalMailRouteList" role="button">Send the route list</a><br><br>
 
-  
-      {{-- <nav class="navbar navbar-light bg-light"> --}}
-          {{-- <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#messageSendModal">Open PopUp</button> --}}
-          {{-- <a class="btn btn-outline-success" href="/lastMail">Get last</a> --}}
-          
-              
-                  
-                  {{-- <button class="btn btn-outline-success" type="submit">Add Group</button> --}}
-                  {{-- <a class="btn btn-outline-success" href="/groups/create" type="submit">Add Group</a> --}}
-                  {{-- <div class="float-end"> --}}
-                      <a class="btn btn-primary" id="btnNewMail" role="button">Create a new email</a><br><br>
-                      {{-- <a class="btn btn-primary" id="btnNewMail" data-bs-toggle="modal" href="#createMailModal" role="button">Create a new email</a><br><br> --}}
-                  {{-- </div> --}}
-                  {{-- float-end btn btn-primary --}}
-              
-          
-          {{-- 
-          <div class="container col-sm-4">
-              <form class="d-flex">
-                  <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search"  autocomplete="off"/>
-                  <br/>
-                  <button class="btn btn-outline-success" type="submit">Search</button>
-              </form>
-          </div>
-          --}}
-      {{-- </nav> --}}
-  
-
-
-  {{-- New email DataTable (Yajra) --}}
   <table class="table table-striped table-hover yajra-datatable" id="emailDataTable">
     <thead>
       <tr>
-        <th scope="col">id</th>
         <th scope="col">Subject</th>
         <th scope="col">Automatic Sending</th>
         <th scope="col">Author</th>
@@ -59,7 +27,7 @@
     </thead>
     <tbody class="align-middle"></tbody>
   </table><br>
-  <a role="button" class="btn btn-light" onclick="ajaxSendMail();" value="">123</a>
+  <a role="button" class="btn btn-light" onclick="ajaxSendMail();" value="">Test Send</a>
 </div>
 
 @include('manager.mails.modals.create')
@@ -67,6 +35,7 @@
 @include('manager.mails.modals.edit')
 @include('manager.mails.modals.destroy')
 @include('manager.mails.modals.send')
+@include('manager.mails.modals.sendList')
 
 <script type="text/javascript">
 
@@ -86,9 +55,8 @@
       processing: true,
       serverSide: true,
       ajax: "{{ route('manager.mails.getMails') }}",
-      //order: [[1, 'desc']],
+      order: [[3, 'desc']],
       columns: [
-        {data: 'id', name: 'id'},
         {data: 'object', name: 'object'},
         {data: 'autoSend', name: 'autoSend'},
         {data: 'author', name: 'author'},
@@ -144,16 +112,6 @@
     return 0;
   }
 </script>
-
-{{--
-<script>
-    setTimeout(function () {
-        // document.getElementById('messagealert').style.display = '';
-        $("#messagealert").hide();
-    }, 1000);
-        
-</script>
---}}
 
 {{--
 <script>

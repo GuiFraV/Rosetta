@@ -127,7 +127,7 @@
                 </div>
               </div>
               <div class="col-sm" style="display: flex; align-items: center;">
-                  <a class="btn btn-warning my-auto" href="/manager/trajets" style="margin-left: 25%; margin-right: 6%;">Reset</a>                
+                  <a class="btn btn-warning my-auto" href="/manager/trajets" style="margin-left: 25%; margin-right: 6%;">Reset</a>
                   <button class="btn btn-primary my-auto" type="submit" style="margin-right: 25%; margin-left: 6%;">Search</button>                
               </div>
             </div>   
@@ -163,9 +163,7 @@
           <th colspan="11" style="text-align: center">{{ $item->zone_name }}</th>            
           @foreach ($data as $key)
             @if ($key->zone_name == $item->zone_name)
-              <tr id="ln{{ $key->id }}" class="{{ isset($key->matched_to) ? 'text-decoration-line-through' : '' }}">
-                
-
+              <tr id="ln{{ $key->id }}" class="{{ isset($key->matched_to) ? 'text-decoration-line-through' : '' }} {{ ($key->urgent === 1) ? 'text-danger' : '' }}">
                 <td>                                         
                   <a href="#" from_l="{{ $key->from_others }}" to_l="{{ $key->to_others }}" typebtn="openmapps"><span style="color: Dodgerblue;" title="Open Maps" class="fa fa-map-marked-alt" ></span></a>
                 </td>
@@ -227,7 +225,6 @@
                     <a role="button" class="bi bi-trash text-danger" style="font-size: 1.4rem;" title="Delete" onclick="$('#destroyModal').modal('show'); $('#destroyedId').val({{ $key->id }});"></a>                  
                   @endif
                 </td>  
-              </tr>
             @endif                
           @endforeach
         </tr>

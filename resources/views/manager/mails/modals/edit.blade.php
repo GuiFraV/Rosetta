@@ -5,7 +5,7 @@
         <h5 class="modal-title" id="editEmailModalLabel">Edit Email</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <form id="formEditMail" method="POST" enctype="multipart/form-data"">
+      <form id="formEditMail" method="POST" enctype="multipart/form-data">
         @csrf
         <input type="text" name="editedId" id="editedId" hidden/>
         <div class="modal-body">          

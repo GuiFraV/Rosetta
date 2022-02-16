@@ -8,11 +8,23 @@
       <form id="formSendMail" method="POST" enctype="multipart/form-data">
         @csrf
         <div class="modal-body">
-          <input type="text" name="mailId1" id="mailId1" hidden>
+          <input type="text" name="emailSentId" id="emailSentId" hidden>
+          <div class="container">
+            <label for="group">Group you wish to send the email to</label>
+            <div class="form-group">
+              <select class="form-select" id="selectSendToGroup" name="selectSendToGroup" aria-label="Default select example">
+                <option selected></option>
+                @foreach($groups as $group)
+                  <option value="{{$group->id}}">{{$group->groupName}}</option>
+                @endforeach
+              </select>
+            </div> 
+          </div>
+          <br>
           <div class="container">
             <div class="form-check form-check-inline">
               <input class="form-check-input" type="radio" name="sendType" id="sendType2" onclick="myFunction()" checked>
-              <label class="form-check-label" for="sendType2">Manual Send</label>
+              <label class="form-check-label" for="sendType2">Send Now</label>
             </div>
             {{-- <div class="form-check form-check-inline">
               <input class="form-check-input" type="radio" name="sendType" id="sendType1" onclick="myFunction()">
@@ -22,18 +34,7 @@
               <input class="form-check-input" type="radio" name="sendType" id="sendType3" onclick="myFunction()">
               <label class="form-check-label" for="sendType3">Send At</label>
             </div>
-          </div>
-          <div class="container">
-            <label for="group">Group</label>
-              <div class="form-group">
-            <select class="form-select" id="group_id" name="group_id" aria-label="Default select example">
-                    <option selected></option>
-                    @foreach($groups as $group)
-                      <option value="{{$group->id}}">{{$group->groupName}}</option>
-                    @endforeach
-            </select>
-              </div> 
-            </div>
+          </div>          
           {{-- <div class="container" id="divTime" style="display:none;">
             <br>
             <label for="time">Time</label>
@@ -59,9 +60,9 @@
                 </form> --}}
           <a class="btn btn-secondary" href="/mails">Close</a>
           {{-- COMMENTED BECAUSE CRASH WITH IT --}}
-          {{-- <button class="btn btn-primary" id="sendMailUpdate" data-bs-target="#updateModal" data-bs-toggle="modal" onclick="editLast({{$lastMail}})">Update</button> --}}
+          {{-- <button class="btn btn-primary" id="sendMailUpdate" data-bs-target="#updateModal" data-bs-toggle="modal" onclick="editLast({{ $lastMail }})">Update</button> --}}
           {{-- <button class="btn btn-success" type="submit" id="sendSubmit" data-bs-dismiss="modal" href="{{ url('testSendMail/1') }}">Send</button> --}}
-          <button type="submit" id="btn_update" class="btn btn-primary">Send</button>
+          <button type="button" id="btnSendNewMail" class="btn btn-primary">Send</button>
         </div>
       </form>
     </div>
@@ -69,7 +70,7 @@
 </div>
 <script>
   function openSendModal(id) {
-    $('#mailId1').val(id);
+    $('#emailSentId').val(id);
     $.ajax({
       async: true,
       type: "GET",
@@ -85,22 +86,23 @@
         if(data['statusCode'] === 400) {
           toastr.warning("Specified email has not been found. Try to reload the page.")
         } else if (data['statusCode'] === 200){
-          
-          // $('#showModalLabel').html("Mail N°"+id);
-          // $('#emailShowSubject').val(data['object']);
-          // tinymce.get('emailShowContent').setContent(data['message']);
-          // // Commented because it doesn't works, but the idea is to hide the toolbar with Jquery / CSS
-          // //$('#emailShowContent').children(".tox-editor-header").css('display','none');
-          // tinymce.get('emailShowContent').setMode('readonly');
-          // $('#emailShowAutoSend').html(data['autoSend']);
-          // $('#emailShowAuthor').html(data['author']);
-          // $('#emailShowCreatedAt').html(data['created_at']);
-          // if(data['updated_at'] === "none") {
-          //   $('#hideShowUpdated').hide();
-          // } else {
-          //   $('#hideShowUpdated').show();
-          //   $('#emailShowUpdatedAt').html(data['updated_at']);
-          // }
+          /*
+          $('#showModalLabel').html("Mail N°"+id);
+          $('#emailShowSubject').val(data['object']);
+          tinymce.get('emailShowContent').setContent(data['message']);
+          // Commented because it doesn't works, but the idea is to hide the toolbar with Jquery / CSS
+          //$('#emailShowContent').children(".tox-editor-header").css('display','none');
+          tinymce.get('emailShowContent').setMode('readonly');
+          $('#emailShowAutoSend').html(data['autoSend']);
+          $('#emailShowAuthor').html(data['author']);
+          $('#emailShowCreatedAt').html(data['created_at']);
+          if(data['updated_at'] === "none") {
+            $('#hideShowUpdated').hide();
+          } else {
+            $('#hideShowUpdated').show();
+            $('#emailShowUpdatedAt').html(data['updated_at']);
+          }
+          */
           $('#sendModal').modal('show');
         }
       },
@@ -109,12 +111,12 @@
       }
     });
   }
-  let formSendMail = $("#formSendMail");
-  formSendMail.submit(function (e) {
-    e.preventDefault(e);
-    tinyMCE.triggerSave();
-    let fd = new FormData(this);
-    fd['mailid'] = $('#mailId1').val();
+
+  $('#btnSendNewMail').click(function() {
+    //tinyMCE.triggerSave();
+    let fd = new FormData();
+    fd.append('emailSentId', $('#emailSentId').val());
+    fd.append('selectSendToGroup', $('#selectSendToGroup').val());
     $.ajax({
       async: true,
       type: "POST",
@@ -127,11 +129,12 @@
         /// Debug on send
         console.log(data);
         $('#editEmailModal').modal('hide');
-        toastr.success("The email has been edited!");
+        toastr.success("The email has been sent!");
       },
       error: function (request, status, error) {
         console.log("error");
       }
     });
   });
+
 </script>

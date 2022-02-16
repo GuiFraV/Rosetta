@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\AgencyController;
 use App\Http\Controllers\admin\CountryController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboard;
@@ -67,7 +68,6 @@ Route::group(['as'=>'manager.','prefix' => 'manager','middleware'=>['auth','mana
     /// Trajets (routes) ///
     Route::resource('trajets',TrajetController::class);
     Route::post('trajets/edit/{id}', 'App\Http\Controllers\TrajetController@edit');
-    // Route::post('trajets/update/{id}', 'App\Http\Controllers\TrajetController@update');
     Route::post('trajets/update/{id}', [TrajetController::class, 'update'])->name('update');
     Route::delete('trajets/destroyer/{id}', 'App\Http\Controllers\TrajetController@destroyer');
     Route::get('searchcity', [TrajetController::class, 'searchcity'])->name('searchcity');
@@ -102,7 +102,9 @@ Route::group(['as'=>'manager.','prefix' => 'manager','middleware'=>['auth','mana
     Route::get('mails/{id}', 'App\Http\Controllers\MailController@show');
     Route::get('mails/edit/{id}', 'App\Http\Controllers\MailController@edit');
     Route::post('mails/update/{id}', 'App\Http\Controllers\MailController@update');
-    Route::post('mails/sendMail/', 'App\Http\Controllers\MailController@sendMail')->name('mails.sendMail');
+    Route::post('mails/sendMail/', 'App\Http\Controllers\MailController@sendMailTest')->name('mails.sendMailTest');
+    Route::post('mails/sendInstantMail/', 'App\Http\Controllers\MailController@sendInstantMail')->name('mails.sendInstantMail');
+    Route::post('mails/getRouteList/', 'App\Http\Controllers\MailController@getRouteList')->name('mails.getRouteList');
 
     // Group routes
     Route::resource('groups',GroupController::class, [
@@ -191,8 +193,8 @@ Route::group(['as'=>'admin.','prefix' => 'admin','middleware'=>['auth','admin']]
     /// Partners ///
     // Partner routes
     Route::resource('partners',AdminPartnerController::class, [
-      'only' => ['index', 'store'],
-      'except' => ['create', 'edit', 'destroy', 'show', 'update']
+        'only' => ['index', 'store'],
+        'except' => ['create', 'edit', 'destroy', 'show', 'update']
     ]);
     Route::get('partners', [AdminPartnerController::class, 'index'])->name('partners.index');
     Route::get('partners/getPartners', [AdminPartnerController::class, 'getPartners'])->name('partners.getPartners');
@@ -204,10 +206,18 @@ Route::group(['as'=>'admin.','prefix' => 'admin','middleware'=>['auth','admin']]
     Route::post('partners/update/{id}', 'App\Http\Controllers\Admin\PartnerController@update');    
     // Route::post('partners/partnerStatus/{partnerStatus}', [AdminPartnerController::class, 'partnerStatus'])->name('partners.partnerStatus');    
 
+    /// Agencies ///
+    Route::resource('agencies', AgencyController::class, [
+        'only' => ['store'],
+        'except' => ['index', 'create', 'edit', 'update', 'show', 'destroy']
+    ]);
+    Route::get('agencies', [AgencyController::class, 'index'])->name('agencies.index');
+    Route::get('agencies/getAgencies', [AgencyController::class, 'getAgencies'])->name('agencies.getAgencies');
+    Route::get('agencies/edit/{id}', 'App\Http\Controllers\Admin\AgencyController@edit');
+    Route::put('agencies/update/{id}', 'App\Http\Controllers\Admin\AgencyController@update');
+    Route::delete('agencies/destroy/{id}', 'App\Http\Controllers\Admin\AgencyController@destroy');
+    
     /// Countries ///
     Route::get('country', [CountryController::class, 'index'])->name('index');
     Route::get('country/getCountries', [CountryController::class, 'getCountries'])->name('country.getCountries');
 });
-
-/// CRON ROUTES ///
-Route::get('cron/decreaseRoadCounter/', 'App\Http\Controllers\CronController@decreaseRoadCounter');

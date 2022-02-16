@@ -27,6 +27,9 @@ class Trajet extends Migration
             $table->boolean("key");
             $table->boolean("concurants");
             $table->integer("stars");
+            $table->boolean("full_load");
+            $table->boolean("used_cars");
+            $table->boolean("urgent");
             $table->integer("visible")->default(0);
             $table->timestamps();
         });

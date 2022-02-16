@@ -43,6 +43,8 @@
         <th>First name</th>
         <th>Last name</th>
         <th>Email</th>
+        <th>Phone</th>
+        <th>Skype</th>
         <th>Type</th>
         <th>Actions</th>
       </tr>
@@ -53,6 +55,8 @@
           <td>{{ $object->first_name }}</td>
           <td>{{ $object->last_name }}</td>
           <td>{{ $object->user->email }}</td>
+          <td>{{ $object->phone }}</td>
+          <td><a href='skype:{{ $object->skype_id }}?chat'>{{ $object->skype_id }}</a></td>
           <td>{{ $object->type }}</td>
           <td>  
             <div class="form-check form-switch">
@@ -93,6 +97,7 @@
   $('a[typebtn="editmanagerbtn"]').on('click', function() {
       $("#agency_edit_manager").find('option').attr("selected", false);
       let text = JSON.parse(atob($(this).attr("datamanager")));
+      console.log(text);
       $("#first_name_edit_manager").val(text["first_name"]);
       $("#last_name_edit_manager").val(text["last_name"]);
       $('#agency_edit_manager option[value='+text["agency_id"]+']').attr('selected','selected');
@@ -102,6 +107,8 @@
           $("#TM_edit_manager").prop("checked", true);
       }
       $("#email_edit_manager").val(text["user"]["email"]);
+      $("#phone_edit_manager").val(text["phone"]);
+      $("#skype_edit_manager").val(text["skype_id"]);
       $("#id_manager").val(text["id"]);
       $("#pass_id_manager").val(text["user_id"]);
       console.log(text);

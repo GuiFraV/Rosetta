@@ -60,7 +60,7 @@ class TrajetController extends Controller
         }
         
         $results->orderBy('trajets.id', 'DESC');
-        $data = $results->get(['trajets.id','trajets.date_depart','zones.zone_name', 'trajets.manager_id', 'trajets.from_others','trajets.to_others','trajets.distance','trajets.duration','trajets.key','trajets.stars','trajets.comment','trajets.vans','trajets.full_load','trajets.used_cars', 'trajets.visible', 'trajets.created_at', 'trajets.matched_to']);
+        $data = $results->get(['trajets.id','trajets.date_depart','zones.zone_name', 'trajets.manager_id', 'trajets.from_others','trajets.to_others','trajets.distance','trajets.duration','trajets.key','trajets.stars','trajets.comment','trajets.vans','trajets.full_load','trajets.used_cars','trajets.urgent', 'trajets.visible', 'trajets.created_at', 'trajets.matched_to']);
         
         return view('manager.trajets.index', compact('zones') , compact('data'))->with('type_manager', $type_manager)->with('countries', $countries)->with('srcCount', $srcCount); 
     }
@@ -121,6 +121,7 @@ class TrajetController extends Controller
      */
     public function store(Request $request)
     {        
+
         // Var attribution for validation and insert
         $date_depart = $request->date_depart;
         $from_others = $request->from_cities;
@@ -175,8 +176,9 @@ class TrajetController extends Controller
           $full_load = 1;
         }
 
-        $used_cars = ($request->has('used_cars') && $request->used_cars === "checked") ? 1 : 0;        
+        $used_cars = ($request->has('used_cars') && $request->used_cars === "checked") ? 1 : 0;
         $intergateTruck = ($request->has('intergateTruck')) ? 1 : 0;
+        $urgent = ($request->has('urgentRoute')) ? 1 : 0;        
 
         $tmpType = getManagerType();        
         $zone_id = 0;
@@ -241,7 +243,8 @@ class TrajetController extends Controller
             'comment' => $comment ,
             'vans' => $vehicles,
             'full_load' => $full_load,
-            'used_cars' => $used_cars
+            'used_cars' => $used_cars,
+            'urgent' => $urgent
         ]);
         // dd($insertData);
         return redirect()->route('manager.trajets.index')->with('created','The road has been created successfully.');        
@@ -284,6 +287,7 @@ class TrajetController extends Controller
                       "vans" => $trajet->vans,
                       "full_load" => $trajet->full_load,
                       "used_cars" => $trajet->used_cars,
+                      "urgent" => $trajet->urgent,
                       "intergate_truck" => $intergate_truck
                   ) 
               )
@@ -353,6 +357,7 @@ class TrajetController extends Controller
             }
 
             $used_cars = $request->used_cars;
+            $urgent = $request->urgent;
 
             $tmpType = getManagerType();        
             $zone_id = 0;
@@ -414,11 +419,12 @@ class TrajetController extends Controller
             $trajet->vans = $vehicles;
             $trajet->full_load = $full_load;
             $trajet->used_cars = $used_cars;
+            $trajet->urgent = $urgent;
             $updateStatus = $trajet->save();
             
             if($updateStatus) {
 
-                $retHTML = '<tr id="ln'.$trajet->id.'" ';
+                $retHTML = ($trajet->urgent) ? '<tr id="ln'.$trajet->id.'" class="text-danger"' : '<tr id="ln'.$trajet->id.'" ';
                 if(isset($trajet->matched_to))
                   $retHTML .= 'class="text-decoration-line-through"';
                 $retHTML .= '>';
@@ -847,7 +853,7 @@ class TrajetController extends Controller
     /**
     * Generate all the routes as text for the user.
     *
-    * @return JSON Object
+    * @return string $json
     */
     public function getRouteList() {
         
@@ -951,7 +957,8 @@ class TrajetController extends Controller
           $finalStr .= $elem['label'].PHP_EOL.PHP_EOL;
         }
 
-        echo json_encode($finalStr);      
+        echo json_encode($finalStr);    
+        exit;  
   }
 
 }

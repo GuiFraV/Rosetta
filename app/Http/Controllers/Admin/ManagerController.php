@@ -52,6 +52,8 @@ class ManagerController extends Controller
         $last_name = $request->last_name_add_manager;
         $email = $request->email_add_manager;
         $password = $request->password_add_manager;
+        $phone = $request->phone_add_manager;
+        $skype = $request->skype_add_manager;
         $signature = $request->signature_add_manager;
         $agency = $request->agency_add_manager;
         $type = $request->manager_add_radios;
@@ -64,6 +66,10 @@ class ManagerController extends Controller
         } else if ($email === null || strlen($email) > 191) {
             return redirect()->route('admin.managers.index')->with('validationError', 'Form error! The email is missing or incorrect.');
         } else if ($password === null || strlen($password) > 191) {
+            return redirect()->route('admin.managers.index')->with('validationError', 'Form error! The password is missing or incorrect.');
+        } else if ($phone === null || strlen($phone) > 191) {
+            return redirect()->route('admin.managers.index')->with('validationError', 'Form error! The password is missing or incorrect.');
+        } else if ($skype === null || strlen($skype) > 191) {
             return redirect()->route('admin.managers.index')->with('validationError', 'Form error! The password is missing or incorrect.');
         } else if ($signature === null || strlen($signature) > 191) {
             return redirect()->route('admin.managers.index')->with('validationError', 'Form error! The signature is missing or incorrect.');
@@ -91,6 +97,8 @@ class ManagerController extends Controller
         $manager = new Manager;
         $manager->first_name = $first_name;
         $manager->last_name = $last_name;
+        $manager->phone = $phone;
+        $manager->skype_id = $skype;
         $manager->type = $type;
         $manager->signature = $signature;
         $manager->agency_id = $agency;
@@ -115,6 +123,8 @@ class ManagerController extends Controller
         $first_name = $request->first_name_edit_manager;
         $last_name = $request->last_name_edit_manager;
         $email = $request->email_edit_manager;
+        $phone = $request->phone_edit_manager;
+        $skype = $request->skype_edit_manager;
         $agency = $request->agency_edit_manager;
         $type = $request->manager_edit_radios;
         
@@ -125,6 +135,10 @@ class ManagerController extends Controller
             return redirect()->route('admin.managers.index')->with('validationError', 'Form error! The last name is missing or incorrect.');
         } else if ($email === null || strlen($email) > 191) {
             return redirect()->route('admin.managers.index')->with('validationError', 'Form error! The email is missing or incorrect.');
+        } else if ($phone === null || strlen($phone) > 191) {
+            return redirect()->route('admin.managers.index')->with('validationError', 'Form error! The password is missing or incorrect.');
+        } else if ($skype === null || strlen($skype) > 191) {
+            return redirect()->route('admin.managers.index')->with('validationError', 'Form error! The password is missing or incorrect.');
         } else if ($agency < 1 || $agency > 7) {
             return redirect()->route('admin.managers.index')->with('validationError', 'Form error! The agency is incorrect.');
         } else if ($type != "LM" && $type != "TM") {
@@ -134,6 +148,8 @@ class ManagerController extends Controller
         $manager = Manager::find($request->id_manager);
         $manager->first_name = $first_name;
         $manager->last_name = $last_name;
+        $manager->phone = $phone;
+        $manager->skype_id = $skype;
         $manager->type = $type;
         $manager->agency_id = $agency;
         $manager->user->email = $email;

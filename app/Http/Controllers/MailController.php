@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Redirect;
 use App\Models\Mail;
 use App\Models\Group;
 use App\Models\Manager;
+use App\Models\Manager\Trajet as Trajet;
+use App\Models\Partner;
 use Carbon\Carbon;
 use DateTime;
 use GuzzleHttp\Client;
@@ -39,16 +41,14 @@ class MailController extends Controller
     public function getMails(Request $request)
     {
         if ($request->ajax()) {      
-            $data = Mail::where('author','=',getManagerId())->get();
+            $data = Mail::where('author', '=', getManagerId())->get();
             return DataTables::of($data)                
                 ->addIndexColumn()
                 ->editColumn('autoSend', function($row)
                 {
-                    $autoSend = $row->autoSend;
-                    
-                    if($autoSend === 1) {
+                    if($row->autoSend === 1) {
                         $ret = "<i class='bi bi-check2 text-success' style='font-size: 1.4rem;'></i>";
-                    } else if ($autoSend === 0) {
+                    } else if ($row->autoSend === 0) {
                         $ret = "<i class='bi bi-x text-danger' style='font-size: 1.4rem;'></i>";
                     } else {
                         $ret = "Erreur";
@@ -78,7 +78,7 @@ class MailController extends Controller
                 })
                 ->addColumn('showBtn', function($row)
                 {
-                    $showBtn = '<a role="button" class="bi bi-eye text-primary" style="font-size: 1.4rem;" onclick="openShowModal('.$row->id.');"></a>';
+                    $showBtn = '<a role="button" class="bi bi-eye text-primary" style="font-size: 1.4rem;" onclick="openShowEmailTemplateModal('.$row->id.');"></a>';
                     return $showBtn;
                 })
                 ->addColumn('editBtn', function($row)
@@ -130,7 +130,7 @@ class MailController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function show($id)
-    {        
+    {
         try {
             $mail = Mail::findOrFail($id);
             $autoDisplay = ($mail->autoSend == 1) ? "Yes" : "No";
@@ -155,11 +155,11 @@ class MailController extends Controller
     }
     
     /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  $id
-     * @return \Illuminate\Http\Response
-     */
+    * Show the form for editing the specified resource.
+    *
+    * @param  $id
+    * @return \Illuminate\Http\Response
+    */
     public function edit($id)
     {
         try {
@@ -228,25 +228,58 @@ class MailController extends Controller
         ));
     }
 
-    //Request $request
+    public function sendMailTest(Request $request) {
+    
+        $complexMail = Mail::where("id", "=", "2")->first();
+
+        $object = $complexMail->object;
+        $message = $complexMail->message;
+
+        $groupTest = array("mail.testing1@intergate-logistic.com", "mail.testing2@intergate-logistic.com", "developpement2@intergate-logistic.com");
+
+        foreach ($groupTest as $currReceiver) {
+            $client = new Client();
+            $res = $client->request(
+                'POST',
+                'https://api.eu.mailgun.net/v3/form.loaditeasy.com/messages',
+                [
+                    'form_params' =>
+                    [
+                        "from" => getManagerEmail(),#manager_email
+                        "to" => $currReceiver,
+                        "subject" => $object,
+                        "html" => $message
+                    ],
+                    'auth' => ['api', 'key-c02e140e0e1bcb64d3b94bc90876e02d']
+                ]
+            );
+            $results = json_decode($res->getBody(), true);
+        }
+        return json_encode(array("error" => $results));        
+    }
+
+    /**
+     * Send the email that have been prepared with MailGun.
+     *
+     * @param  Request $request
+     * @return \Illuminate\Http\Response
+     */
     public function sendMail(Request $request) {
         
              
-        $mailId = $request->input('mailId1');
-        $groupId = $request->input('group_id');
+        $mailId = $request->emailSentId;
+        $groupId = $request->selectSendToGroup;
+        
+        /*
         $sendDate = $request->input('sendDate');
         $newDate = date('D, d M Y H:i:s O', strtotime($sendDate));
-
+        */
          
-        $mail = Mail::find($mailId);
-        $group = Group::find($groupId);
+        $mail = Mail::findOrFail($mailId);
+        $group = Group::findOrFail($groupId);
 
-        $details = [
-            'object' => $mail->object,
-            'message' => $mail->message
-        ];
-
-        $selectedPartners = $group -> partners;
+        $selectedPartners = $group->partners;
+        
         $partnersGroup = array();
         foreach ($selectedPartners as $partner){
             $partnersGroup[] = $partner->email;
@@ -282,5 +315,226 @@ class MailController extends Controller
         } else {
             return json_encode("Failed! Your E-mail has not sent.");
         }  
+    }
+
+    /**
+    * Send an email with given parameters with MailGun.
+    *
+    * @param  Request $request
+    * @return \Illuminate\Http\Response
+    */
+    public function sendInstantMail(Request $request) {
+
+        // Push all the partner's mail of the group in an array.
+        if($request->selectRouteListGroup != "allMyContacts") {
+            $selectedGroup = Group::findOrFail($request->selectRouteListGroup);
+            $groupPartners = $selectedGroup->partners;
+            $arrGroupPartners = array();
+            foreach ($groupPartners as $partner)
+                array_push($arrGroupPartners, $partner->email);    
+        } else {
+            $groupPartners = Partner::where("manager_id", "=", getManagerId())->get();
+            $arrGroupPartners = array();
+            foreach($groupPartners as $curr)
+                array_push($arrGroupPartners, $curr->email);
+        }
+
+        $object = $request->emailRouteListObject;
+        $message = $request->emailRouteListContent;
+
+        foreach ($arrGroupPartners as $currReceiver) {
+            $client = new Client();
+            $res = $client->request(
+                'POST',
+                'https://api.eu.mailgun.net/v3/form.loaditeasy.com/messages',
+                [
+                    'form_params' =>
+                    [
+                        "from" => getManagerEmail(),#manager_email
+                        "to" => $currReceiver,
+                        "subject" => $object,
+                        "html" => $message
+                    ],
+                    'auth' => ['api', 'key-c02e140e0e1bcb64d3b94bc90876e02d']
+                ]
+            );
+            $results = json_decode($res->getBody(), true);
+        }
+        return json_encode(array("error" => $results));        
+    }
+
+
+    /**
+     * Get the route List and returns it in a formatted way to insert it in a mail builder.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function getRouteList () {
+        
+        $typeManager = getManagerType();        
+        
+        $typeList = (getManagerType() === "LM") ? "Loads" : "Trucks";
+        
+        if($typeManager === "LM") {
+            $dataFull = Trajet::where("visible", ">=", "0")->whereIn("zone_id", [1, 2, 3])->get();
+            $dataPart = Trajet::where("visible", ">=", "0")->where("zone_id", "=", 4)->get();
+        } else if($typeManager === "TM") {
+            $dataFull = Trajet::where("visible", ">=", "0")->whereIn("zone_id", [5, 7])->get();
+            $dataPart = Trajet::where("visible", ">=", "0")->where("zone_id", "=", 6)->get();
+        } else if($typeManager === "Admin") {
+            // No support for this type of user ATM
+            $data = Trajet::where("visible", ">=", "0")->get();
+        }
+
+        if ($dataFull->isEmpty() && $dataPart->isEmpty()) { 
+            $finalStr = "There are currently no loads or trucks available.";  
+        }
+
+        $retArrFull = array();        
+        foreach($dataFull as $route) {            
+            $firstSub = $route->from_others;
+            
+            // Check if the FROM is defined, else continue
+            if($firstSub === null)
+              continue;
+
+            // If it's a load with multiple loading places, substr the first loading place (before '+')
+            if(str_contains($firstSub, "+")) {
+                $tmp = explode("+", $firstSub);
+                $firstSub = $tmp[0];
+            } 
+
+            // Find the position of '(' and substr the right part
+            $tmp = explode("(", $firstSub);   	
+            $secondSub = $tmp[1];
+
+            // Then Find the position of ')' and substr the left part
+            $tmp = explode(")", $secondSub);
+
+            $countryDeparture = $tmp[0];
+            
+            // Formating the text for the mail as a list
+            $displayText = (isset($route->comment)) ? $route->from_others . " -> " . $route->to_others . " | " . $route->comment : $route->from_others . " -> " . $route->to_others;
+
+            // Insert in an array the country code and the display text used for the email
+            array_push($retArrFull, ["countryCode" => $countryDeparture, "label" => $displayText, "urgent" => $route->urgent, "isMatched" => $route->matched_to]);
+        }
+
+        $retArrPart = array();        
+        foreach($dataPart as $route) {            
+            $firstSub = $route->from_others;
+            
+            // Check if the FROM is defined, else continue
+            if($firstSub === null)
+              continue;
+
+            // If it's a load with multiple loading places, substr the first loading place (before '+')
+            if(str_contains($firstSub, "+")) {
+                $tmp = explode("+", $firstSub);
+                $firstSub = $tmp[0];
+            } 
+
+            // Find the position of '(' and substr the right part
+            $tmp = explode("(", $firstSub);   	
+            $secondSub = $tmp[1];
+
+            // Then Find the position of ')' and substr the left part
+            $tmp = explode(")", $secondSub);
+
+            $countryDeparture = $tmp[0];
+            
+            // Formating the text for the mail as a list
+            $displayText = (isset($route->comment)) ? $route->from_others . " -> " . $route->to_others . " | " . $route->comment : $route->from_others . " -> " . $route->to_others;            
+            
+            // Insert in an array the country code and the display text used for the email
+            array_push($retArrPart, ["countryCode" => $countryDeparture, "label" => $displayText, "urgent" => $route->urgent, "isMatched" => $route->matched_to]);
+        }
+        
+        // Ordering our return array in a ascendant way
+        array_multisort($retArrFull, SORT_ASC);        
+        array_multisort($retArrPart, SORT_ASC);        
+        // dd($retArr);
+        
+        $finalStr = "<br><br><span style='font-weight: bold;'>FULL LOAD</span><br><br>";
+        $tmp = "";
+        foreach($retArrFull as $elem) {
+            if($tmp != $elem['countryCode']) {
+                $tmp = $elem['countryCode'];
+                $finalStr .= "<br><br><span style='font-weight: bold;'>".$tmp."</span><br><br>";
+            }
+            $conditionnalCss = "";
+            $conditionnalCss .= ($elem['urgent']) ? "color: red;" : "";
+            $conditionnalCss .= ($elem['isMatched'] != null) ? " text-decoration-line: line-through;" : "";
+            $finalStr .= "<span style='".$conditionnalCss."'>".$elem['label']."</span><br><br>";
+        }
+        $finalStr .= "<br><br><br><span style='font-weight: bold;'>PART LOAD</span><br><br>";
+        foreach($retArrPart as $elem) {
+            if($tmp != $elem['countryCode']) {
+                $tmp = $elem['countryCode'];
+                $finalStr .= "<br><br>".$tmp."<br><br>";
+            }
+            $conditionnalCss = "";
+            $conditionnalCss .= ($elem['urgent']) ? "color: red;" : "";
+            $conditionnalCss .= ($elem['isMatched'] != null) ? " text-decoration-line: line-through;" : "";
+            $finalStr .= "<span style='".$conditionnalCss."'>".$elem['label']."</span><br><br>";
+        }
+    
+        $insertManagerType = (getManagerType() === "LM") ? "Logistic Manager" : "Transport Manager";
+
+        $signature = "
+        <tr>
+            <td bgcolor='#e1e4ec' style='padding: 20px 20px 20px 40px; border-bottom: 1px solid #989898;'>
+                <span style='font-size: 28px;'>INTERGATE LOGISTIC</span><br />
+                <span style='color: #6359ab; font-weight: bold;'> ". getManagerName(getManagerId(), 'all') ." - International ". $insertManagerType ."</span><br />
+                <br>
+                <table border='0' width='100%' style='text-align: left;'>
+                    <tr>
+                        <td style='font-weight: bold; width: 150px;'>Phone:</td>
+                        <td>0033180855191</td>
+                    </tr>
+                    <tr>
+                        <td style='font-weight: bold;'>Mobile:</td>
+                        <td>0033761910406</td>
+                    </tr>
+                    <tr>
+                        <td style='font-weight: bold;'>Web:</td>
+                        <td><a href='www.intergate-logistic.com'>www.intergate-logistic.com</a></td>
+                    </tr>
+                    <tr>
+                        <td style='font-weight: bold;'>Mail:</td>
+                        <td><a href='mailto:transport2@intergate-logistic.com'>transport2@intergate-logistic.com</a></td>
+                    </tr>
+                    <tr>
+                        <td style='font-weight: bold;'>Skype:</td>
+                        
+                        <td><a href='skype:intergate.logistic1?chat'>intergate.logistic1</a></td>
+                    </tr>
+                    <tr>
+                        <td style='font-weight: bold;'>VAT:</td>
+                        <td>FR95527908883</td>
+                    </tr>
+                    <tr>
+                        <td style='font-weight: bold;'>DUNS:</td>
+                        <td>262558982</td>
+                    </tr>
+                    <tr>
+                        <td style='font-weight: bold;'>CMR Insurance:</td>
+                        <td>1.000.000 €</td>
+                    </tr>
+                    <tr>
+                        <td style='font-weight: bold;'>Capital:</td>
+                        <td>258.000 €</td>
+                    </tr>
+                    <tr>
+                        <td colspan='2'>INTERGATE LOGISTIC - <span style='color: #6359ab; text-decoration: underline;'>149 route de Melun, 91250 Saintry sur Seine, France</span> - 91008 EVRY CEDEX France</td>
+                    </tr>
+                </table>
+            </td>
+        </tr>";
+
+        $finalStr .= $signature;
+
+        return json_encode(array("list" => $finalStr, "typeList" => $typeList, "todaysDate" => date('d-m-Y'), "error" => 0));
+        exit;
     }
 }

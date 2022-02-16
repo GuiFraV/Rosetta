@@ -125,7 +125,12 @@
                 <input class="form-check-input" type="checkbox"  name="intergateTruck" id="intergateTruck" value="1">
                 <label class="form-check-label" for="usedcars">Intergate Truck</label>
               </div>
-            @endif              
+            @endif
+            &nbsp &nbsp
+            <div class="my-auto">
+              <input class="form-check-input" type="checkbox"  name="urgentRoute" id="urgentRoute" value="1">
+              <label class="form-check-label" for="urgentRoute">Urgent</label>
+            </div>             
         </div>        
       </div>   
       <br>   

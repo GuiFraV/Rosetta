@@ -142,6 +142,11 @@
                   <label class="form-check-label" for="usedcars">Intergate Truck</label>
                 </div>
               @endif
+              &nbsp &nbsp
+              <div class="my-auto">
+                <input class="form-check-input" type="checkbox"  name="urgentRoute" id="urgentRoute" value="1">
+                <label class="form-check-label" for="urgentRoute">Urgent</label>
+              </div>
             </div>              
             <br>   
             <br>   
@@ -175,6 +180,7 @@
     $("#btnradio1, #btnradio2, #btnradio3, #btnradio4, #btnradio5, #btnradio6, #btnradio7, #btnradio8, #btnradio9, #btnradio10, #btnradio11, #btnradio12").prop("checked", false);
     $("#usedcars").prop("checked", false);     
     $("#intergateTruck").prop("checked", false);
+    $("#urgentRoute").prop("checked", false);
     $("#trip_comment").val('');
   }
 
@@ -220,6 +226,8 @@
             $("#usedcars").prop("checked", true ); 
           if(data.trajet.intergate_truck)
             $("#intergateTruck").prop("checked", true);
+          if(data.trajet.urgent)
+            $("#urgentRoute").prop("checked", true ); 
           $("#trip_comment").val(data.trajet.comment);
           $('#editRouteModal').modal('show');
           return 0;          
@@ -243,6 +251,7 @@
     let vanNumber = $("input[name='btnradio']:checked").val(); 
     let intergateTruck = $('#intergateTruck').prop('checked') ? 1 : 0;
     let used_cars = $('#usedcars').prop('checked') ? 1 : 0;
+    let urgent = $('#urgentRoute').prop('checked') ? 1 : 0;
     let comment_trajet = $('#trip_comment').val();
     
     let boolCheck = false;
@@ -305,6 +314,7 @@
     fd.append("vanNumber", vanNumber);
     fd.append("intergateTruck", intergateTruck);
     fd.append("used_cars", used_cars);
+    fd.append("urgent", urgent);
     fd.append("comment_trajet", comment_trajet);    
     
     toastr.info("This operation can take time, please be patient.");

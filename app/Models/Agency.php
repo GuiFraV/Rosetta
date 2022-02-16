@@ -9,8 +9,10 @@ class Agency extends Model
 {
     use HasFactory;
     protected $table = 'agencies';
-
+    
     protected $fillable = [
     	'agency_name'
     ];
+
+    public $timestamps = false;
 }
