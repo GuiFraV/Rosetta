@@ -126,7 +126,6 @@ class TrajetController extends Controller
      */
     public function store(Request $request)
     {        
-
         // Var attribution for validation and insert
         $date_depart = $request->date_depart;
         $from_others = $request->from_cities;

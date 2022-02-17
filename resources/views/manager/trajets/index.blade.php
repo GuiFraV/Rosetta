@@ -72,84 +72,84 @@
     <br/><br/>
 
 
-<!-- Filter -->
-<div class="collapse" id="searchFiltersCollapse">
-      <div class="card card-body" style="display: flex; justify-content: space-around;">
-        <form action="{{ route('manager.trajets.index') }}" method="GET" style="display: flex; justify-content: space-around;">
-          <div class="container">
-            <div class="row">
-              <div class="col">
-                <label class="control-label" for="srcDepartureCity" ">From</label>                    
-                <div class="card">
-                  <div class="card-body from_card">
-                    <div class="form-group">
-                      <select id="srcDepartureCountry"  class="selectpicker form-control form-select" name="srcDepartureCountry" data-live-search="true" title="Select Country" >
-                        @foreach ($countries as $country)
-                          <option value={{$country->code}} >{{$country->fullname}}</option>
-                        @endforeach
-                      </select>
+  <!-- Filter -->
+  <div class="collapse" id="searchFiltersCollapse">
+        <div class="card card-body" style="display: flex; justify-content: space-around;">
+          <form action="{{ route('manager.trajets.index') }}" method="GET" style="display: flex; justify-content: space-around;">
+            <div class="container">
+              <div class="row">
+                <div class="col">
+                  <label class="control-label" for="srcDepartureCity" ">From</label>                    
+                  <div class="card">
+                    <div class="card-body from_card">
+                      <div class="form-group">
+                        <select id="srcDepartureCountry"  class="selectpicker form-control form-select" name="srcDepartureCountry" data-live-search="true" title="Select Country" >
+                          @foreach ($countries as $country)
+                            <option value={{$country->code}} >{{$country->fullname}}</option>
+                          @endforeach
+                        </select>
+                      </div>
+                      <input id="srcDepartureCity" type="text"  placeholder="Enter a city" name="srcDepartureCity" autocomplete="off" runat="server"/>  
                     </div>
-                    <input id="srcDepartureCity" type="text"  placeholder="Enter a city" name="srcDepartureCity" autocomplete="off" runat="server"/>  
-                  </div>
-                </div>          
-              </div>
-              <div class="col">
-                <label class="control-label" for="srcArrivalCity">To</label>                    
-                <div class="card">
-                  <div class="card-body to_card">
-                    <div class="form-group">
-                      <select id="srcArrivalCountry"  class="selectpicker form-control form-select" name="srcArrivalCountry" data-live-search="true"  title="Select Country" >
-                        @foreach ($countries as $country)
-                          <option value={{$country->code}} >{{$country->fullname}}</option>
-                        @endforeach
-                      </select>
-                    </div>
-                    <input id="srcArrivalCity" type="text"  placeholder="Enter a city" name="srcArrivalCity" autocomplete="off" runat="server"/>  
-                  </div>
-                </div>          
-              </div>
-              <div class="col">
-                <!-- Manager Search zone -->
-                <div class="row">
-                  <!-- Title Manager -->
-                  <label for="srcManager" class="form-label" style="margin: 0;">Manager</label>
-                  <!-- Input Select Manager -->
-                  <select class="form-select" name="srcManager" id="srcManager" style="display: block; width: 100%; padding: .375rem .75rem; font-size: 1rem; font-weight: 400; line-height: 1.5; color: #212529; background-color: #fff; background-clip: padding-box; border: 1px solid #ced4da; -webkit-appearance: none;    -moz-appearance: none;    appearance: none;    border-radius: .25rem;    transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;">
-                    <option value="" selected>Select a manager</option>
-                    @foreach (getallmanagers() as $item)
-                      <option value="{{$item->id}}">{{$item->first_name}} {{$item->last_name}}</option>
-                    @endforeach
-                  </select>
-                </div>    
-                <!-- Input Select a Zone -->
-                <div class="row">
-                  <label for="srcZone" class="form-label" style="margin-bottom: 0; margin-top: 2%;">Zone</label>
-                  <select class="form-select" name="srcZone" id="srcZone" style="display: block; width: 100%; padding: .375rem .75rem; font-size: 1rem; font-weight: 400; line-height: 1.5; color: #212529; background-color: #fff; background-clip: padding-box; border: 1px solid #ced4da; -webkit-appearance: none;    -moz-appearance: none;    appearance: none;    border-radius: .25rem;    transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;">
-                    <option value="" selected>Select a zone</option>
-                    @foreach ($zones as $zone)
-                      <option value="{{$zone->id}}">{{$zone->zone_name}}</option>
-                    @endforeach
-                  </select>
+                  </div>          
                 </div>
-              </div>
-              <!-- Div Date -->
-              <div class="col" style="display: flex; flex-direction:column; align-items: center; justify-content: space-between; margin-left: 10px; ">
-                <!-- Label pour rechercher l'input -->
-                  <div class="row" style="display: flex; justify-content: center;">
-                  <label class="control-label" for="srcDate" style="margin: 0;">Date</label>    
-                    <input id="in" class="form-select" type="date" placeholder="Default input" name="srcDate">
+                <div class="col">
+                  <label class="control-label" for="srcArrivalCity">To</label>                    
+                  <div class="card">
+                    <div class="card-body to_card">
+                      <div class="form-group">
+                        <select id="srcArrivalCountry"  class="selectpicker form-control form-select" name="srcArrivalCountry" data-live-search="true"  title="Select Country" >
+                          @foreach ($countries as $country)
+                            <option value={{$country->code}} >{{$country->fullname}}</option>
+                          @endforeach
+                        </select>
+                      </div>
+                      <input id="srcArrivalCity" type="text"  placeholder="Enter a city" name="srcArrivalCity" autocomplete="off" runat="server"/>  
+                    </div>
+                  </div>          
+                </div>
+                <div class="col">
+                  <!-- Manager Search zone -->
+                  <div class="row">
+                    <!-- Title Manager -->
+                    <label for="srcManager" class="form-label" style="margin: 0;">Manager</label>
+                    <!-- Input Select Manager -->
+                    <select class="form-select" name="srcManager" id="srcManager" style="display: block; width: 100%; padding: .375rem .75rem; font-size: 1rem; font-weight: 400; line-height: 1.5; color: #212529; background-color: #fff; background-clip: padding-box; border: 1px solid #ced4da; -webkit-appearance: none;    -moz-appearance: none;    appearance: none;    border-radius: .25rem;    transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;">
+                      <option value="" selected>Select a manager</option>
+                      @foreach (getallmanagers() as $item)
+                        <option value="{{$item->id}}">{{$item->first_name}} {{$item->last_name}}</option>
+                      @endforeach
+                    </select>
+                  </div>    
+                  <!-- Input Select a Zone -->
+                  <div class="row">
+                    <label for="srcZone" class="form-label" style="margin-bottom: 0; margin-top: 2%;">Zone</label>
+                    <select class="form-select" name="srcZone" id="srcZone" style="display: block; width: 100%; padding: .375rem .75rem; font-size: 1rem; font-weight: 400; line-height: 1.5; color: #212529; background-color: #fff; background-clip: padding-box; border: 1px solid #ced4da; -webkit-appearance: none;    -moz-appearance: none;    appearance: none;    border-radius: .25rem;    transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;">
+                      <option value="" selected>Select a zone</option>
+                      @foreach ($zones as $zone)
+                        <option value="{{$zone->id}}">{{$zone->zone_name}}</option>
+                      @endforeach
+                    </select>
                   </div>
-                  <div style="display: flex; width: 100%; justify-content: space-around;">
-                    <a class="btn btn-warning" href="/manager/trajets">Reset</a>                
-                    <button class="btn btn-primary" type="submit">Search</button>
-                  </div>
-              </div>             
-             </div>   
-          </div>                      
-        </form>
+                </div>
+                <!-- Div Date -->
+                <div class="col" style="display: flex; flex-direction:column; align-items: center; justify-content: space-between; margin-left: 10px; ">
+                  <!-- Label pour rechercher l'input -->
+                    <div class="row" style="display: flex; justify-content: center;">
+                    <label class="control-label" for="srcDate" style="margin: 0;">Date</label>    
+                      <input id="in" class="form-select" type="date" placeholder="Default input" name="srcDate">
+                    </div>
+                    <div style="display: flex; width: 100%; justify-content: space-around;">
+                      <a class="btn btn-warning" href="/manager/trajets">Reset</a>                
+                      <button class="btn btn-primary" type="submit">Search</button>
+                    </div>
+                </div>             
+              </div>   
+            </div>                      
+          </form>
+        </div>
       </div>
-    </div>
-<!-- End filter -->
+  <!-- End filter -->
 
 
   </div>
@@ -251,8 +251,8 @@
   <textarea id="routesTextCopy" style="display: none;"></textarea>
 </div>
 
-  
-<div class="position-sticky float-end text-center" style="bottom: 7%; margin-right: 3.25%;  margin-bottom: -30%;">
+  <!-- Start Anchors -->
+<div class="position-sticky float-end" style="bottom: 15%; margin-right:1%; margin-bottom: -30%;">
   <div class="col">
     <div class="row">
       <a role="button" class="btn btn-outline-primary" style="width: 70%; height: 75%; font-size: 50%;" onclick="$('html,body').animate({scrollTop: $('#zone1').offset().top},'fast');">Z1</a>
@@ -272,14 +272,16 @@
     <div class="row">
       <a role="button" class="btn btn-outline-primary" style="width: 70%; height: 75%; font-size: 50%;" onclick="$('html,body').animate({scrollTop: $('#zone6').offset().top},'fast');">PT</a>
     </div>
-    <div class="row" style="padding-bottom: 750%;">
+    <div class="row" style="padding-bottom: 200px;">
       <a role="button" class="btn btn-outline-primary" style="width: 70%; height: 75%; font-size: 50%;" onclick="$('html,body').animate({scrollTop: $('#zone7').offset().top},'fast');">IT</a>
     </div>
-    <div class="row">
+    <div class="row" style="border: 1px solid black;">
       <a role="button" class="bi bi-arrow-up-circle text-primary float-end" style="font-size: 1.5rem;" onclick="$('html,body').animate({scrollTop: $('html').offset().top},'fast');"></a>
     </div>
   </div>
 </div>
+
+<!-- End Anchors -->
 
 @include('manager.trajets.modals.edit')
 @include('manager.trajets.modals.destroy')
