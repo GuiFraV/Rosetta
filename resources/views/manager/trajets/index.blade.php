@@ -69,15 +69,17 @@
       <button class="btn btn-danger float-end" type="button" onclick="location.reload();">Refresh</button>  
       {{-- <button class="btn btn-primary float-end" type="button" style="margin-right: 4px;" onclick="duplicateAll()">Duplicate All</button> --}}
     </form>  
-    <br>
+    <br/><br/>
 
-    <div class="collapse" id="searchFiltersCollapse">
-      <div class="card card-body">
-        <form action="{{ route('manager.trajets.index') }}" method="GET" style="display: inline;">
+
+<!-- Filter -->
+<div class="collapse" id="searchFiltersCollapse">
+      <div class="card card-body" style="display: flex; justify-content: space-around;">
+        <form action="{{ route('manager.trajets.index') }}" method="GET" style="display: flex; justify-content: space-around;">
           <div class="container">
             <div class="row">
               <div class="col">
-                <label class="control-label" for="srcDepartureCity">From</label>                    
+                <label class="control-label" for="srcDepartureCity" ">From</label>                    
                 <div class="card">
                   <div class="card-body from_card">
                     <div class="form-group">
@@ -107,17 +109,21 @@
                 </div>          
               </div>
               <div class="col">
-                <div class="row" style="padding-bottom: 2%;">
-                  <label for="srcManager" class="form-label">Manager</label>
+                <!-- Manager Search zone -->
+                <div class="row">
+                  <!-- Title Manager -->
+                  <label for="srcManager" class="form-label" style="margin: 0;">Manager</label>
+                  <!-- Input Select Manager -->
                   <select class="form-select" name="srcManager" id="srcManager" style="display: block; width: 100%; padding: .375rem .75rem; font-size: 1rem; font-weight: 400; line-height: 1.5; color: #212529; background-color: #fff; background-clip: padding-box; border: 1px solid #ced4da; -webkit-appearance: none;    -moz-appearance: none;    appearance: none;    border-radius: .25rem;    transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;">
                     <option value="" selected>Select a manager</option>
                     @foreach (getallmanagers() as $item)
                       <option value="{{$item->id}}">{{$item->first_name}} {{$item->last_name}}</option>
                     @endforeach
-                  </select>    
-                </div>                
-                <div class="row" style="padding-top: 2%;">
-                  <label for="srcZone" class="form-label">Zone</label>
+                  </select>
+                </div>    
+                <!-- Input Select a Zone -->
+                <div class="row">
+                  <label for="srcZone" class="form-label" style="margin-bottom: 0; margin-top: 2%;">Zone</label>
                   <select class="form-select" name="srcZone" id="srcZone" style="display: block; width: 100%; padding: .375rem .75rem; font-size: 1rem; font-weight: 400; line-height: 1.5; color: #212529; background-color: #fff; background-clip: padding-box; border: 1px solid #ced4da; -webkit-appearance: none;    -moz-appearance: none;    appearance: none;    border-radius: .25rem;    transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;">
                     <option value="" selected>Select a zone</option>
                     @foreach ($zones as $zone)
@@ -126,15 +132,26 @@
                   </select>
                 </div>
               </div>
-              <div class="col-sm" style="display: flex; align-items: center;">
-                  <a class="btn btn-warning my-auto" href="/manager/trajets" style="margin-left: 25%; margin-right: 6%;">Reset</a>
-                  <button class="btn btn-primary my-auto" type="submit" style="margin-right: 25%; margin-left: 6%;">Search</button>                
-              </div>
-            </div>   
+              <!-- Div Date -->
+              <div class="col" style="display: flex; flex-direction:column; align-items: center; justify-content: space-between; margin-left: 10px; ">
+                <!-- Label pour rechercher l'input -->
+                  <div class="row" style="display: flex; justify-content: center;">
+                  <label class="control-label" for="srcDate" style="margin: 0;">Date</label>    
+                    <input id="in" class="form-select" type="date" placeholder="Default input" name="srcDate">
+                  </div>
+                  <div style="display: flex; width: 100%; justify-content: space-around;">
+                    <a class="btn btn-warning" href="/manager/trajets">Reset</a>                
+                    <button class="btn btn-primary" type="submit">Search</button>
+                  </div>
+              </div>             
+             </div>   
           </div>                      
         </form>
       </div>
     </div>
+<!-- End filter -->
+
+
   </div>
   @if (json_decode($data) == [])
     <div class="container text-center">
@@ -313,6 +330,11 @@
     if(searchParams.get("srcZone") != "") {
       $('#srcZone option[value="'+searchParams.get("srcZone")+'"]').prop('selected', true);
     }
+
+    if(searchParams.get("srcDate") != "") {
+      $('#srcDate option[value="'+searchParams.get("srcDate")+'"]').prop('selected', true);
+    }
+
   });
 
   // Init of the Google Maps API for city autocomplete

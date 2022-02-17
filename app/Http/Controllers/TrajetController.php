@@ -28,7 +28,7 @@ class TrajetController extends Controller
         $zones = Zone::get(['zones.id', 'zones.zone_name']);
 
         $results = Trajet::query();
-        $results->join('zones', 'zones.id', '=', 'trajets.zone_id');
+        $results->join('zones', '.zone_id', '=', 'trajets.zone_id');
         $results->where('trajets.visible', ">=", '0');
         
         $srcCount = 0;
@@ -56,6 +56,11 @@ class TrajetController extends Controller
         
         if ($request->srcZone != null) {
             $results = $results->where('trajets.zone_id', '=', $request->srcZone);
+            $srcCount++;
+        }
+
+        if ($request->srcDate != null) {
+            $results = $results->where('trajets.date_depart', '=', $request->srcDate);
             $srcCount++;
         }
         
