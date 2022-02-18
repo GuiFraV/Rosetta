@@ -151,7 +151,7 @@
       </div>
   <!-- End filter -->
 
-
+<!-- Table Manager -->
   </div>
   @if (json_decode($data) == [])
     <div class="container text-center">
@@ -214,12 +214,24 @@
                     <span class="fas fa-star" style="align-self: center" title="***"></span>
                   @endif
                 </td>                  
-                <td style="font-size: 75%">{{ date('H:i', strtotime($key->created_at)) }}</td>                  
+                <td style="font-size: 75%">{{ date('H:i', strtotime($key->created_at)) }}</td>  
+
+                  <!-- Start Comments -->
+
                 <td>
                   @if (isset($key->comment))
                     <a role="button" class="bi bi-chat-square-text text-warning" style="font-size: 1.4rem;" id="buttonComment" onclick="" data-bs-toggle="tooltip" title="" data-bs-original-title="{{ $key->comment }}"></a>
                   @endif
                 </td>
+
+                <td >
+                  @if (isset($key->private_comment))
+                    <a role="button" class="bi bi-chat-square-text" style="font-size: 1.4rem; color: #C069FA;" id="buttonComment" onclick="" data-bs-toggle="tooltip" title="" data-bs-original-title="{{ $key->private_comment }}"></a>
+                  @endif
+                </td>
+
+                  <!-- End Comments  -->
+
                 <td>                  
                   @if (!isset($key->matched_to) && $key->manager_id === getManagerId())
                     <a role="button" class="bi bi-arrows-collapse text-success" style="font-size: 1.4rem;" title="Match" onclick="openMatchModal({{ $key->id }}); $('#idInitialElementMatch').val({{ $key->id }}); $('#maxKilometersMatch').val(150); $('#actualRangeVal').html('150Km');"></a>               
@@ -250,6 +262,7 @@
   @endif
   <textarea id="routesTextCopy" style="display: none;"></textarea>
 </div>
+<!-- End Table Manager -->
 
   <!-- Start Anchors -->
 <div class="position-sticky float-end" style="bottom: 15%; margin-right:1%; margin-bottom: -30%;">
@@ -275,7 +288,7 @@
     <div class="row" style="padding-bottom: 200px;">
       <a role="button" class="btn btn-outline-primary" style="width: 70%; height: 75%; font-size: 50%;" onclick="$('html,body').animate({scrollTop: $('#zone7').offset().top},'fast');">IT</a>
     </div>
-    <div class="row" style="border: 1px solid black;">
+    <div class="row">
       <a role="button" class="bi bi-arrow-up-circle text-primary float-end" style="font-size: 1.5rem;" onclick="$('html,body').animate({scrollTop: $('html').offset().top},'fast');"></a>
     </div>
   </div>

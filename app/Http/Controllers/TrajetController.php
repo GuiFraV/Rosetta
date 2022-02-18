@@ -65,7 +65,7 @@ class TrajetController extends Controller
         }
         
         $results->orderBy('trajets.id', 'DESC');
-        $data = $results->get(['trajets.id','trajets.date_depart','zones.zone_name', 'trajets.manager_id', 'trajets.from_others','trajets.to_others','trajets.distance','trajets.duration','trajets.key','trajets.stars','trajets.comment','trajets.vans','trajets.full_load','trajets.used_cars','trajets.urgent', 'trajets.visible', 'trajets.created_at', 'trajets.matched_to']);
+        $data = $results->get(['trajets.id','trajets.date_depart','zones.zone_name', 'trajets.manager_id', 'trajets.from_others','trajets.to_others','trajets.distance','trajets.duration','trajets.key','trajets.stars','trajets.comment','trajets.private_comment','trajets.vans','trajets.full_load','trajets.used_cars','trajets.urgent', 'trajets.visible', 'trajets.created_at', 'trajets.matched_to']);
         
         return view('manager.trajets.index', compact('zones') , compact('data'))->with('type_manager', $type_manager)->with('countries', $countries)->with('srcCount', $srcCount); 
     }
@@ -170,7 +170,12 @@ class TrajetController extends Controller
 
         $key = ($request->key_radios === "key") ? 1 : 0;        
         $stars = $request->stars_select;
+
+        // Comment trajet : 
         $comment = $request->comment_trajet;
+
+        // Private Comment :
+        $Pcomment = $request->private_comment;
         
         $vehicles = $request->btnradio;
         $full_load = 0;
@@ -229,8 +234,6 @@ class TrajetController extends Controller
             return redirect()->route('manager.trajets.index')->with('validationError', 'Form error! The number of vehicles is incorrect.');
         }
         
-        // dd($request);
-
         // Insertion
         $insertData = Trajet::insert([
             'date_depart' => $date_depart,
@@ -245,12 +248,13 @@ class TrajetController extends Controller
             'key' => $key,
             'stars' => $stars,                
             'comment' => $comment ,
+            'private_comment' => $Pcomment,
             'vans' => $vehicles,
             'full_load' => $full_load,
             'used_cars' => $used_cars,
             'urgent' => $urgent
         ]);
-        // dd($insertData);
+
         return redirect()->route('manager.trajets.index')->with('created','The road has been created successfully.');        
     }
 

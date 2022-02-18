@@ -133,11 +133,26 @@
             </div>             
         </div>        
       </div>   
-      <br>   
-      <div class="form-group"><label class="control-label" for="trip_comment">Comment</label> <input type="text" id="trip_comment" name="comment_trajet" class="form-control" /></div>
+      <br> 
+
+      <!-- Comment  -->
+
+      <div class="form-group">
+        <label class="control-label" for="trip_comment">Comment</label> 
+        <input type="text" id="trip_comment" name="comment_trajet" class="form-control" />
+      </div>
+
+      <div class="form-group">
+        <label class="control-label" for="trip_comment">Private Comment</label> 
+        <input type="text" id="trip_comment" name="private_comment" class="form-control" />
+      </div> 
+
+      <!-- End -->
+
       <div class="text-center p-3">
         <button type="button" class="btn btn-primary" id="btnSubmitRoad">Create</button>
       </div>
+
     </form>
   </div>
 </div>
