@@ -62,7 +62,7 @@
                 <input type="date" name="date_depart" id="date_depart" min="{{ date('Y-m-d') }}" style="display: block; width: 100%; padding: .375rem .75rem; font-size: 1rem; font-weight: 400; line-height: 1.5; color: #212529; background-color: #fff;    background-clip: padding-box;    border: 1px solid #ced4da;    -webkit-appearance: none;    -moz-appearance: none;    appearance: none;    border-radius: .25rem;    transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;" value="{{ date('Y-m-d') }}">                        
                 <div class="row">
                   <div class="col" style="margin-top: 10px;">
-                    <input class="form-check-input" type="radio" name="key_radios" id="key_id" value="key" checked>
+                    <input class="form-check-input" type="radio" name="key_radios" id="key_id" value="key">
                     <label class="form-check-label" for="key_id">Key</label>
                     <br>
                     <input class="form-check-input" type="radio" name="key_radios" id="conc_id" value="concurant">
@@ -149,11 +149,20 @@
               </div>
             </div>              
             <br>   
-            <br>   
+            <br>
+
+            <!-- Start Comments -->
             <div class="form-group">
               <label class="control-label" for="trip_comment">Comment</label> 
               <input type="text" id="trip_comment" name="comment_trajet" class="form-control"/>
-            </div>           
+            </div>
+            
+            <div class="form-group">
+              <label class="control-label" for="trip_privatecomment">Private Comment</label> 
+              <input type="text" id="trip_privatecomment" name="private_comment" class="form-control" />
+            </div> 
+            <!-- End Comments -->
+
           </div>
         </div>
 
@@ -182,6 +191,7 @@
     $("#intergateTruck").prop("checked", false);
     $("#urgentRoute").prop("checked", false);
     $("#trip_comment").val('');
+    $("#trip_privatecomment").val('');
   }
 
   $(function() {
@@ -193,6 +203,9 @@
   });
   
   function openModalEdit(id) {    
+
+    console.log('tu passes par là ?');
+
     $.ajax({
       async: true,
       type: "POST",
@@ -202,35 +215,73 @@
       cache: false,
       processData: false,
       contentType: false,    
-      success: function(data) {        
+      success: function(data) {
+
         if(data.error) {
-          toastr.warning(data.message);          
+
+          toastr.warning(data.message);
+
+          console.log("Par là aussi ?");  // pour comprendre par ou il passe ? 
+
           return 1;
-        } else {    
+
+        } else {  
+
           $('#editedId').val(id);
+           
           $('#date_depart').val(data.trajet.date_depart);
+
           $('#trip_additionalCityFrom').val(data.trajet.from_others);
+
           $('#trip_additionalCityTo').val(data.trajet.to_others);
+
           $('#trip_cityTo option[value="'+data.trajet.stars+'"]').prop('selected', true);
-          if(data.trajet.key === 0) {            
-            $("input[name=key_radios][value='concurant']").prop("checked", true);          
-          } else if (data.trajet.key === 1) {            
+
+
+          if(data.trajet.key === 0) {    
+            
+           
+                    
+          $("input[name=key_radios][value='concurant']").prop("checked", true); 
+
+          } else if (data.trajet.key === 1) {  
+
             $("input[name=key_radios][value='key']").prop("checked", true);
+
           }
           if(data.trajet.full_load) {
+
             $("#btnradio12").prop("checked",true);
+
           } else {
+
             $("#btnradio"+data.trajet.vans).prop("checked", true);
+
           }
           if(data.trajet.used_cars)
+
             $("#usedcars").prop("checked", true ); 
+
           if(data.trajet.intergate_truck)
+
             $("#intergateTruck").prop("checked", true);
+
           if(data.trajet.urgent)
+
             $("#urgentRoute").prop("checked", true ); 
-          $("#trip_comment").val(data.trajet.comment);
-          $('#editRouteModal').modal('show');
-          return 0;          
+
+            $("#trip_comment").val(data.trajet.comment);
+
+            $("#trip_privatecomment").val(data.trajet.private_comment); // le problème via la route data.trajet la valeur sort null ? PQ?
+
+            test = data.trajet;
+
+            console.log(test);
+
+            console.log("Par là ?"); 
+
+            $('#editRouteModal').modal('show');
+          return 0;    
         }
       },
       error: function (request, status, error) {
@@ -239,6 +290,7 @@
       }
     });
   }
+
    
   /// Form validation then sending via Ajax
   $("#btnSendEditRoute").click(function() {
@@ -253,7 +305,8 @@
     let used_cars = $('#usedcars').prop('checked') ? 1 : 0;
     let urgent = $('#urgentRoute').prop('checked') ? 1 : 0;
     let comment_trajet = $('#trip_comment').val();
-    
+    let private_comment = $('#trip_privatecomment').val();
+
     let boolCheck = false;
     
     if(tmpDepart === "") {
@@ -261,7 +314,7 @@
       boolCheck = true;
     }
 	
-	  let tmpToday = moment().format('YYYY-MM-DD');;
+	  let tmpToday = moment().format('YYYY-MM-DD');
 	  if(date_depart < tmpToday) {
 	  	toastr.warning("Form error! The departure date can't be before today's date.");
 	  	boolCheck = true;
@@ -315,8 +368,9 @@
     fd.append("intergateTruck", intergateTruck);
     fd.append("used_cars", used_cars);
     fd.append("urgent", urgent);
-    fd.append("comment_trajet", comment_trajet);    
-    
+    fd.append("comment_trajet", comment_trajet); 
+    fd.append("private_comment", private_comment); 
+
     toastr.info("This operation can take time, please be patient.");
 
     $.ajax({

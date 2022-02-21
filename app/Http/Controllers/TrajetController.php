@@ -173,7 +173,6 @@ class TrajetController extends Controller
 
         // Comment trajet : 
         $comment = $request->comment_trajet;
-
         // Private Comment :
         $Pcomment = $request->private_comment;
         
@@ -292,6 +291,7 @@ class TrajetController extends Controller
                       "key" => $trajet->key,
                       "stars" => $trajet->stars,
                       "comment" => $trajet->comment,
+                      "private_comment" => $trajet->private_comment,
                       "vans" => $trajet->vans,
                       "full_load" => $trajet->full_load,
                       "used_cars" => $trajet->used_cars,
@@ -321,7 +321,6 @@ class TrajetController extends Controller
         try {
             // Var attribution for validation  
             $trajet = Trajet::findOrFail($request->id);
-            
             $date_depart = $request->date_depart;
             $from_others = $request->from_cities;
             $to_others = $request->to_cities;
@@ -354,7 +353,12 @@ class TrajetController extends Controller
             
             $key = ($request->key_radios === "key") ? 1 : 0;        
             $stars = $request->stars;
+
+            // Comment 
             $comment = $request->comment_trajet;
+
+            // Private Comment:
+            $Pcomment = $request->private_comment;
 
             $vehicles = $request->vanNumber;
             $full_load = 0;
@@ -424,6 +428,7 @@ class TrajetController extends Controller
             $trajet->key = $key;
             $trajet->stars = $stars;            
             $trajet->comment = $comment;
+            $trajet->private_comment = $Pcomment;
             $trajet->vans = $vehicles;
             $trajet->full_load = $full_load;
             $trajet->used_cars = $used_cars;
@@ -464,9 +469,15 @@ class TrajetController extends Controller
                     $retHTML .= '<span class="fas fa-star" style="align-self: center" title="***"></span>';
                 $retHTML .= '</td>';
                 $retHTML .= '<td style="font-size: 75%">'.date('H:i', strtotime($trajet->created_at)).'</td>';
+
+                // Comment Start 
                 if (isset($trajet->comment))
                     $retHTML .= '<td><a role="button" class="bi bi-chat-square-text text-warning" style="font-size: 1.4rem;" id="buttonComment" onclick="" data-bs-toggle="tooltip" title="" data-bs-original-title="'. $trajet->comment .'"></a></td>';
                 else 
+
+                // End Comments
+
+
                     $retHTML .= '<td></td>';              
                 if (!isset($trajet->matched_to) && $trajet->manager_id === getManagerId())
                     $retHTML .= '<td><a role="button" class="bi bi-arrows-collapse text-success" style="font-size: 1.4rem;" title="Match" onclick="openMatchModal('.$trajet->id.'); $(\'#idInitialElementMatch\').val('. $trajet->id .'); $(\'#maxKilometersMatch\').val(150); $(\'#actualRangeVal\').html(\'150Km\');"></a></td>';

@@ -143,8 +143,8 @@
       </div>
 
       <div class="form-group">
-        <label class="control-label" for="trip_comment">Private Comment</label> 
-        <input type="text" id="trip_comment" name="private_comment" class="form-control" />
+        <label class="control-label" for="trip_privatecomment">Private Comment</label> 
+        <input type="text" id="trip_privatecomment" name="private_comment" class="form-control" />
       </div> 
 
       <!-- End -->
@@ -265,6 +265,8 @@
     let to_cities = $('#trip_additionalCityTo').val();    
     let vanNumber = $("input[name='btnradio']:checked").val();         
     let comment_trajet = $('#comment_trajet').val();
+    console.log("hellow");
+  
     
     let boolCheck = false;
     
