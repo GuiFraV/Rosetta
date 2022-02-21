@@ -62,11 +62,19 @@
                 <input type="date" name="date_depart" id="date_depart" min="{{ date('Y-m-d') }}" style="display: block; width: 100%; padding: .375rem .75rem; font-size: 1rem; font-weight: 400; line-height: 1.5; color: #212529; background-color: #fff;    background-clip: padding-box;    border: 1px solid #ced4da;    -webkit-appearance: none;    -moz-appearance: none;    appearance: none;    border-radius: .25rem;    transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;" value="{{ date('Y-m-d') }}">                        
                 <div class="row">
                   <div class="col" style="margin-top: 10px;">
-                    <input class="form-check-input" type="radio" name="key_radios" id="key_id" value="key">
-                    <label class="form-check-label" for="key_id">Key</label>
+
+                  <!-- Change Source -->
+
+                    <input class="form-check-input" type="checkbox" name="key_radios" id="key_id" value="key">
+                    <label class="form-check-label" for="key_id">Source</label>
+
                     <br>
-                    <input class="form-check-input" type="radio" name="key_radios" id="conc_id" value="concurant">
-                    <label class="form-check-label" for="conc_id">Concurant</label>            
+
+                    <!-- <input class="form-check-input" type="radio" name="key_radios" id="conc_id" value="concurant">
+                    <label class="form-check-label" for="conc_id">Concurant</label>  -->
+
+                  <!--End Change Source  -->
+                    
                   </div>
                   <div class="col">              
                     <label class="control-label required">Star(s)</label>
@@ -98,7 +106,7 @@
               <div id="collapseOne">
                 <label class="form-check-label" for="flexRadioDefault1">Number of vehicles :</label>
                 <br>
-                <div class="btn-group" role="group" >
+                <div class="btn-group" role="group">
                   <input type="radio" class="btn-check" name="btnradio" id="btnradio1" autocomplete="off" value="1"  >
                   <label class="btn btn-outline-primary" for="btnradio1">1</label>            
                   <input type="radio" class="btn-check" name="btnradio" id="btnradio2" autocomplete="off" value="2">
@@ -120,7 +128,7 @@
                   <input type="radio" class="btn-check" name="btnradio" id="btnradio10" autocomplete="off" value="10">
                   <label class="btn btn-outline-primary" for="btnradio10">10</label>
                   <input type="radio" class="btn-check" name="btnradio" id="btnradio11" autocomplete="off" value="11">
-                  <label class="btn btn-outline-primary" for="btnradio11">11</label>
+                  <label class="btn btn-outline-primary" for="btnradio11" style="border-top-right-radius: 10% !important; border-bottom-right-radius: 10% !important;">11</label>
                   &nbsp &nbsp
                   <div class="fullload">
                     <input type="checkbox" class="btn-check" name="btnradio" id="btnradio12" autocomplete="off">
@@ -203,9 +211,6 @@
   });
   
   function openModalEdit(id) {    
-
-    console.log('tu passes par là ?');
-
     $.ajax({
       async: true,
       type: "POST",
@@ -216,70 +221,37 @@
       processData: false,
       contentType: false,    
       success: function(data) {
-
         if(data.error) {
-
           toastr.warning(data.message);
-
-          console.log("Par là aussi ?");  // pour comprendre par ou il passe ? 
-
           return 1;
-
         } else {  
-
-          $('#editedId').val(id);
-           
+          $('#editedId').val(id);          
           $('#date_depart').val(data.trajet.date_depart);
-
           $('#trip_additionalCityFrom').val(data.trajet.from_others);
-
           $('#trip_additionalCityTo').val(data.trajet.to_others);
-
           $('#trip_cityTo option[value="'+data.trajet.stars+'"]').prop('selected', true);
 
-
           if(data.trajet.key === 0) {    
-            
-           
-                    
-          $("input[name=key_radios][value='concurant']").prop("checked", true); 
+                               
+            $("input[name=key_radios][value='key']").prop("checked", false); 
 
           } else if (data.trajet.key === 1) {  
 
             $("input[name=key_radios][value='key']").prop("checked", true);
-
           }
           if(data.trajet.full_load) {
-
             $("#btnradio12").prop("checked",true);
-
           } else {
-
             $("#btnradio"+data.trajet.vans).prop("checked", true);
-
           }
           if(data.trajet.used_cars)
-
             $("#usedcars").prop("checked", true ); 
-
           if(data.trajet.intergate_truck)
-
-            $("#intergateTruck").prop("checked", true);
-
+            $("#intergateTruck").prop("checked", true)
           if(data.trajet.urgent)
-
             $("#urgentRoute").prop("checked", true ); 
-
             $("#trip_comment").val(data.trajet.comment);
-
-            $("#trip_privatecomment").val(data.trajet.private_comment); // le problème via la route data.trajet la valeur sort null ? PQ?
-
-            test = data.trajet;
-
-            console.log(test);
-
-            console.log("Par là ?"); 
-
+            $("#trip_privatecomment").val(data.trajet.private_comment); 
             $('#editRouteModal').modal('show');
           return 0;    
         }
@@ -296,7 +268,7 @@
   $("#btnSendEditRoute").click(function() {
     let tmpDepart = $("[name='date_depart']").val();
     let date_depart = moment(tmpDepart).format('YYYY-MM-DD');
-    let key = $("input[name='key_radios']:checked").val();    
+    let key = $("input[name='key_radios']:checked").val();
     let stars = $('#trip_cityTo').val();
     let from_cities = $('#trip_additionalCityFrom').val();
     let to_cities = $('#trip_additionalCityTo').val();    
@@ -320,10 +292,10 @@
 	  	boolCheck = true;
 	  }
 
-    if(key != "key" && key != "concurant") {
-      toastr.warning("Form error! Please select a key.");
-      boolCheck = true;
-    }
+    // if(key != "key" && key != "concurant") {
+    //   toastr.warning("Form error! Please select a key.");
+    //   boolCheck = true;
+    // }
 
     if(stars === null || (stars != 1 && stars != 2 && stars != 3)) {
       toastr.warning("Form error! Please select a number of stars.");
@@ -370,7 +342,7 @@
     fd.append("urgent", urgent);
     fd.append("comment_trajet", comment_trajet); 
     fd.append("private_comment", private_comment); 
-
+    
     toastr.info("This operation can take time, please be patient.");
 
     $.ajax({

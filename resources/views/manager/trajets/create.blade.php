@@ -51,11 +51,19 @@
           <input type="date" name="date_depart" min="{{ date('Y-m-d') }}" style="display: block; width: 100%; padding: .375rem .75rem; font-size: 1rem; font-weight: 400; line-height: 1.5; color: #212529; background-color: #fff;    background-clip: padding-box;    border: 1px solid #ced4da;    -webkit-appearance: none;    -moz-appearance: none;    appearance: none;    border-radius: .25rem;    transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;" value="{{ date('Y-m-d') }}">                        
           <div class="row">
             <div class="col" style="margin-top: 10px;">
-              <input class="form-check-input" type="radio" name="key_radios" id="key_id" value="key">
-              <label class="form-check-label" for="key_id">Key</label>
+
+            <!-- Change Key -->
+
+              <input class="form-check-input" type="checkbox" name="key_radios" id="key_id" value="key">
+              <label class="form-check-label" for="key_id">Source</label>
+
               <br>
-              <input class="form-check-input" type="radio" name="key_radios" id="conc_id" value="concurant">
-              <label class="form-check-label" for="conc_id">Concurant</label>            
+
+              <!-- <input class="form-check-input" type="radio" name="key_radios" id="conc_id" value="concurant">
+              <label class="form-check-label" for="conc_id">Concurant</label>    -->
+            
+            <!-- End Change Key -->
+              
             </div>
             <div class="col">              
               <label class="control-label required">Star(s)</label>
@@ -264,9 +272,7 @@
     let from_cities = $('#trip_additionalCityFrom').val();
     let to_cities = $('#trip_additionalCityTo').val();    
     let vanNumber = $("input[name='btnradio']:checked").val();         
-    let comment_trajet = $('#comment_trajet').val();
-    console.log("hellow");
-  
+    let comment_trajet = $('#comment_trajet').val();  
     
     let boolCheck = false;
     
@@ -281,10 +287,10 @@
 	  	boolCheck = true;
 	  }
 
-    if(key != "key" && key != "concurant") {
-      toastr.warning("Form error! Please select a key.");
-      boolCheck = true;
-    }
+    // if(key != "key" && key != "concurant") {
+    //   toastr.warning("Form error! Please select a key.");
+    //   boolCheck = true;
+    // }
 
     if(stars === null || (stars != 1 && stars != 2 && stars != 3)) {
       toastr.warning("Form error! Please select a number of stars.");
