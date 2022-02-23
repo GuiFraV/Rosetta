@@ -268,6 +268,10 @@
     let tmpDepart = $("[name='date_depart']").val();
     let date_depart = moment(tmpDepart).format('YYYY-MM-DD');
     let key = $("input[name='key_radios']:checked").val();    
+
+    console.log(key);
+
+
     let stars = $('#trip_cityTo').val();
     let from_cities = $('#trip_additionalCityFrom').val();
     let to_cities = $('#trip_additionalCityTo').val();    

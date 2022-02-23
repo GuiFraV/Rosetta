@@ -73,7 +73,7 @@
 
 
   <!-- Filter -->
-  <div class="collapse" id="searchFiltersCollapse">
+  <div class="collapse" id="searchFiltersCollapse" >
         <div class="card card-body" style="display: flex; justify-content: space-around;">
           <form action="{{ route('manager.trajets.index') }}" method="GET" style="display: flex; justify-content: space-around;">
             <div class="container">
@@ -149,18 +149,19 @@
           </form>
         </div>
       </div>
-  <!-- End filter -->
-
-<!-- Table Manager -->
   </div>
+<!-- End filter -->
+  
+<!-- Table Manager -->
   @if (json_decode($data) == [])
     <div class="container text-center">
       <h1>Oops!</h1>
       <h2>There are no routes with this filter.</h2>
     </div>
   @else
-    <table class="table align-middle" >      
-      <tr>
+  <div style="border-radius: 5px;">
+    <table class="table table-hover" style="display:flex;" >      
+      <tr class="table table-striped">
         <th style="font-size: 85%"></th>
         <th style="font-size: 85%">Manager</th>
         <th style="font-size: 85%">Date of departure</th>
@@ -177,7 +178,7 @@
       </tr>      
       @foreach ($zones as $item)
         <tr class="table-light" id="zone{{ $item->id }}">
-          <th colspan="11" style="text-align: center">{{ $item->zone_name }}</th>            
+          <th colspan="100%" style="text-align: center; width: 100%;">{{ $item->zone_name }}</th>            
           @foreach ($data as $key)
             @if ($key->zone_name == $item->zone_name)
               <tr id="ln{{ $key->id }}" class="{{ isset($key->matched_to) ? 'text-decoration-line-through' : '' }} {{ ($key->urgent === 1) ? 'text-danger' : '' }}">
@@ -260,6 +261,7 @@
       @endforeach  
     </table>
   @endif
+</div>
   <textarea id="routesTextCopy" style="display: none;"></textarea>
 </div>
 <!-- End Table Manager -->

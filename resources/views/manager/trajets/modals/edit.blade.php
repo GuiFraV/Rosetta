@@ -10,8 +10,8 @@
 </style>
 
 <div class="modal fade" id="editRouteModal" data-bs-backdrop="static" aria-hidden="true" aria-labelledby="editRouteModalLabel" tabindex="-1">
-  <div class="modal-dialog modal-dialog-centered modal-dialog modal-lg">
-    <div class="modal-content">
+  <div class="modal-dialog modal-dialog-centered modal-dialog modal-lg" >
+    <div class="modal-content" >
       
       <div class="modal-header">
         <h5 class="modal-title" id="editRouteModalLabel">Edit a route</h5>
@@ -42,7 +42,7 @@
                 </div>                
               </div>
               <div class="col">
-                <label class="control-label required" for="trip_cityFrom">To</label>                
+                <label class="control-label required" for="trip_cityFrom">ToTest</label>                
                 <div class="card">
                   <div class="card-body to_card">
                     <div class="form-group">
@@ -231,14 +231,16 @@
           $('#trip_additionalCityTo').val(data.trajet.to_others);
           $('#trip_cityTo option[value="'+data.trajet.stars+'"]').prop('selected', true);
 
-          if(data.trajet.key === 0) {    
-                               
-            $("input[name=key_radios][value='key']").prop("checked", false); 
-
+          if(data.trajet.key === 0) {                                 
+            $("input[name=key_radios]").prop("checked", false); 
           } else if (data.trajet.key === 1) {  
-
-            $("input[name=key_radios][value='key']").prop("checked", true);
+            $("input[name=key_radios]").prop("checked", true);
           }
+
+          // if(data.trajet.key){
+          //   $("input[name=key_radios]").prop("checked", true);
+          // }
+
           if(data.trajet.full_load) {
             $("#btnradio12").prop("checked",true);
           } else {
@@ -268,13 +270,21 @@
   $("#btnSendEditRoute").click(function() {
     let tmpDepart = $("[name='date_depart']").val();
     let date_depart = moment(tmpDepart).format('YYYY-MM-DD');
-    let key = $("input[name='key_radios']:checked").val();
+
+    // Renvoi 1 lorsque c'est coché, renvoi 0 lorsque pas coché : 
+
+    let key = $("input[name=key_radios][value='key']").prop("checked") ? 1 : 0; // la donnée key à envoyer en bdd 
+  
     let stars = $('#trip_cityTo').val();
     let from_cities = $('#trip_additionalCityFrom').val();
     let to_cities = $('#trip_additionalCityTo').val();    
     let vanNumber = $("input[name='btnradio']:checked").val(); 
     let intergateTruck = $('#intergateTruck').prop('checked') ? 1 : 0;
+
+    // Used Car
     let used_cars = $('#usedcars').prop('checked') ? 1 : 0;
+
+
     let urgent = $('#urgentRoute').prop('checked') ? 1 : 0;
     let comment_trajet = $('#trip_comment').val();
     let private_comment = $('#trip_privatecomment').val();
